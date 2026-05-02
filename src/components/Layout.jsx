@@ -180,17 +180,17 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-slate-50 font-sans relative overflow-hidden">
+    <div className="relative min-h-screen bg-slate-50 font-sans">
       {/* Mobile Backdrop */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/50 z-[90] md:hidden backdrop-blur-sm transition-opacity"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar for Desktop and Mobile */}
-      <aside 
+      {/* Sidebar - Always on top */}
+      <aside
         className={`fixed inset-y-0 left-0 z-[100] h-screen bg-white border-r border-slate-100/50 transition-all duration-300 ease-in-out print:hidden flex flex-col ${
           isMobileOpen ? 'translate-x-0 w-72 shadow-2xl' : '-translate-x-full md:translate-x-0'
         } ${sidebarCollapsed ? 'md:w-20 md:shadow-sm' : 'md:w-72 md:shadow-xl'}`}
@@ -211,9 +211,9 @@ export default function Layout() {
               </div>
             )}
           </div>
-          
+
           {/* Mobile Close Button */}
-          <button 
+          <button
             className="md:hidden p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg absolute right-4"
             onClick={() => setIsMobileOpen(false)}
           >
@@ -221,7 +221,7 @@ export default function Layout() {
           </button>
 
           {/* Desktop Toggle Button */}
-          <button 
+          <button
             className="hidden md:flex absolute -right-3 top-8 bg-white border border-slate-200 text-slate-400 hover:text-emerald-800 hover:border-emerald-800 rounded-full p-1 shadow-sm transition-all z-10"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           >
@@ -231,7 +231,7 @@ export default function Layout() {
 
         <nav className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-4'} space-y-1 overflow-y-auto custom-scrollbar`}>
           {access.dashboard && <NavItem to="dashboard" icon={LayoutDashboard} label="Dashboard" collapsed={sidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          
+
           {/* Manajemen Data Section */}
           {(access.siswa || access.bukuKlaper || access.dkn) && (
             <>
@@ -315,11 +315,11 @@ export default function Layout() {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 min-h-screen overflow-x-hidden ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-72'}`}>
-        {/* Header Bar */}
-        <header className="bg-white sticky top-0 z-50 px-4 md:px-8 py-4 border-b border-slate-100 flex items-center justify-between print:hidden">
-          <div className="flex items-center gap-3">
+        {/* Header - Fixed, always on top */}
+      <header className={`bg-white fixed top-0 z-50 border-b border-slate-100 flex items-center justify-between print:hidden px-4 md:px-8 py-4 transition-all duration-300 left-0 right-0 ${
+        sidebarCollapsed ? 'md:left-20' : 'md:left-72'
+      }`}>
+        <div className="flex items-center gap-3">
             <button 
               className="md:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors"
               onClick={() => setIsMobileOpen(true)}
@@ -332,65 +332,67 @@ export default function Layout() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 group transition-all"
+            title="Cari Siswa... (Ctrl+K)"
+          >
+            <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          </button>
+
+          <div className="relative">
             <button
-              onClick={() => setIsSearchOpen(true)}
-              className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 group transition-all"
-              title="Cari Siswa... (Ctrl+K)"
+              onClick={() => setIsNotifOpen(!isNotifOpen)}
+              className={`relative p-2 rounded-xl transition-all ${isNotifOpen ? 'bg-emerald-100 text-emerald-900' : 'hover:bg-slate-50 hover:text-slate-400'}`}
             >
-              <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            </button>
-
-            <div className="relative">
-              <button
-                onClick={() => setIsNotifOpen(!isNotifOpen)}
-                className={`relative p-2 rounded-xl transition-all ${isNotifOpen ? 'bg-emerald-100 text-emerald-900' : 'hover:bg-slate-50 hover:text-slate-400'}`}
-              >
-                <Bell className="w-5 h-5 transition-transform group-hover:rotate-12" />
-                {notifications.some(n => !n.isRead) && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white shadow-sm animate-pulse z-10" />
-                )}
-              </button>
-
-              <NotificationDrawer
-                isOpen={isNotifOpen}
-                onClose={() => setIsNotifOpen(false)}
-                notifications={notifications}
-                onMarkAsRead={handleMarkAsRead}
-                onMarkAllAsRead={handleMarkAllAsRead}
-              />
-            </div>
-
-            <div className="h-4 w-px bg-slate-100 mx-1" />
-
-            <div className="text-right hidden sm:block">
-              <p className="text-[11px] font-black text-slate-900 leading-none">{user?.name}</p>
-              <div className="flex items-center justify-end gap-1.5 mt-1">
-                <p className="text-[9px] font-bold text-[#fdb813] uppercase tracking-widest">{role}</p>
-                {user?.managedClass && (
-                  <>
-                    <span className="text-[8px] text-slate-300">•</span>
-                    <span className="bg-emerald-100 text-emerald-900 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border border-emerald-200/50">
-                      Kelas {user.managedClass}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigate('/profile')}
-              className="w-10 h-10 rounded-2xl overflow-hidden hover:ring-4 hover:ring-emerald-50 transition-all border-2 border-white flex-shrink-0"
-            >
-              {user?.picture ? (
-                <img src={user.picture} alt="Profil" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-slate-100 flex items-center justify-center"><User className="w-5 h-5 text-slate-400" /></div>
+              <Bell className="w-5 h-5 transition-transform group-hover:rotate-12" />
+              {notifications.some(n => !n.isRead) && (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white shadow-sm animate-pulse z-10" />
               )}
             </button>
-          </div>
-        </header>
 
+            <NotificationDrawer
+              isOpen={isNotifOpen}
+              onClose={() => setIsNotifOpen(false)}
+              notifications={notifications}
+              onMarkAsRead={handleMarkAsRead}
+              onMarkAllAsRead={handleMarkAllAsRead}
+            />
+          </div>
+
+          <div className="h-4 w-px bg-slate-100 mx-1" />
+
+          <div className="text-right hidden sm:block">
+            <p className="text-[11px] font-black text-slate-900 leading-none">{user?.name}</p>
+            <div className="flex items-center justify-end gap-1.5 mt-1">
+              <p className="text-[9px] font-bold text-[#fdb813] uppercase tracking-widest">{role}</p>
+              {user?.managedClass && (
+                <>
+                  <span className="text-[8px] text-slate-300">•</span>
+                  <span className="bg-emerald-100 text-emerald-900 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border border-emerald-200/50">
+                    Kelas {user.managedClass}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-10 h-10 rounded-2xl overflow-hidden hover:ring-4 hover:ring-emerald-50 transition-all border-2 border-white flex-shrink-0 block"
+          >
+            {user?.picture ? (
+              <img src={user.picture} alt="Profil" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-slate-100 flex items-center justify-center"><User className="w-5 h-5 text-slate-400" /></div>
+            )}
+          </button>
+        </div>
+      </header>
+
+       {/* Main Content */}
+      <main className={`transition-all duration-300 min-h-screen overflow-x-hidden ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-72'} pt-20`}>
         <div className="p-4 sm:p-8 pb-8">
           <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
             <Outlet />
@@ -405,9 +407,9 @@ export default function Layout() {
         </div>
       </main>
 
-      <SearchModal 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
         students={students}
       />
       <Toast />
