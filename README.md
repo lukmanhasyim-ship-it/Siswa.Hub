@@ -34,9 +34,11 @@
 *   **Home Visit Evidence**: Fitur unggahan foto bukti kunjungan rumah langsung ke Google Drive melalui aplikasi, terintegrasi dengan laporan perkembangan siswa.
 *   **Automated Notifications**: Kirim pesan motivasi dan pengingat resmi secara otomatis kepada siswa dan pengurus kelas.
 
----
-
----
+### 📦 Sistem Pengarsipan Otomatis
+*   **Auto-Archive Monthly**: Sistem otomatis mengarsipkan data absensi dan keuangan bulan sebelumnya setiap tanggal 1.
+*   **Trigger Terjadwal**: Menggunakan Google Apps Script time-based trigger yang berjalan otomatis tanpa intervensi manual.
+*   **3 Archive Sheets**: Data diarsip ke sheet `Archive_Rekap_Absensi`, `Archive_Rekap_Keuangan`, dan `Archive_Detail_Absensi`.
+*   **Diagnosa Sistem**: Fungsi `diagnoseArchive()` tersedia untuk mengecek kesehatan sistem arsip kapan saja.
 
 ### 🛡️ Backup & Recovery (v4.9.5)
 *   **Database Backup Premium**: Export seluruh database ke dua format sekaligus (XLSX + SQL) untuk keamanan maksimal.
@@ -62,14 +64,14 @@
 
 ---
 
-## 🆕 What's New in v4.9.4
+## 🆕 What's New in v4.9.6
 
-### Fitur Draf Transaksi (Bulk Save)
-*   **Input Tanpa Reload**: Transaksi keuangan tidak langsung disimpan ke backend. Data ditampung dalam draf terlebih dahulu.
-*   **Tabel Draf Dinamis**: Draf transaksi ditampilkan dalam tabel berwarna amber di bawah riwayat keuangan dengan lebar menyesuaikan aplikasi.
-*   **Bulk Save**: Simpan semua draf sekaligus dengan tombol "Simpan Semua (X)" menggunakan fitur `BULK_CREATE` di Google Apps Script.
-*   **Hapus Individual**: Setiap draf memiliki tombol hapus (Trash2) untuk membatalkan draf tertentu dengan konfirmasi.
-*   **Notifikasi Otomatis**: Notifikasi dikirim ke pengurus kelas dan siswa setelah draf disimpan (bulk save).
+*   **Pembersihan Kode**: Menghapus sheet Lokasi yang tidak digunakan dari `setupSpreadsheet()` di Code.gs dan referensi di halaman Profil.
+*   **Sinkronisasi Dokumentasi**: Menyesuaikan struktur kolom sheet di README.md dengan `gas/Code.gs` agar akurat (Master_Siswa, Presensi, Log_Panggilan, Profil_Wali_Kelas).
+*   **Dokumentasi Sheet Archive**: Menambahkan 3 sheet arsip (Archive_Rekap_Absensi, Archive_Rekap_Keuangan, Archive_Detail_Absensi) ke panduan instalasi dan Fitur Unggulan.
+*   **Sistem Pengarsipan**: Menambahkan dokumentasi fitur pengarsipan otomatis bulanan ke Fitur Unggulan.
+*   **Atribusi AI**: Menambahkan keterangan "Aplikasi ini dibangun dengan bantuan AI" di akhir README.
+*   **Update Versi**: Memperbarui versi aplikasi ke 4.9.6 di package.json dan README.md.
 
 ---
 
@@ -80,17 +82,23 @@ Buat sebuah Google Spreadsheet baru. Tambahkan sheet-sheet berikut dengan nama d
 
 | Nama Sheet | Struktur Kolom (Header Baris 1) |
 | :--- | :--- |
-| **Master_Siswa** | ID_Siswa, NIS, NISN, Nama_Siswa, L/P, Email, Jabatan, Tempat_Lahir, Tanggal_Lahir, Tanggal_Masuk_X, Tanggal_Naik_XI, Tanggal_Naik_XII, Tanggal_Tamat_Sekolah, No_WA_Siswa, Nama_Wali, No_WA_Wali, Alamat, Latitude, Longitude, Lokasi, Status_Aktif, Last_Active, Keterangan, Created_At |
-| **Presensi** | ID_Presensi, Tanggal, ID_Siswa, Status_Pagi, Status_Siang, Keterangan, Timestamp_Pagi, Timestamp_Siang |
+| **Master_Siswa** | ID_Siswa, NIS, NISN, Nama_Siswa, L/P, Email, Jabatan, Tempat_Lahir, Tanggal_Lahir, No_WA_Siswa, Nama_Wali, No_WA_Wali, Alamat |
+| **Presensi** | ID_Presensi, Tanggal, ID_Siswa, NISN, Status_Pagi, Timestamp_Pagi, Status_Siang, Timestamp_Siang, Keterangan |
 | **Keuangan** | ID_Transaksi, Tanggal, ID_Siswa, NISN, Tipe, Jumlah, Keterangan |
 | **Daftar_Nilai** | ID_Nilai, ID_Siswa, NISN, Jenjang, Semester, Kategori_Mapel, Nama_Mapel, Topik, Nilai, Timestamp |
-| **Log_Panggilan** | ID_Panggilan, Tanggal, NISN, Kategori, Alasan, Tanggal_Pemanggilan, Hasil_Pertemuan, Status_Selesai, Bukti_File_URL |
-| **Profil_Wali_Kelas** | Id_Wali, Nama, Email, Bio, Gaya_Ajar, Kontak, Alamat, Latitude, Longitude, Lokasi, Nominal_Iuran, Kelas, Created_At |
+| **Log_Panggilan** | ID_Panggilan, Tanggal, ID_Siswa, NISN, Kategori, Alasan, Tanggal_Pemanggilan, Waktu_Diskusi, Hasil_Pertemuan, Status_Selesai, Bukti_File_URL |
+| **Profil_Wali_Kelas** | Id_Wali, Nama, Email, Bio, Gaya_Ajar, Kontak, Created_At, Nominal_Iuran, Kelas |
 | **Piket** | ID_Piket, Hari, ID_Siswa, Nama_Siswa, Email |
 | **Notifikasi** | ID, Message, Type, Target_Email, Is_Read, Timestamp, Target_Role, Role, Email |
+| **Archive_Rekap_Absensi** | ID_Siswa, Bulan, H, I, S, A, B |
+| **Archive_Rekap_Keuangan** | Bulan, Saldo_Awal, Total_Masuk, Total_Keluar, Saldo_Akhir |
+| **Archive_Detail_Absensi** | ID_Presensi, Tanggal, ID_Siswa, NISN, Status_Pagi, Timestamp_Pagi, Status_Siang, Timestamp_Siang, Keterangan |
 
 > [!IMPORTANT]
 > Pastikan kolom `Bukti_File_URL` di sheet `Log_Panggilan` tersedia untuk menyimpan link foto dokumentasi dari Google Drive.
+
+> [!NOTE]
+> Sheet Archive (Archive_Rekap_Absensi, Archive_Rekap_Keuangan, Archive_Detail_Absensi) akan dibuat **otomatis** saat proses pengarsipan bulanan dijalankan. Anda tidak perlu membuat sheet ini manual.
 
 ### 2. Konfigurasi Backend (Google Apps Script)
 1.  Buka Spreadsheet Anda, arahkan ke **Extensions** > **Apps Script**.
