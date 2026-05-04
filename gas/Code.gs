@@ -32,6 +32,121 @@ function buildHeaderIndex(headers) {
   return index;
 }
 
+function validatePresensiSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Presensi');
+  if (!sheet) return 'Sheet Presensi tidak ditemukan.';
+  
+  var expectedHeaders = ['ID_Presensi', 'Tanggal', 'ID_Siswa', 'NISN', 'Status_Pagi', 'Timestamp_Pagi', 'Status_Siang', 'Timestamp_Siang', 'Keterangan'];
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  
+  var missingHeaders = expectedHeaders.filter(function(h) {
+    return headers.indexOf(h) === -1;
+  });
+  
+  if (missingHeaders.length > 0) {
+    sheet.getRange(1, headers.length + 1, 1, missingHeaders.length).setValues([missingHeaders]);
+    return 'Ditambahkan kolom yang hilang: ' + missingHeaders.join(', ');
+  }
+  
+  return 'Struktur sheet Presensi sudah benar.';
+}
+
+function repairPresensiSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Presensi');
+  var expectedHeaders = ['ID_Presensi', 'Tanggal', 'ID_Siswa', 'NISN', 'Status_Pagi', 'Timestamp_Pagi', 'Status_Siang', 'Timestamp_Siang', 'Keterangan'];
+  
+  if (!sheet) {
+    sheet = ss.insertSheet('Presensi');
+    sheet.appendRow(expectedHeaders);
+    return 'Sheet Presensi dibuat dengan struktur yang benar.';
+  }
+  
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var missingHeaders = expectedHeaders.filter(function(h) {
+    return headers.indexOf(h) === -1;
+  });
+  
+  if (missingHeaders.length > 0) {
+    sheet.getRange(1, headers.length + 1, 1, missingHeaders.length).setValues([missingHeaders]);
+    return 'Ditambahkan kolom yang hilang: ' + missingHeaders.join(', ');
+  }
+  
+  return 'Tidak ada perbaikan yang diperlukan.';
+}
+
+function diagnosePresensiData() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Presensi');
+  if (!sheet) return 'Sheet Presensi tidak ditemukan.';
+  
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return 'Tidak ada data dalam sheet Presensi.';
+  
+  var headers = data[0];
+  var hMap = buildHeaderIndex(headers);
+  var idIdx = hMap['ID_Siswa'] !== undefined ? hMap['ID_Siswa'] : hMap['NISN'];
+  var statusPagiIdx = hMap['Status_Pagi'];
+  var statusSiangIdx = hMap['Status_Siang'];
+  
+  Logger.log('=== DIAGNOSA DATA PRESENSI ===');
+  Logger.log('Total baris data: ' + (data.length - 1));
+  Logger.log('Header ditemukan: ' + JSON.stringify(headers));
+  Logger.log('Index ID_Siswa/NISN: ' + idIdx);
+  Logger.log('Index Status_Pagi: ' + statusPagiIdx);
+  Logger.log('Index Status_Siang: ' + statusSiangIdx);
+  
+  var diagnosis = {
+    totalRows: data.length - 1,
+    rowsWithoutId: 0,
+    rowsWithAbsence: 0,
+    absenceStatuses: {},
+    sampleAbsenceRows: []
+  };
+  
+  for (var i = 1; i < data.length; i++) {
+    var sId = (data[i][idIdx] || '').toString();
+    if (!sId) {
+      diagnosis.rowsWithoutId++;
+      continue;
+    }
+    
+    var sp = (statusPagiIdx !== undefined ? data[i][statusPagiIdx] : '').toString().trim();
+    var ssv = (statusSiangIdx !== undefined ? data[i][statusSiangIdx] : '').toString().trim();
+    
+    if (sp && sp !== 'H') {
+      diagnosis.rowsWithAbsence++;
+      diagnosis.absenceStatuses[sp] = (diagnosis.absenceStatuses[sp] || 0) + 1;
+      if (diagnosis.sampleAbsenceRows.length < 5) {
+        diagnosis.sampleAbsenceRows.push({
+          row: i+1,
+          id: sId,
+          status: 'Pagi: ' + sp
+        });
+      }
+    }
+    if (ssv && ssv !== 'H') {
+      diagnosis.rowsWithAbsence++;
+      diagnosis.absenceStatuses[ssv] = (diagnosis.absenceStatuses[ssv] || 0) + 1;
+      if (diagnosis.sampleAbsenceRows.length < 5) {
+        diagnosis.sampleAbsenceRows.push({
+          row: i+1,
+          id: sId,
+          status: 'Siang: ' + ssv
+        });
+      }
+    }
+  }
+  
+  Logger.log('Baris tanpa ID: ' + diagnosis.rowsWithoutId);
+  Logger.log('Baris dengan ketidakhadiran: ' + diagnosis.rowsWithAbsence);
+  Logger.log('Status ketidakhadiran: ' + JSON.stringify(diagnosis.absenceStatuses));
+  Logger.log('Sample baris tidak hadir: ' + JSON.stringify(diagnosis.sampleAbsenceRows));
+  
+  return JSON.stringify(diagnosis);
+}
+
 function doGet(e) {
   return handleResponse(e);
 }
@@ -328,7 +443,7 @@ function bulkUpdatePresensi(dataList) {
   var sheet = ss.getSheetByName('Presensi');
   if (!sheet) {
     sheet = ss.insertSheet('Presensi');
-    sheet.appendRow(['ID_Presensi', 'Tanggal', 'NISN', 'Status_Pagi', 'Status_Siang', 'Keterangan', 'Timestamp_Pagi', 'Timestamp_Siang']);
+    sheet.appendRow(['ID_Presensi', 'Tanggal', 'ID_Siswa', 'NISN', 'Status_Pagi', 'Timestamp_Pagi', 'Status_Siang', 'Timestamp_Siang', 'Keterangan']);
   }
 
   var fullData = sheet.getDataRange().getValues();
@@ -869,7 +984,10 @@ function archiveAbsensi(ss, monthStr) {
     if (rowMonth !== monthStr) continue;
     
     var sId = (data[i][idIdx] || '').toString();
-    if (!sId) continue;
+    if (!sId) {
+      Logger.log('Baris ' + (i+1) + ': ID_Siswa/NISN kosong, dilewati.');
+      continue;
+    }
     
     if (!rekapMap[sId]) rekapMap[sId] = { H: 0, S: 0, I: 0, A: 0, B: 0 };
     
@@ -886,9 +1004,11 @@ function archiveAbsensi(ss, monthStr) {
     // Jika ada status tidak hadir, simpan detail barisnya
     if (combinedStatus['S'] || combinedStatus['I'] || combinedStatus['A'] || combinedStatus['B']) {
       rowsToMove.push(data[i]);
+      Logger.log('Baris ' + (i+1) + ': Status tidak hadir ditemukan (' + Object.keys(combinedStatus).join(',') + '), akan diarsip ke detail.');
     }
     
     rowsToDelete.push(i + 1); // +1 karena row di Sheet adalah 1-indexed
+    Logger.log('Baris ' + (i+1) + ': Akan dihapus dari sheet Presensi aktif.');
   }
   
   if (rowsToDelete.length === 0) return 'Tidak ada data bulan ' + monthStr + ' di sheet Presensi.';
