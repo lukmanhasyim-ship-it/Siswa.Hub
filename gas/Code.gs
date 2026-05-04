@@ -32,6 +32,25 @@ function buildHeaderIndex(headers) {
   return index;
 }
 
+function parseDateToMonth(rawDate) {
+  if (rawDate instanceof Date) {
+    return Utilities.formatDate(rawDate, Session.getScriptTimeZone(), 'yyyy-MM');
+  }
+  if (typeof rawDate === 'string') {
+    if (rawDate.indexOf('-') > -1) {
+      var parts = rawDate.split('-');
+      if (parts.length >= 2 && parts[0].length === 4 && parts[1].length === 2) {
+        return rawDate.substring(0, 7);
+      }
+    }
+    var d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      return Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyy-MM');
+    }
+  }
+  return '';
+}
+
 function doGet(e) {
   return handleResponse(e);
 }
@@ -121,6 +140,9 @@ function handleResponse(e) {
       RUN_MANUAL_ARCHIVE: function() {
         return { status: 'success', data: runMonthlyArchive(payload && payload.month) };
       },
+      DIAGNOSE_ARCHIVE: function() {
+        return { status: 'success', data: diagnoseArchive() };
+      },
       SETUP_TRIGGERS: function() {
         return { status: 'success', data: setupArchiveTriggers() };
       },
@@ -177,20 +199,11 @@ function readData(sheetName) {
     var row = data[i];
     var obj = {};
     for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = row[j];
+      var header = headers[j];
+      var value = row[j];
       
-      // Auto format JS Date to YYYY-MM-DD, except for timestamp columns
-      if (headers[j] !== 'Timestamp_Pagi' && headers[j] !== 'Timestamp_Siang' && obj[headers[j]] instanceof Date) {
-        var d = obj[headers[j]];
-        var month = '' + (d.getMonth() + 1);
-        var day = '' + d.getDate();
-        var year = d.getFullYear();
-
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-
-        obj[headers[j]] = [year, month, day].join('-');
-      }
+      // Use formatDateValue for consistent date formatting
+      obj[header] = formatDateValue(value, header);
     }
     result.push(obj);
   }
@@ -272,16 +285,7 @@ function updateData(sheetName, id, updateObj) {
 
     var headers = data[0];
     var headerMap = buildHeaderIndex(headers);
-    var pkIndex = 0; 
-
-    // Auto-detect PK index if the first column isn't it
-    if (headerMap['ID_' + sheetName.replace('Log_', '')] !== undefined) {
-      pkIndex = headerMap['ID_' + sheetName.replace('Log_', '')];
-    } else if (headerMap['ID'] !== undefined) {
-      pkIndex = headerMap['ID'];
-    } else if (headerMap['ID_Transaksi'] !== undefined && sheetName === 'Keuangan') {
-      pkIndex = headerMap['ID_Transaksi'];
-    }
+    var pkIndex = getPrimaryKeyIndex(headerMap, sheetName);
 
     if (sheetName === 'Presensi' && updateObj.Status_Siang) {
       updateObj.Timestamp_Siang = formatDateValue(new Date(), 'Timestamp_Siang');
@@ -308,101 +312,121 @@ function updateData(sheetName, id, updateObj) {
 }
 
 
+function getPrimaryKeyIndex(headerMap, sheetName) {
+  var pkName = 'ID_' + sheetName.replace('Log_', '');
+  if (headerMap[pkName] !== undefined) return headerMap[pkName];
+  if (headerMap['ID'] !== undefined) return headerMap['ID'];
+  if (sheetName === 'Keuangan' && headerMap['ID_Transaksi'] !== undefined) return headerMap['ID_Transaksi'];
+  return 0; // fallback to first column
+}
+
 function deleteData(sheetName, id) {
   sheetName = (sheetName || '').toString();
   if (!sheetName || id === undefined || id === null) return false;
 
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-  if (!sheet) return false;
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
 
-  var data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return false;
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    if (!sheet) return false;
 
-  var pkIndex = 0; // PK is usually first column
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return false;
 
-  for (var i = 1; i < data.length; i++) {
-    if (data[i][pkIndex].toString() === id.toString()) {
-      sheet.deleteRow(i + 1);
-      return true;
+    var headerMap = buildHeaderIndex(data[0]);
+    var pkIndex = getPrimaryKeyIndex(headerMap, sheetName);
+
+    for (var i = 1; i < data.length; i++) {
+      if ((data[i][pkIndex] || '').toString() === id.toString()) {
+        sheet.deleteRow(i + 1);
+        return true;
+      }
     }
+    return false;
+  } finally {
+    lock.releaseLock();
   }
-  return false;
 }
 
 function bulkUpdatePresensi(dataList) {
   if (!dataList || !Array.isArray(dataList)) throw new Error('Data harus berupa array.');
   
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var studentsData = readData('Master_Siswa'); // Prefetch student emails
-  var sheet = ss.getSheetByName('Presensi');
-  if (!sheet) {
-    sheet = ss.insertSheet('Presensi');
-    sheet.appendRow(['ID_Presensi', 'Tanggal', 'NISN', 'Status_Pagi', 'Status_Siang', 'Keterangan', 'Timestamp_Pagi', 'Timestamp_Siang']);
-  }
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
 
-  var fullData = sheet.getDataRange().getValues();
-  var headers = fullData[0];
-  var headerMap = buildHeaderIndex(headers);
-  var dateIdx = headerMap['Tanggal'];
-  var idSiswaIdx = headerMap['ID_Siswa'] !== undefined ? headerMap['ID_Siswa'] : headerMap['NISN'];
-  if (idSiswaIdx === undefined) throw new Error('Kolom identitas (ID_Siswa/NISN) tidak ditemukan di sheet Presensi.');
-
-  // Map to find row by composite key (Tanggal + ID)
-  var keyToRowMap = {};
-  for (var i = 1; i < fullData.length; i++) {
-    var dateVal = formatDateValue(fullData[i][dateIdx], 'Tanggal');
-    var idVal = (fullData[i][idSiswaIdx] || '').toString();
-    if (idVal) keyToRowMap[dateVal + '_' + idVal] = i;
-  }
-
-  var now = new Date();
-  var newRows = [];
-
-  dataList.forEach(function(item) {
-    var itemDate = formatDateValue(item.Tanggal, 'Tanggal');
-    var itemId = (item.ID_Siswa || item.NISN || '').toString();
-    if (!itemId) return;
-    var key = itemDate + '_' + itemId;
-    var rowIdx = keyToRowMap[key];
-    var oldStatusPagi = '';
-    var oldStatusSiang = '';
-
-    if (rowIdx !== undefined) {
-      // Get old status to check for changes
-      oldStatusPagi = (fullData[rowIdx][headerMap['Status_Pagi']] || '').toString();
-      oldStatusSiang = (fullData[rowIdx][headerMap['Status_Siang']] || '').toString();
-
-      // Update existing row in fullData array
-      for (var keyAttr in item) {
-        if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
-          var colIdx = headerMap[keyAttr];
-          fullData[rowIdx][colIdx] = formatDateValue(item[keyAttr], keyAttr);
-        }
-      }
-      // Timestamps - Only update if status CHANGED and is NOT empty
-      if (item.Status_Pagi && item.Status_Pagi.toString() !== oldStatusPagi && headerMap.hasOwnProperty('Timestamp_Pagi')) {
-          fullData[rowIdx][headerMap['Timestamp_Pagi']] = formatDateValue(now, 'Timestamp_Pagi');
-      }
-      if (item.Status_Siang && item.Status_Siang.toString() !== oldStatusSiang && headerMap.hasOwnProperty('Timestamp_Siang')) {
-          fullData[rowIdx][headerMap['Timestamp_Siang']] = formatDateValue(now, 'Timestamp_Siang');
-      }
-    } else {
-      // Prepare new row
-      var newRow = headers.map(function(h) { return ''; });
-      for (var keyAttr in item) {
-        if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
-          newRow[headerMap[keyAttr]] = formatDateValue(item[keyAttr], keyAttr);
-        }
-      }
-      // Timestamps for new row
-      if (item.Status_Pagi && headerMap.hasOwnProperty('Timestamp_Pagi')) {
-          newRow[headerMap['Timestamp_Pagi']] = formatDateValue(now, 'Timestamp_Pagi');
-      }
-      if (item.Status_Siang && headerMap.hasOwnProperty('Timestamp_Siang')) {
-          newRow[headerMap['Timestamp_Siang']] = formatDateValue(now, 'Timestamp_Siang');
-      }
-      newRows.push(newRow);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var studentsData = readData('Master_Siswa'); // Prefetch student emails
+    var sheet = ss.getSheetByName('Presensi');
+    if (!sheet) {
+      sheet = ss.insertSheet('Presensi');
+      sheet.appendRow(['ID_Presensi', 'Tanggal', 'NISN', 'Status_Pagi', 'Status_Siang', 'Keterangan', 'Timestamp_Pagi', 'Timestamp_Siang']);
     }
+
+    var fullData = sheet.getDataRange().getValues();
+    var headers = fullData[0];
+    var headerMap = buildHeaderIndex(headers);
+    var dateIdx = headerMap['Tanggal'];
+    var idSiswaIdx = headerMap['ID_Siswa'] !== undefined ? headerMap['ID_Siswa'] : headerMap['NISN'];
+    if (idSiswaIdx === undefined) throw new Error('Kolom identitas (ID_Siswa/NISN) tidak ditemukan di sheet Presensi.');
+
+    // Map to find row by composite key (Tanggal + ID)
+    var keyToRowMap = {};
+    for (var i = 1; i < fullData.length; i++) {
+      var dateVal = formatDateValue(fullData[i][dateIdx], 'Tanggal');
+      var idVal = (fullData[i][idSiswaIdx] || '').toString();
+      if (idVal) keyToRowMap[dateVal + '_' + idVal] = i;
+    }
+
+    var now = new Date();
+    var newRows = [];
+
+    dataList.forEach(function(item) {
+      var itemDate = formatDateValue(item.Tanggal, 'Tanggal');
+      var itemId = (item.ID_Siswa || item.NISN || '').toString();
+      if (!itemId) return;
+      var key = itemDate + '_' + itemId;
+      var rowIdx = keyToRowMap[key];
+      var oldStatusPagi = '';
+      var oldStatusSiang = '';
+
+      if (rowIdx !== undefined) {
+        // Get old status to check for changes
+        oldStatusPagi = (fullData[rowIdx][headerMap['Status_Pagi']] || '').toString();
+        oldStatusSiang = (fullData[rowIdx][headerMap['Status_Siang']] || '').toString();
+
+        // Update existing row in fullData array
+        for (var keyAttr in item) {
+          if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
+            var colIdx = headerMap[keyAttr];
+            fullData[rowIdx][colIdx] = formatDateValue(item[keyAttr], keyAttr);
+          }
+        }
+        // Timestamps - Only update if status CHANGED and is NOT empty
+        if (item.Status_Pagi && item.Status_Pagi.toString() !== oldStatusPagi && headerMap.hasOwnProperty('Timestamp_Pagi')) {
+            fullData[rowIdx][headerMap['Timestamp_Pagi']] = formatDateValue(now, 'Timestamp_Pagi');
+        }
+        if (item.Status_Siang && item.Status_Siang.toString() !== oldStatusSiang && headerMap.hasOwnProperty('Timestamp_Siang')) {
+            fullData[rowIdx][headerMap['Timestamp_Siang']] = formatDateValue(now, 'Timestamp_Siang');
+        }
+      } else {
+        // Prepare new row
+        var newRow = headers.map(function(h) { return ''; });
+        for (var keyAttr in item) {
+          if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
+            newRow[headerMap[keyAttr]] = formatDateValue(item[keyAttr], keyAttr);
+          }
+        }
+        // Timestamps for new row
+        if (item.Status_Pagi && headerMap.hasOwnProperty('Timestamp_Pagi')) {
+            newRow[headerMap['Timestamp_Pagi']] = formatDateValue(now, 'Timestamp_Pagi');
+        }
+        if (item.Status_Siang && headerMap.hasOwnProperty('Timestamp_Siang')) {
+            newRow[headerMap['Timestamp_Siang']] = formatDateValue(now, 'Timestamp_Siang');
+        }
+        newRows.push(newRow);
+      }
 
         // --- INTEGRASI NOTIFIKASI ---
         try {
@@ -412,8 +436,8 @@ function bulkUpdatePresensi(dataList) {
           
           if (student && student.Email) {
             var studentName = student.Nama_Siswa || 'Siswa';
-            var nowStr = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd'T'HH:mm:ssXXX");
-
+            var nowStr = formatDateValue(now, 'Timestamp');
+            
             // Notifikasi Pagi (Hanya jika ada PERUBAHAN status)
             var newPagi = (item.Status_Pagi || '').toString();
             if (newPagi && newPagi !== oldStatusPagi) {
@@ -427,7 +451,6 @@ function bulkUpdatePresensi(dataList) {
               }
               
               createNotification(msgPagi, newPagi === 'H' ? 'success' : 'info', 'Siswa', student.Email);
-              // Tambahkan notifikasi untuk Wali Kelas (yang juga bisa dilihat Pengurus)
               createNotification(msgPagi, 'info', 'Wali Kelas', '');
             }
 
@@ -442,7 +465,6 @@ function bulkUpdatePresensi(dataList) {
               }
               
               createNotification(msgSiang, newSiang === 'H' ? 'success' : 'info', 'Siswa', student.Email);
-              // Tambahkan notifikasi untuk Wali Kelas (yang juga bisa dilihat Pengurus)
               createNotification(msgSiang, 'info', 'Wali Kelas', '');
             }
           }
@@ -452,104 +474,114 @@ function bulkUpdatePresensi(dataList) {
         // ----------------------------
   });
 
-  // Write back updated data
-  if (fullData.length > 1) {
-    sheet.getRange(1, 1, fullData.length, headers.length).setValues(fullData);
+    // Write back updated data
+    if (fullData.length > 1) {
+      sheet.getRange(1, 1, fullData.length, headers.length).setValues(fullData);
+    }
+    
+    // Append new rows
+    if (newRows.length > 0) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, headers.length).setValues(newRows);
+    }
+    
+    return { updated: fullData.length - 1, added: newRows.length };
+  } finally {
+    lock.releaseLock();
   }
-  
-  // Append new rows
-  if (newRows.length > 0) {
-    sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, headers.length).setValues(newRows);
-  }
-
-  return true;
 }
 
 function bulkUpdateNilai(dataList) {
   if (!dataList || !Array.isArray(dataList)) throw new Error('Data harus berupa array.');
   
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Daftar_Nilai');
-  if (!sheet) {
-    sheet = ss.insertSheet('Daftar_Nilai');
-    sheet.appendRow(['ID_Nilai', 'ID_Siswa', 'Jenjang', 'Semester', 'Kategori_Mapel', 'Nama_Mapel', 'Topik', 'Nilai', 'Timestamp']);
-  }
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
 
-  var fullData = sheet.getDataRange().getValues();
-  var headers = fullData[0];
-  var headerMap = buildHeaderIndex(headers);
-  var idSiIdx = headerMap['ID_Siswa'] !== undefined ? headerMap['ID_Siswa'] : headerMap['NISN'];
-  if (idSiIdx === undefined) throw new Error('Kolom identitas (ID_Siswa/NISN) tidak ditemukan di sheet Daftar_Nilai.');
-
-  var semesterIdx = headerMap['Semester'];
-  var mapelIdx = headerMap['Nama_Mapel'];
-  var topikIdx = headerMap['Topik'];
-
-  // Map to find row by composite key
-  var keyToRowMap = {};
-  for (var i = 1; i < fullData.length; i++) {
-    var idVal = (fullData[i][idSiIdx] || '').toString();
-    if (!idVal) continue;
-    var semVal = (fullData[i][semesterIdx] || '').toString();
-    var mapelVal = (fullData[i][mapelIdx] || '').toString();
-    var topikVal = (fullData[i][topikIdx] || '').toString();
-    keyToRowMap[idVal + '_' + semVal + '_' + mapelVal + '_' + topikVal] = i;
-  }
-
-  var now = new Date();
-  var newRows = [];
-
-  dataList.forEach(function(item) {
-    var idVal = (item.ID_Siswa || item.NISN || '').toString();
-    if (!idVal) return;
-    var semVal = (item.Semester || '').toString();
-    var mapelVal = (item.Nama_Mapel || '').toString();
-    var topikVal = (item.Topik || '').toString();
-    var key = idVal + '_' + semVal + '_' + mapelVal + '_' + topikVal;
-    
-    // Skip if no grade
-    if (item.Nilai === undefined || item.Nilai === null || item.Nilai === '') return;
-    
-    var rowIdx = keyToRowMap[key];
-
-    if (rowIdx !== undefined) {
-      // Update existing
-      for (var keyAttr in item) {
-        if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
-          var colIdx = headerMap[keyAttr];
-          fullData[rowIdx][colIdx] = formatDateValue(item[keyAttr], keyAttr);
-        }
-      }
-      if (headerMap.hasOwnProperty('Timestamp')) {
-          fullData[rowIdx][headerMap['Timestamp']] = formatDateValue(now, 'Timestamp');
-      }
-    } else {
-      // Prepare new row
-      var newRow = headers.map(function(h) { return ''; });
-      for (var keyAttr in item) {
-        if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
-          newRow[headerMap[keyAttr]] = formatDateValue(item[keyAttr], keyAttr);
-        }
-      }
-      if (headerMap.hasOwnProperty('Timestamp')) {
-          newRow[headerMap['Timestamp']] = formatDateValue(now, 'Timestamp');
-      }
-      if (headerMap.hasOwnProperty('ID_Nilai') && !newRow[headerMap['ID_Nilai']]) {
-          newRow[headerMap['ID_Nilai']] = 'N' + new Date().getTime() + Math.random().toString(36).substr(2, 5);
-      }
-      newRows.push(newRow);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Daftar_Nilai');
+    if (!sheet) {
+      sheet = ss.insertSheet('Daftar_Nilai');
+      sheet.appendRow(['ID_Nilai', 'ID_Siswa', 'Jenjang', 'Semester', 'Kategori_Mapel', 'Nama_Mapel', 'Topik', 'Nilai', 'Timestamp']);
     }
-  });
 
-  if (fullData.length > 1) {
-    sheet.getRange(1, 1, fullData.length, headers.length).setValues(fullData);
-  }
-  
-  if (newRows.length > 0) {
-    sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, headers.length).setValues(newRows);
-  }
+    var fullData = sheet.getDataRange().getValues();
+    var headers = fullData[0];
+    var headerMap = buildHeaderIndex(headers);
+    var idSiIdx = headerMap['ID_Siswa'] !== undefined ? headerMap['ID_Siswa'] : headerMap['NISN'];
+    if (idSiIdx === undefined) throw new Error('Kolom identitas (ID_Siswa/NISN) tidak ditemukan di sheet Daftar_Nilai.');
 
-  return true;
+    var semesterIdx = headerMap['Semester'];
+    var mapelIdx = headerMap['Nama_Mapel'];
+    var topikIdx = headerMap['Topik'];
+
+    // Map to find row by composite key
+    var keyToRowMap = {};
+    for (var i = 1; i < fullData.length; i++) {
+      var idVal = (fullData[i][idSiIdx] || '').toString();
+      if (!idVal) continue;
+      var semVal = (fullData[i][semesterIdx] || '').toString();
+      var mapelVal = (fullData[i][mapelIdx] || '').toString();
+      var topikVal = (fullData[i][topikIdx] || '').toString();
+      keyToRowMap[idVal + '_' + semVal + '_' + mapelVal + '_' + topikVal] = i;
+    }
+
+    var now = new Date();
+    var newRows = [];
+
+    dataList.forEach(function(item) {
+      var idVal = (item.ID_Siswa || item.NISN || '').toString();
+      if (!idVal) return;
+      var semVal = (item.Semester || '').toString();
+      var mapelVal = (item.Nama_Mapel || '').toString();
+      var topikVal = (item.Topik || '').toString();
+      var key = idVal + '_' + semVal + '_' + mapelVal + '_' + topikVal;
+      
+      // Skip if no grade
+      if (item.Nilai === undefined || item.Nilai === null || item.Nilai === '') return;
+      
+      var rowIdx = keyToRowMap[key];
+
+      if (rowIdx !== undefined) {
+        // Update existing
+        for (var keyAttr in item) {
+          if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
+            var colIdx = headerMap[keyAttr];
+            fullData[rowIdx][colIdx] = formatDateValue(item[keyAttr], keyAttr);
+          }
+        }
+        if (headerMap.hasOwnProperty('Timestamp')) {
+            fullData[rowIdx][headerMap['Timestamp']] = formatDateValue(now, 'Timestamp');
+        }
+      } else {
+        // Prepare new row
+        var newRow = headers.map(function(h) { return ''; });
+        for (var keyAttr in item) {
+          if (item.hasOwnProperty(keyAttr) && headerMap.hasOwnProperty(keyAttr)) {
+            newRow[headerMap[keyAttr]] = formatDateValue(item[keyAttr], keyAttr);
+          }
+        }
+        if (headerMap.hasOwnProperty('Timestamp')) {
+            newRow[headerMap['Timestamp']] = formatDateValue(now, 'Timestamp');
+        }
+        if (headerMap.hasOwnProperty('ID_Nilai') && !newRow[headerMap['ID_Nilai']]) {
+            newRow[headerMap['ID_Nilai']] = 'N' + new Date().getTime() + Math.random().toString(36).substr(2, 5);
+        }
+        newRows.push(newRow);
+      }
+    });
+
+    if (fullData.length > 1) {
+      sheet.getRange(1, 1, fullData.length, headers.length).setValues(fullData);
+    }
+    
+    if (newRows.length > 0) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, headers.length).setValues(newRows);
+    }
+
+    return { updated: fullData.length - 1, added: newRows.length };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function bulkUpdateMasterHistory(dataList) {
@@ -681,7 +713,7 @@ function createNotification(message, type, targetRole, targetEmail) {
     Type: type || 'info', 
     Target_Email: targetEmail || '',
     Is_Read: 'false',
-    Timestamp: Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd'T'HH:mm:ssXXX"),
+    Timestamp: formatDateValue(new Date(), 'Timestamp'),
     Target_Role: targetRole || 'ALL',
     Role: targetRole || 'ALL', // Sesuai schema 9 kolom
     Email: targetEmail || ''    // Sesuai schema 9 kolom
@@ -858,152 +890,263 @@ function ensureArchiveSheets(ss) {
   }
 }
 
-function archiveAbsensi(ss, monthStr) {
-  var presensiSheet = ss.getSheetByName('Presensi');
-  var rekapSheet = ss.getSheetByName('Archive_Rekap_Absensi');
-  var detailSheet = ss.getSheetByName('Archive_Detail_Absensi');
+function diagnoseArchive() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var report = [];
   
-  if (!presensiSheet) return 'Sheet Presensi tidak ditemukan.';
-  if (!rekapSheet || !detailSheet) return 'Sheet Archive belum siap.';
+  report.push('=== DIAGNOSA SISTEM ARSIP ===');
+  report.push('');
   
-  var lastRow = presensiSheet.getLastRow();
-  if (lastRow <= 1) return 'Tidak ada data presensi untuk diarsip.';
+  // Check sheets exist
+  var sheets = ['Presensi', 'Keuangan', 'Archive_Rekap_Absensi', 'Archive_Rekap_Keuangan', 'Archive_Detail_Absensi'];
+  report.push('1. Status Sheet:');
+  sheets.forEach(function(sheetName) {
+    var sheet = ss.getSheetByName(sheetName);
+    report.push('   - ' + sheetName + ': ' + (sheet ? 'ADA' : 'TIDAK ADA'));
+  });
   
-  var data = presensiSheet.getRange(1, 1, lastRow, presensiSheet.getLastColumn()).getValues();
-  var headers = data[0];
-  var hMap = buildHeaderIndex(headers);
-  var dateIdx = hMap['Tanggal'];
-  var idIdx = hMap['ID_Siswa'] !== undefined ? hMap['ID_Siswa'] : hMap['NISN'];
-  
-  if (dateIdx === undefined) return 'Kolom Tanggal tidak ditemukan di sheet Presensi.';
-  if (idIdx === undefined) return 'Kolom ID_Siswa/NISN tidak ditemukan di sheet Presensi.';
-  
-  var rekapMap = {}; // { studentId: { H, S, I, A, B } }
-  var rowsToMove = [];
-  var rowsToDelete = [];
-  
-  for (var i = 1; i < data.length; i++) {
-    var rawDate = data[i][dateIdx];
-    var rowMonth = '';
-    if (rawDate instanceof Date) {
-      rowMonth = Utilities.formatDate(rawDate, Session.getScriptTimeZone(), 'yyyy-MM');
-    } else if (typeof rawDate === 'string' && rawDate.indexOf('-') > -1) {
-      rowMonth = rawDate.substring(0, 7);
+  // Check triggers
+  report.push('');
+  report.push('2. Status Trigger:');
+  var triggers = ScriptApp.getProjectTriggers();
+  var archiveTrigger = null;
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'runMonthlyArchive') {
+      archiveTrigger = triggers[i];
+      break;
     }
-    
-    if (rowMonth !== monthStr) continue;
-    
-    var sId = (data[i][idIdx] || '').toString();
-    if (!sId) continue;
-    
-    if (!rekapMap[sId]) rekapMap[sId] = { H: 0, S: 0, I: 0, A: 0, B: 0 };
-    
-    var sp = (data[i][hMap['Status_Pagi']] || '').toString().trim();
-    var ssv = (data[i][hMap['Status_Siang']] || '').toString().trim();
-    var combinedStatus = {};
-    if (sp) combinedStatus[sp] = true;
-    if (ssv) combinedStatus[ssv] = true;
-    
-    for (var st in combinedStatus) {
-      if (rekapMap[sId][st] !== undefined) rekapMap[sId][st]++;
-    }
-    
-    // Jika ada status tidak hadir, simpan detail barisnya
-    if (combinedStatus['S'] || combinedStatus['I'] || combinedStatus['A'] || combinedStatus['B']) {
-      rowsToMove.push(data[i]);
-    }
-    
-    rowsToDelete.push(i + 1); // +1 karena row di Sheet adalah 1-indexed
+  }
+  if (archiveTrigger) {
+    report.push('   - Trigger arsip: ADA');
+    report.push('     - Tipe: ' + archiveTrigger.getEventType());
+  } else {
+    report.push('   - Trigger arsip: TIDAK ADA (harus jalankan SETUP_TRIGGERS)');
   }
   
-  if (rowsToDelete.length === 0) return 'Tidak ada data bulan ' + monthStr + ' di sheet Presensi.';
+  // Check data counts
+  report.push('');
+  report.push('3. Jumlah Data:');
+  try {
+    var presensiSheet = ss.getSheetByName('Presensi');
+    if (presensiSheet) {
+      var presensiRows = Math.max(0, presensiSheet.getLastRow() - 1);
+      report.push('   - Presensi (aktif): ' + presensiRows + ' baris');
+    }
+    
+    var archiveAbsensi = ss.getSheetByName('Archive_Rekap_Absensi');
+    if (archiveAbsensi) {
+      var archiveAbsensiRows = Math.max(0, archiveAbsensi.getLastRow() - 1);
+      report.push('   - Archive Rekap Absensi: ' + archiveAbsensiRows + ' baris');
+    }
+    
+    var archiveDetail = ss.getSheetByName('Archive_Detail_Absensi');
+    if (archiveDetail) {
+      var archiveDetailRows = Math.max(0, archiveDetail.getLastRow() - 1);
+      report.push('   - Archive Detail Absensi: ' + archiveDetailRows + ' baris');
+    }
+    
+    var keuanganSheet = ss.getSheetByName('Keuangan');
+    if (keuanganSheet) {
+      var keuanganRows = Math.max(0, keuanganSheet.getLastRow() - 1);
+      report.push('   - Keuangan (aktif): ' + keuanganRows + ' baris');
+    }
+    
+    var archiveKeuangan = ss.getSheetByName('Archive_Rekap_Keuangan');
+    if (archiveKeuangan) {
+      var archiveKeuanganRows = Math.max(0, archiveKeuangan.getLastRow() - 1);
+      report.push('   - Archive Rekap Keuangan: ' + archiveKeuanganRows + ' baris');
+    }
+  } catch (e) {
+    report.push('   - Error: ' + e.toString());
+  }
+  
+  // Check date formats in Presensi
+  report.push('');
+  report.push('4. Cek Format Tanggal Presensi:');
+  try {
+    var presSheet = ss.getSheetByName('Presensi');
+    if (presSheet && presSheet.getLastRow() > 1) {
+      var data = presSheet.getDataRange().getValues();
+      var headers = data[0];
+      var hMap = buildHeaderIndex(headers);
+      var dateIdx = hMap['Tanggal'];
+      if (dateIdx !== undefined) {
+        var sampleDates = [];
+        for (var i = 1; i < Math.min(6, data.length); i++) {
+          var rawDate = data[i][dateIdx];
+          var month = parseDateToMonth(rawDate);
+          sampleDates.push(rawDate + ' -> ' + month);
+        }
+        report.push('   - Sample parsing:');
+        sampleDates.forEach(function(d) {
+          report.push('     ' + d);
+        });
+      }
+    }
+  } catch (e) {
+    report.push('   - Error: ' + e.toString());
+  }
+  
+  report.push('');
+  report.push('5. Test Manual Archive (April 2026):');
+  report.push('   - Jalankan: runMonthlyArchive("2026-04")');
+  
+  return report.join('\n');
+}
 
-  // Simpan Rekap per siswa
-  for (var sid in rekapMap) {
-    rekapSheet.appendRow([
-      sid, monthStr,
-      rekapMap[sid].H, rekapMap[sid].S,
-      rekapMap[sid].I, rekapMap[sid].A, rekapMap[sid].B
-    ]);
+function archiveAbsensi(ss, monthStr) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+
+    var presensiSheet = ss.getSheetByName('Presensi');
+    var rekapSheet = ss.getSheetByName('Archive_Rekap_Absensi');
+    var detailSheet = ss.getSheetByName('Archive_Detail_Absensi');
+
+    if (!presensiSheet) return 'Sheet Presensi tidak ditemukan.';
+    if (!rekapSheet || !detailSheet) return 'Sheet Archive belum siap.';
+
+    var lastRow = presensiSheet.getLastRow();
+    if (lastRow <= 1) return 'Tidak ada data presensi untuk diarsip.';
+
+    var data = presensiSheet.getRange(1, 1, lastRow, presensiSheet.getLastColumn()).getValues();
+    var headers = data[0];
+    var hMap = buildHeaderIndex(headers);
+    var dateIdx = hMap['Tanggal'];
+    var idIdx = hMap['ID_Siswa'] !== undefined ? hMap['ID_Siswa'] : hMap['NISN'];
+
+    if (dateIdx === undefined) return 'Kolom Tanggal tidak ditemukan di sheet Presensi.';
+    if (idIdx === undefined) return 'Kolom ID_Siswa/NISN tidak ditemukan di sheet Presensi.';
+
+    var requiredStatusCols = ['Status_Pagi', 'Status_Siang'];
+    for (var c = 0; c < requiredStatusCols.length; c++) {
+      if (hMap[requiredStatusCols[c]] === undefined) {
+        return 'Kolom ' + requiredStatusCols[c] + ' tidak ditemukan di sheet Presensi.';
+      }
+    }
+
+    var rekapMap = {}; // { studentId: { H, I, S, A, B } }
+    var rowsToMove = [];
+    var rowsToDelete = [];
+
+    for (var i = 1; i < data.length; i++) {
+      var rawDate = data[i][dateIdx];
+      var rowMonth = parseDateToMonth(rawDate);
+
+      if (rowMonth !== monthStr) continue;
+
+      var sId = (data[i][idIdx] || '').toString();
+      if (!sId) continue;
+
+      if (!rekapMap[sId]) rekapMap[sId] = { H: 0, I: 0, S: 0, A: 0, B: 0 };
+
+      var sp = (data[i][hMap['Status_Pagi']] || '').toString().trim();
+      var ssv = (data[i][hMap['Status_Siang']] || '').toString().trim();
+      var combinedStatus = {};
+      if (sp) combinedStatus[sp] = true;
+      if (ssv) combinedStatus[ssv] = true;
+
+      for (var st in combinedStatus) {
+        if (rekapMap[sId][st] !== undefined) rekapMap[sId][st]++;
+      }
+
+      if (combinedStatus['S'] || combinedStatus['I'] || combinedStatus['A'] || combinedStatus['B']) {
+        rowsToMove.push(data[i]);
+      }
+
+      rowsToDelete.push(i + 1);
+    }
+
+    if (rowsToDelete.length === 0) return 'Tidak ada data bulan ' + monthStr + ' di sheet Presensi.';
+
+    for (var sid in rekapMap) {
+      rekapSheet.appendRow([
+        sid, monthStr,
+        rekapMap[sid].H, rekapMap[sid].I,
+        rekapMap[sid].S, rekapMap[sid].A, rekapMap[sid].B
+      ]);
+    }
+
+    if (rowsToMove.length > 0) {
+      detailSheet.getRange(detailSheet.getLastRow() + 1, 1, rowsToMove.length, rowsToMove[0].length).setValues(rowsToMove);
+    }
+
+    for (var j = rowsToDelete.length - 1; j >= 0; j--) {
+      presensiSheet.deleteRow(rowsToDelete[j]);
+    }
+
+    return 'Berhasil mengarsip ' + rowsToDelete.length + ' baris absensi bulan ' + monthStr + '.';
+  } finally {
+    lock.releaseLock();
   }
-  
-  // Simpan Detail Non-Hadir
-  if (rowsToMove.length > 0) {
-    detailSheet.getRange(detailSheet.getLastRow() + 1, 1, rowsToMove.length, headers.length).setValues(rowsToMove);
-  }
-  
-  // Hapus dari sheet utama (dari bawah ke atas agar row index tidak bergeser)
-  for (var j = rowsToDelete.length - 1; j >= 0; j--) {
-    presensiSheet.deleteRow(rowsToDelete[j]);
-  }
-  
-  return 'Berhasil mengarsip ' + rowsToDelete.length + ' baris absensi bulan ' + monthStr + '.';
 }
 
 function archiveKeuangan(ss, monthStr) {
-  var keuanganSheet = ss.getSheetByName('Keuangan');
-  var rekapSheet = ss.getSheetByName('Archive_Rekap_Keuangan');
-  
-  if (!keuanganSheet) return 'Sheet Keuangan tidak ditemukan.';
-  if (!rekapSheet) return 'Sheet Archive_Rekap_Keuangan belum siap.';
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
 
-  var lastRow = keuanganSheet.getLastRow();
-  if (lastRow <= 1) {
-    // Tidak ada transaksi, tetap simpan rekap dengan nilai 0
-    var rekapDataEmpty = rekapSheet.getDataRange().getValues();
-    var saldoAwalEmpty = rekapDataEmpty.length > 1 ? (Number(rekapDataEmpty[rekapDataEmpty.length - 1][4]) || 0) : 0;
-    rekapSheet.appendRow([monthStr, saldoAwalEmpty, 0, 0, saldoAwalEmpty]);
-    return 'Tidak ada transaksi bulan ' + monthStr + '. Rekap saldo disimpan.';
-  }
-  
-  var data = keuanganSheet.getRange(1, 1, lastRow, keuanganSheet.getLastColumn()).getValues();
-  var headers = data[0];
-  var hMap = buildHeaderIndex(headers);
+    var keuanganSheet = ss.getSheetByName('Keuangan');
+    var rekapSheet = ss.getSheetByName('Archive_Rekap_Keuangan');
 
-  if (hMap['Tanggal'] === undefined) return 'Kolom Tanggal tidak ditemukan di sheet Keuangan.';
-  if (hMap['Tipe'] === undefined || hMap['Jumlah'] === undefined) return 'Kolom Tipe/Jumlah tidak ditemukan di sheet Keuangan.';
-  
-  var totalMasuk = 0;
-  var totalKeluar = 0;
-  var rowsToDelete = [];
-  
-  // Hitung Saldo Awal (Saldo Akhir dari rekap bulan terakhir)
-  var rekapData = rekapSheet.getDataRange().getValues();
-  var saldoAwal = 0;
-  if (rekapData.length > 1) {
-    saldoAwal = Number(rekapData[rekapData.length - 1][4]) || 0;
-  }
-  
-  for (var i = 1; i < data.length; i++) {
-    var rawDate = data[i][hMap['Tanggal']];
-    var rowMonth = '';
-    if (rawDate instanceof Date) {
-      rowMonth = Utilities.formatDate(rawDate, Session.getScriptTimeZone(), 'yyyy-MM');
-    } else if (typeof rawDate === 'string' && rawDate.indexOf('-') > -1) {
-      rowMonth = rawDate.substring(0, 7);
+    if (!keuanganSheet) return 'Sheet Keuangan tidak ditemukan.';
+    if (!rekapSheet) return 'Sheet Archive_Rekap_Keuangan belum siap.';
+
+    var lastRow = keuanganSheet.getLastRow();
+    if (lastRow <= 1) {
+      var rekapDataEmpty = rekapSheet.getDataRange().getValues();
+      var saldoAwalEmpty = 0;
+      if (rekapDataEmpty.length > 1) {
+        var lastRowData = rekapDataEmpty[rekapDataEmpty.length - 1];
+        saldoAwalEmpty = Number(lastRowData[4]) || 0;
+      }
+      rekapSheet.appendRow([monthStr, saldoAwalEmpty, 0, 0, saldoAwalEmpty]);
+      return 'Tidak ada transaksi bulan ' + monthStr + '. Rekap saldo disimpan.';
     }
-    
-    if (rowMonth !== monthStr) continue;
-    
-    var tipe = (data[i][hMap['Tipe']] || '').toString().trim();
-    var jumlah = Number(data[i][hMap['Jumlah']]) || 0;
-    if (tipe === 'Masuk') totalMasuk += jumlah;
-    else if (tipe === 'Keluar') totalKeluar += jumlah;
-    
-    rowsToDelete.push(i + 1);
+
+    var data = keuanganSheet.getRange(1, 1, lastRow, keuanganSheet.getLastColumn()).getValues();
+    var headers = data[0];
+    var hMap = buildHeaderIndex(headers);
+
+    if (hMap['Tanggal'] === undefined) return 'Kolom Tanggal tidak ditemukan di sheet Keuangan.';
+    if (hMap['Tipe'] === undefined || hMap['Jumlah'] === undefined) return 'Kolom Tipe/Jumlah tidak ditemukan di sheet Keuangan.';
+
+    var totalMasuk = 0;
+    var totalKeluar = 0;
+    var rowsToDelete = [];
+
+    var rekapData = rekapSheet.getDataRange().getValues();
+    var saldoAwal = 0;
+    if (rekapData.length > 1) {
+      saldoAwal = Number(rekapData[rekapData.length - 1][4]) || 0;
+    }
+
+    for (var i = 1; i < data.length; i++) {
+      var rawDate = data[i][hMap['Tanggal']];
+      var rowMonth = parseDateToMonth(rawDate);
+
+      if (rowMonth !== monthStr) continue;
+
+      var tipe = (data[i][hMap['Tipe']] || '').toString().trim();
+      var jumlah = Number(data[i][hMap['Jumlah']]) || 0;
+      if (tipe === 'Masuk') totalMasuk += jumlah;
+      else if (tipe === 'Keluar') totalKeluar += jumlah;
+
+      rowsToDelete.push(i + 1);
+    }
+
+    var saldoAkhir = saldoAwal + totalMasuk - totalKeluar;
+
+    rekapSheet.appendRow([monthStr, saldoAwal, totalMasuk, totalKeluar, saldoAkhir]);
+
+    for (var k = rowsToDelete.length - 1; k >= 0; k--) {
+      keuanganSheet.deleteRow(rowsToDelete[k]);
+    }
+
+    return 'Berhasil mutasi kas bulan ' + monthStr + '. Saldo Akhir: Rp ' + saldoAkhir.toLocaleString('id-ID');
+  } finally {
+    lock.releaseLock();
   }
-  
-  var saldoAkhir = saldoAwal + totalMasuk - totalKeluar;
-  
-  // Simpan Rekap Mutasi
-  rekapSheet.appendRow([monthStr, saldoAwal, totalMasuk, totalKeluar, saldoAkhir]);
-  
-  // Hapus baris lama dari bawah ke atas
-  for (var k = rowsToDelete.length - 1; k >= 0; k--) {
-    keuanganSheet.deleteRow(rowsToDelete[k]);
-  }
-  
-  return 'Berhasil mutasi kas bulan ' + monthStr + '. Saldo Akhir: Rp ' + saldoAkhir.toLocaleString('id-ID');
 }
 
 /**

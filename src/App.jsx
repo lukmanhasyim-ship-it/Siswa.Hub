@@ -134,7 +134,7 @@ function AppRoutes() {
         <Route
           path="update-presensi"
           element={
-            <RoleProtectedRoute allowedRoles={[]}>
+            <RoleProtectedRoute allowedRoles={['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Sekretaris', 'Wakil Sekretaris', 'Bendahara', 'Wakil Bendahara']}>
               <Presensi key={location.key} />
             </RoleProtectedRoute>
           }
