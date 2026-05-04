@@ -1,7 +1,7 @@
-# Siswa.Hub v4.9.4 - Ekosistem Manajemen Kelas Digital Premium
+# Siswa.Hub v4.9.6 - Ekosistem Manajemen Kelas Digital Premium
 
 ![License](https://img.shields.io/badge/License-Private-red.svg)
-![Version](https://img.shields.io/badge/Version-4.9.4-emerald.svg)
+![Version](https://img.shields.io/badge/Version-4.9.6-emerald.svg)
 ![React](https://img.shields.io/badge/Frontend-React%2019-blue.svg)
 ![Backend](https://img.shields.io/badge/Backend-Google%20Apps%20Script-orange.svg)
 
@@ -15,6 +15,7 @@
 *   **Real-time Monitoring**: Visualisasi instan kehadiran harian, saldo kas, dan statistik kedisiplinan.
 *   **Role-Based Experience**: Antarmuka yang dipersonalisasi untuk Wali Kelas, Pengurus Kelas (Ketua Kelas & Wakil, Sekretaris & Wakil, Bendahara & Wakil), dan Siswa.
 *   **Privacy-First Design**: Siswa hanya dapat melihat data pribadi mereka (nilai dan presensi), sementara Wali Kelas memiliki kendali penuh atas seluruh data kelas.
+*   **Quick Actions**: Akses cepat ke fitur draf memungkinkan input transaksi tanpa hambatan reload halaman.
 
 ### 📝 Administrasi Akademik & Presensi
 *   **Presensi Dual-Session**: Pencatatan kehadiran pagi dan siang dengan *timestamp* otomatis untuk akurasi maksimal.
@@ -22,16 +23,55 @@
 *   **Buku Klaper Digital**: Arsip data mutasi dan riwayat siswa yang siap cetak kapan saja dengan fitur **Ekspor ke Excel**.
 
 ### 💰 Manajemen Keuangan (Kas Kelas)
+*   **Draf Transaksi Massal**: Input multiple transaksi tanpa reload! Transaksi ditampung dalam draf dan disimpan sekaligus (Bulk Save) untuk efisiensi maksimal.
 *   **Laporan Kas 4 Kolom**: Transparansi penuh dengan pencatatan masuk, keluar, dan saldo akhir secara otomatis.
 *   **Smart Debtor Tracking**: Sistem otomatis mendeteksi siswa yang memiliki tanggungan iuran berdasarkan nominal yang ditetapkan Wali Kelas.
 *   **Otoritas Bendahara**: Fitur input keuangan yang diamankan secara khusus hanya untuk akun Google Bendahara dan Wakil Bendahara yang terdaftar.
+*   **Hapus Transaksi**: Tombol hapus (Trash2) tersedia untuk membatalkan transaksi yang sudah tersimpan maupun yang masih dalam draf.
 
 ### 🏠 Layanan Konseling & Home Visit (v4.9)
 *   **Digital Call Log**: Pendataan panggilan siswa secara sistematis mulai dari kategori hingga alasan detail.
 *   **Home Visit Evidence**: Fitur unggahan foto bukti kunjungan rumah langsung ke Google Drive melalui aplikasi, terintegrasi dengan laporan perkembangan siswa.
 *   **Automated Notifications**: Kirim pesan motivasi dan pengingat resmi secara otomatis kepada siswa dan pengurus kelas.
 
+### 📦 Sistem Pengarsipan Otomatis
+*   **Auto-Archive Monthly**: Sistem otomatis mengarsipkan data absensi dan keuangan bulan sebelumnya setiap tanggal 1.
+*   **Trigger Terjadwal**: Menggunakan Google Apps Script time-based trigger yang berjalan otomatis tanpa intervensi manual.
+*   **3 Archive Sheets**: Data diarsip ke sheet `Archive_Rekap_Absensi`, `Archive_Rekap_Keuangan`, dan `Archive_Detail_Absensi`.
+*   **Diagnosa Sistem**: Fungsi `diagnoseArchive()` tersedia untuk mengecek kesehatan sistem arsip kapan saja.
+
+### 🛡️ Backup & Recovery (v4.9.5)
+*   **Database Backup Premium**: Export seluruh database ke dua format sekaligus (XLSX + SQL) untuk keamanan maksimal.
+*   **Multi-Sheet Workbook**: File Excel dengan semua sheet terpisah, siap dibuka di Microsoft Excel atau Google Sheets.
+*   **MySQL Compatible**: File SQL dengan struktur `CREATE TABLE` dan `INSERT` yang langsung bisa di-import ke database MySQL/MariaDB.
+*   **Auto-Download**: Kedua file otomatis terdownload ke komputer tanpa perlu setup server tambahan.
+*   **Safe Zone UI**: Tombol backup yang jelas di halaman Edit Profil, ditempatkan sebelum zona bahaya reset database.
+
+### 📤 Export Leger Premium (v4.9.5)
+*   **6 Sheet dalam 1 File**: Export leger dengan sheet terorganisir per jenjang dan semester (X Ganjil, X Genap, XI Ganjil, XI Genap, XII Ganjil, XII Genap).
+*   **Semua Siswa Tampil**: Setiap sheet menampilkan seluruh siswa aktif, termasuk yang belum diinput nilainya (ditampilkan dengan nilai 0).
+*   **Format Profesional**: Header kategori dan mata pelajaran yang rapi dengan merge cells otomatis.
+
+### 💬 Feedback yang Lebih Handal (v4.9.5)
+*   **Fallback Modal**: Saat email client tidak tersedia, modal muncul dengan informasi email lengkap yang bisa di-copy manual.
+*   **Quick Links**: Tombol langsung ke Gmail Compose dan Outlook Web dengan subject dan body otomatis terisi.
+*   **One-Click Copy**: Tombol copy untuk email tujuan, subjek, dan pesan dengan notifikasi tersalin.
+
+### 🧹 Pembersihan Kode (v4.9.6)
+*   **Hapus Sheet Lokasi yang Tidak Digunakan**: Menghilangkan kode mati dengan menghapus sheet Lokasi yang tidak digunakan dari fungsi `setupSpreadsheet()` di Google Apps Script.
+*   **Logika Backup Lebih Bersih**: Menghapus referensi sheet Lokasi dari ekspor backup SQL di halaman Profil.
+*   **Maintainabilitas Lebih Baik**: Merapikan codebase dengan menghapus fitur yang tidak pernah diimplementasikan.
+
 ---
+
+## 🆕 What's New in v4.9.6
+
+*   **Pembersihan Kode**: Menghapus sheet Lokasi yang tidak digunakan dari `setupSpreadsheet()` di Code.gs dan referensi di halaman Profil.
+*   **Sinkronisasi Dokumentasi**: Menyesuaikan struktur kolom sheet di README.md dengan `gas/Code.gs` agar akurat (Master_Siswa, Presensi, Log_Panggilan, Profil_Wali_Kelas).
+*   **Dokumentasi Sheet Archive**: Menambahkan 3 sheet arsip (Archive_Rekap_Absensi, Archive_Rekap_Keuangan, Archive_Detail_Absensi) ke panduan instalasi dan Fitur Unggulan.
+*   **Sistem Pengarsipan**: Menambahkan dokumentasi fitur pengarsipan otomatis bulanan ke Fitur Unggulan.
+*   **Atribusi AI**: Menambahkan keterangan "Aplikasi ini dibangun dengan bantuan AI" di akhir README.
+*   **Update Versi**: Memperbarui versi aplikasi ke 4.9.6 di package.json dan README.md.
 
 ---
 
@@ -42,17 +82,23 @@ Buat sebuah Google Spreadsheet baru. Tambahkan sheet-sheet berikut dengan nama d
 
 | Nama Sheet | Struktur Kolom (Header Baris 1) |
 | :--- | :--- |
-| **Master_Siswa** | ID_Siswa, NIS, NISN, Nama_Siswa, L/P, Email, Jabatan, Tempat_Lahir, Tanggal_Lahir, Tanggal_Masuk_X, Tanggal_Naik_XI, Tanggal_Naik_XII, Tanggal_Tamat_Sekolah, No_WA_Siswa, Nama_Wali, No_WA_Wali, Alamat, Latitude, Longitude, Lokasi, Status_Aktif, Last_Active, Keterangan, Created_At |
-| **Presensi** | ID_Presensi, Tanggal, ID_Siswa, Status_Pagi, Status_Siang, Keterangan, Timestamp_Pagi, Timestamp_Siang |
+| **Master_Siswa** | ID_Siswa, NIS, NISN, Nama_Siswa, L/P, Email, Jabatan, Tempat_Lahir, Tanggal_Lahir, No_WA_Siswa, Nama_Wali, No_WA_Wali, Alamat |
+| **Presensi** | ID_Presensi, Tanggal, ID_Siswa, NISN, Status_Pagi, Timestamp_Pagi, Status_Siang, Timestamp_Siang, Keterangan |
 | **Keuangan** | ID_Transaksi, Tanggal, ID_Siswa, NISN, Tipe, Jumlah, Keterangan |
 | **Daftar_Nilai** | ID_Nilai, ID_Siswa, NISN, Jenjang, Semester, Kategori_Mapel, Nama_Mapel, Topik, Nilai, Timestamp |
-| **Log_Panggilan** | ID_Panggilan, Tanggal, NISN, Kategori, Alasan, Tanggal_Pemanggilan, Hasil_Pertemuan, Status_Selesai, Bukti_File_URL |
-| **Profil_Wali_Kelas** | Id_Wali, Nama, Email, Bio, Gaya_Ajar, Kontak, Alamat, Latitude, Longitude, Lokasi, Nominal_Iuran, Kelas, Created_At |
+| **Log_Panggilan** | ID_Panggilan, Tanggal, ID_Siswa, NISN, Kategori, Alasan, Tanggal_Pemanggilan, Waktu_Diskusi, Hasil_Pertemuan, Status_Selesai, Bukti_File_URL |
+| **Profil_Wali_Kelas** | Id_Wali, Nama, Email, Bio, Gaya_Ajar, Kontak, Created_At, Nominal_Iuran, Kelas |
 | **Piket** | ID_Piket, Hari, ID_Siswa, Nama_Siswa, Email |
 | **Notifikasi** | ID, Message, Type, Target_Email, Is_Read, Timestamp, Target_Role, Role, Email |
+| **Archive_Rekap_Absensi** | ID_Siswa, Bulan, H, I, S, A, B |
+| **Archive_Rekap_Keuangan** | Bulan, Saldo_Awal, Total_Masuk, Total_Keluar, Saldo_Akhir |
+| **Archive_Detail_Absensi** | ID_Presensi, Tanggal, ID_Siswa, NISN, Status_Pagi, Timestamp_Pagi, Status_Siang, Timestamp_Siang, Keterangan |
 
 > [!IMPORTANT]
 > Pastikan kolom `Bukti_File_URL` di sheet `Log_Panggilan` tersedia untuk menyimpan link foto dokumentasi dari Google Drive.
+
+> [!NOTE]
+> Sheet Archive (Archive_Rekap_Absensi, Archive_Rekap_Keuangan, Archive_Detail_Absensi) akan dibuat **otomatis** saat proses pengarsipan bulanan dijalankan. Anda tidak perlu membuat sheet ini manual.
 
 ### 2. Konfigurasi Backend (Google Apps Script)
 1.  Buka Spreadsheet Anda, arahkan ke **Extensions** > **Apps Script**.
@@ -119,13 +165,15 @@ Aplikasi telah dikonfigurasi untuk mendukung rilis publik secara cepat (*Single-
 
 ## 💻 Tech Stack
 
-*   **Framework**: [React 19](https://react.dev/)
-*   **Build Tool**: [Vite 6](https://vitejs.dev/)
+*   **Framework**: [React 19.2](https://react.dev/)
+*   **Build Tool**: [Vite 7](https://vitejs.dev/)
 *   **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/)
-*   **Icons**: [Lucide React](https://lucide.dev/)
+*   **Icons**: [Lucide React 1.8](https://lucide.dev/)
 *   **Storage & Database**: Google Sheets via [Google Apps Script](https://developers.google.com/apps-script)
 *   **Auth**: Google OAuth 2.0
 *   **Export Engine**: jsPDF, xlsx (SheetJS), html2canvas
+*   **Notifications**: Automated email notifications via Google Apps Script
+*   **PWA**: Service Worker with Workbox (vite-plugin-pwa)
 
 ---
 
@@ -133,11 +181,13 @@ Aplikasi telah dikonfigurasi untuk mendukung rilis publik secara cepat (*Single-
 Siswa.Hub menggunakan autentikasi resmi Google. Data Anda tersimpan sepenuhnya di Google Drive Anda sendiri. Kami sangat menyarankan untuk:
 1.  Tidak membagikan file `.env` ke publik.
 2.  Memasukkan email Pengurus Kelas di sheet `Master_Siswa` untuk memberikan hak akses tertentu secara otomatis.
-3.  Secara berkala melakukan backup/ekspor data nilai ke format Excel melalui fitur yang disediakan di dalam aplikasi.
+3.  **Secara berkala melakukan backup database** melalui fitur "Backup Database" di halaman Edit Profil Wali Kelas. Fitur ini akan mengexport seluruh data ke format XLSX dan SQL yang bisa disimpan offline.
 
 ---
 
 > **Didesain dengan ❤️ oleh Mohamad Lukman Nurhasyim, S.Kom, Gr.**  
 > *Membangun ekosistem pendidikan yang lebih baik, satu baris kode dalam satu waktu.*
+
+> **Aplikasi ini dibangun dengan bantuan AI**
 
 © 2026 Siswa.Hub. All rights reserved.
