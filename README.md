@@ -1,7 +1,7 @@
-# Siswa.Hub v4.9.5 - Ekosistem Manajemen Kelas Digital Premium
+# Siswa.Hub v4.9.6 - Ekosistem Manajemen Kelas Digital Premium
 
 ![License](https://img.shields.io/badge/License-Private-red.svg)
-![Version](https://img.shields.io/badge/Version-4.9.5-emerald.svg)
+![Version](https://img.shields.io/badge/Version-4.9.6-emerald.svg)
 ![React](https://img.shields.io/badge/Frontend-React%2019-blue.svg)
 ![Backend](https://img.shields.io/badge/Backend-Google%20Apps%20Script-orange.svg)
 
@@ -54,6 +54,11 @@
 *   **Fallback Modal**: Saat email client tidak tersedia, modal muncul dengan informasi email lengkap yang bisa di-copy manual.
 *   **Quick Links**: Tombol langsung ke Gmail Compose dan Outlook Web dengan subject dan body otomatis terisi.
 *   **One-Click Copy**: Tombol copy untuk email tujuan, subjek, dan pesan dengan notifikasi tersalin.
+
+### 🧹 Pembersihan Kode (v4.9.6)
+*   **Hapus Sheet Lokasi yang Tidak Digunakan**: Menghilangkan kode mati dengan menghapus sheet Lokasi yang tidak digunakan dari fungsi `setupSpreadsheet()` di Google Apps Script.
+*   **Logika Backup Lebih Bersih**: Menghapus referensi sheet Lokasi dari ekspor backup SQL di halaman Profil.
+*   **Maintainabilitas Lebih Baik**: Merapikan codebase dengan menghapus fitur yang tidak pernah diimplementasikan.
 
 ---
 
@@ -174,5 +179,7 @@ Siswa.Hub menggunakan autentikasi resmi Google. Data Anda tersimpan sepenuhnya d
 
 > **Didesain dengan ❤️ oleh Mohamad Lukman Nurhasyim, S.Kom, Gr.**  
 > *Membangun ekosistem pendidikan yang lebih baik, satu baris kode dalam satu waktu.*
+
+> **Aplikasi ini dibangun dengan bantuan AI**
 
 © 2026 Siswa.Hub. All rights reserved.

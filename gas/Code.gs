@@ -361,7 +361,7 @@ function bulkUpdatePresensi(dataList) {
     var sheet = ss.getSheetByName('Presensi');
     if (!sheet) {
       sheet = ss.insertSheet('Presensi');
-      sheet.appendRow(['ID_Presensi', 'Tanggal', 'NISN', 'Status_Pagi', 'Status_Siang', 'Keterangan', 'Timestamp_Pagi', 'Timestamp_Siang']);
+      sheet.appendRow(['ID_Presensi', 'Tanggal', 'ID_Siswa', 'NISN', 'Status_Pagi', 'Timestamp_Pagi', 'Status_Siang', 'Timestamp_Siang', 'Keterangan']);
     }
 
     var fullData = sheet.getDataRange().getValues();
@@ -501,7 +501,7 @@ function bulkUpdateNilai(dataList) {
     var sheet = ss.getSheetByName('Daftar_Nilai');
     if (!sheet) {
       sheet = ss.insertSheet('Daftar_Nilai');
-      sheet.appendRow(['ID_Nilai', 'ID_Siswa', 'Jenjang', 'Semester', 'Kategori_Mapel', 'Nama_Mapel', 'Topik', 'Nilai', 'Timestamp']);
+      sheet.appendRow(['ID_Nilai', 'ID_Siswa', 'NISN', 'Jenjang', 'Semester', 'Kategori_Mapel', 'Nama_Mapel', 'Topik', 'Nilai', 'Timestamp']);
     }
 
     var fullData = sheet.getDataRange().getValues();
@@ -812,9 +812,6 @@ function setupSpreadsheet() {
   
   var profil = ss.insertSheet('Profil_Wali_Kelas');
   profil.appendRow(['Id_Wali', 'Nama', 'Email', 'Bio', 'Gaya_Ajar', 'Kontak', 'Created_At', 'Nominal_Iuran', 'Kelas']);
-
-  var lokasi = ss.insertSheet('Lokasi');
-  lokasi.appendRow(['ID_Lokasi', 'Nama_Lokasi', 'Deskripsi', 'Alamat', 'Latitude', 'Longitude', 'Lokasi', 'Created_By', 'Created_By_Email', 'Created_At']);
 
   var notif = ss.insertSheet('Notifikasi');
   notif.appendRow(['ID', 'Message', 'Type', 'Target_Email', 'Is_Read', 'Timestamp', 'Target_Role', 'Role', 'Email']);

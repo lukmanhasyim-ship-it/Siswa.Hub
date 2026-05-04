@@ -199,8 +199,7 @@ export default function Profile() {
       'Archive_Rekap_Absensi': 'archive_rekap_absensi',
       'Archive_Rekap_Keuangan': 'archive_rekap_keuangan',
       'Archive_Detail_Absensi': 'archive_detail_absensi',
-      'Profil_Wali_Kelas': 'profil_wali_kelas',
-      'Lokasi': 'lokasi'
+      'Profil_Wali_Kelas': 'profil_wali_kelas'
     };
 
     let sql = '-- ============================================\n';
