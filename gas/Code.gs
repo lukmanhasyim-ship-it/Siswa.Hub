@@ -250,6 +250,9 @@ function handleResponse(e) {
       },
       SYNC_PIKET: function() {
         return { status: 'success', data: syncPiket(payload && payload.data) };
+      },
+      GET_THUMBNAILS: function() {
+        return { status: 'success', data: getThumbnails(payload && payload.ids) };
       }
     };
 
@@ -1326,3 +1329,32 @@ function fixLogPanggilanHeader() {
   }
   return "Gagal mendeteksi kolom Alasan.";
 }
+
+function getThumbnails(ids) {
+  if (!ids || !Array.isArray(ids)) return {};
+  var result = {};
+  ids.forEach(function(id) {
+    try {
+      // Use Drive API v3 via Advanced Service if enabled, or URL Fetch
+      // We'll use URL Fetch to be safer if Advanced Service is not enabled
+      var url = "https://www.googleapis.com/drive/v3/files/" + id + "?fields=thumbnailLink&key=" + getApiKey();
+      // Actually, if we are in GAS, we can just use DriveApp/Drive service with the script's token
+      var options = {
+        headers: {
+          "Authorization": "Bearer " + ScriptApp.getOAuthToken()
+        }
+      };
+      var response = UrlFetchApp.fetch("https://www.googleapis.com/drive/v3/files/" + id + "?fields=thumbnailLink", options);
+      var json = JSON.parse(response.getContentText());
+      if (json.thumbnailLink) {
+        result[id] = json.thumbnailLink;
+      }
+    } catch (e) {
+      Logger.log("Error getting thumbnail for " + id + ": " + e.toString());
+    }
+  });
+  return result;
+}
+
+// Dummy helper if needed, but we use OAuth Token above
+function getApiKey() { return ""; }

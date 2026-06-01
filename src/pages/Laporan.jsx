@@ -39,12 +39,18 @@ import {
   FileDown,
   AlertTriangle,
   UserCheck,
-  DollarSign
+  DollarSign,
+  Printer,
+  ChevronLeft,
+  Clock,
+  ExternalLink,
+  ChevronDown
 } from 'lucide-react';
 import Loading from '../components/Loading';
 import Skeleton, { SkeletonStats, SkeletonTable } from '../components/Skeleton';
 import EmptyState from '../components/EmptyState';
 import PageGuide from '../components/PageGuide';
+import ImageLightbox from '../components/ImageLightbox';
 import { formatDateIndo } from '../utils/logic';
 
 const COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#64748b'];
@@ -60,6 +66,12 @@ export default function Laporan() {
   const [archiveKeuangan, setArchiveKeuangan] = useState([]);
   const [archiveDetail, setArchiveDetail] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [thumbnailLinks, setThumbnailLinks] = useState({});
+
+  // Lightbox state for image preview
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Filter States
   const [filterType, setFilterType] = useState('month'); // 'month' or 'week'
@@ -90,6 +102,30 @@ export default function Laporan() {
         setArchiveAbsensi(ar.data || []);
         setArchiveKeuangan(rk.data || []);
         setArchiveDetail(ad.data || []);
+
+        // Batch fetch thumbnails for Drive files
+        const driveIds = [];
+        const allLogs = pg.data || [];
+        allLogs.forEach(log => {
+          if (log.Bukti_File_URL) {
+            const urls = log.Bukti_File_URL.split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean);
+            urls.forEach(u => {
+              const dMatch = u.match(/\/d\/([a-zA-Z0-9_-]+)/) || u.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+              if (dMatch) driveIds.push(dMatch[1]);
+            });
+          }
+        });
+
+        if (driveIds.length > 0) {
+          try {
+            const res = await fetchGAS('GET_THUMBNAILS', { ids: [...new Set(driveIds)] });
+            if (res.status === 'success') {
+              setThumbnailLinks(res.data);
+            }
+          } catch (err) {
+            console.error('Failed to fetch thumbnails:', err);
+          }
+        }
       } catch (error) {
         console.error('Laporan load error:', error);
         showToast('Gagal memuat data laporan.', 'error');
@@ -281,7 +317,7 @@ export default function Laporan() {
       if (!val) return 0;
       if (typeof val === 'number') return val;
       // Jika string, hapus titik (ribuan) dan ganti koma ke titik (desimal) jika ada
-      const cleaned = val.toString().replace(/\./g, '').replace(/,/g, '.');
+      const cleaned = val.toString().replace(/\./g, "").replace(/,/g, '.');
       return Number(cleaned) || 0;
     };
 
@@ -447,7 +483,8 @@ export default function Laporan() {
   if (loading) return <Loading message="Menganalisis data laporan..." />;
 
   return (
-    <div className="space-y-8 pb-12 animate-fade-in">
+    <>
+      <div className="space-y-8 pb-12 animate-fade-in">
       <style>{`
         @media print {
           @page {
@@ -457,7 +494,7 @@ export default function Laporan() {
           @page :nth(2) {
             margin-top: 15mm;
           }
-          .no-print, aside, header, nav, footer, button, .sidebar-class, .navbar-class {
+          .no-print, aside, header, nav, footer, .btn-no-print, .sidebar-class, .navbar-class {
             display: none !important;
           }
           
@@ -581,7 +618,7 @@ export default function Laporan() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-emerald-600">
             <FileText className="w-5 h-5" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Wali Kelas Center</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em] tracking-widest">Wali Kelas Center</span>
           </div>
           <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
@@ -595,13 +632,13 @@ export default function Laporan() {
           <div className="flex bg-slate-100 p-1 rounded-xl">
             <button
               onClick={() => setFilterType('month')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filterType === 'month' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all btn-no-print ${filterType === 'month' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
               Bulanan
             </button>
             <button
               onClick={() => setFilterType('week')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filterType === 'week' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all btn-no-print ${filterType === 'week' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
               Mingguan
             </button>
@@ -632,7 +669,7 @@ export default function Laporan() {
 
             <button
               onClick={handleDownload}
-              className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all group"
+              className="p-2.5 bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all group btn-no-print"
               title="Cetak Laporan"
             >
               <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -720,32 +757,36 @@ export default function Laporan() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 h-[200px] print-grid-cols-2">
-            <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-2">
-              <PieChart width="100%" height="100%">
-                <Pie
-                  data={chartDataGeneral}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={25}
-                  outerRadius={45}
-                  paddingAngle={3}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {chartDataGeneral.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                </Pie>
-                <Tooltip />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '7px', paddingTop: '2px' }} />
-              </PieChart>
+            <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-2 overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartDataGeneral}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={25}
+                    outerRadius={45}
+                    paddingAngle={3}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {chartDataGeneral.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                  </Pie>
+                  <Tooltip />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '7px', paddingTop: '2px' }} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-2">
-              <BarChart data={chartDataGeneral} width="100%" height="100%">
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 7, fontWeight: 800, fill: '#64748b' }} interval={0} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 7, fontWeight: 800, fill: '#64748b' }} width={20} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#64748b" radius={[3, 3, 0, 0]} />
-              </BarChart>
+            <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-2 overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartDataGeneral}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 7, fontWeight: 800, fill: '#64748b' }} interval={0} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 7, fontWeight: 800, fill: '#64748b' }} width={20} />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#64748b" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
@@ -1062,38 +1103,70 @@ export default function Laporan() {
                             )}
                           </td>
                           <td className="text-center align-top py-2 px-1">
-                            {pg.Bukti_File_URL ? (
-                              <div className="flex flex-wrap justify-center gap-1 max-w-[100px] mx-auto">
-                                {(pg.Bukti_File_URL || '').split(',').filter(Boolean).map((url, uIdx) => {
-                                  const driveIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-                                  const driveId = driveIdMatch ? driveIdMatch[1] : null;
-                                  const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || driveId;
+                             {pg.Bukti_File_URL ? (
+                               <div className="flex flex-wrap justify-center gap-1.5 max-w-[120px] mx-auto">
+                                 {(pg.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean).map((url, uIdx) => {
+                                   const trimUrl = url.trim();
+                                   const driveIdMatch = trimUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || trimUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                                   const driveId = driveIdMatch ? driveIdMatch[1] : null;
+                                   const isImage = trimUrl.match(/\.(jpeg|jpg|gif|png|webp|bmp|tif|tiff)$/i) || driveId;
+                                   const images = (pg.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean);
 
-                                  return (
-                                    <div key={uIdx} className="relative">
-                                      {isImage ? (
-                                        <a href={url} target="_blank" rel="noreferrer" className="block">
-                                          <img
-                                            src={driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w200-h200` : url}
-                                            className="h-10 w-12 object-cover rounded shadow-sm border border-slate-200"
-                                            alt="Bukti"
-                                            onError={(e) => { e.target.style.display = 'none'; if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'; }}
-                                          />
-                                          <div className="hidden h-10 w-12 items-center justify-center bg-slate-50 border rounded text-[7px] font-bold">IMG</div>
-                                        </a>
-                                      ) : (
-                                        <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center w-8 h-8 bg-slate-50 text-slate-400 rounded border border-slate-200 text-[8px] font-bold">
-                                          #{uIdx + 1}
-                                        </a>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <span className="text-[9px] text-slate-400 font-bold bg-slate-50 px-2 py-1 rounded block mt-1 w-full text-center border border-slate-100 border-dashed">-</span>
-                            )}
-                          </td>
+                                   return (
+                                     <div key={uIdx} className="relative group">
+                                       {isImage ? (
+                                           <div className="flex flex-col items-center gap-1">
+                                             <div
+                                               onClick={() => {
+                                                 setLightboxImages(images);
+                                                 setLightboxIndex(uIdx);
+                                                 setLightboxOpen(true);
+                                               }}
+                                               className="block cursor-pointer print-block"
+                                             >
+                                               <img
+                                                 src={driveId ? (thumbnailLinks[driveId] || `https://lh3.googleusercontent.com/d/${driveId}=s400`) : trimUrl}
+                                                 className="h-20 w-24 object-cover rounded-xl shadow-sm border border-slate-200 group-hover:border-indigo-400 group-hover:shadow-md transition-all duration-200"
+                                                 alt={`Bukti ${uIdx + 1}`}
+                                                 loading="lazy"
+                                                 onError={(e) => { 
+                                                    e.target.style.display = 'none'; 
+                                                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'; 
+                                                 }}
+                                               />
+                                               <div className="hidden h-20 w-24 items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-[8px] font-black uppercase tracking-widest">
+                                                  No Img
+                                               </div>
+                                               {images.length > 1 && (
+                                                 <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center shadow-lg ring-2 ring-white">
+                                                   {uIdx + 1}
+                                                 </span>
+                                               )}
+                                             </div>
+                                             <a 
+                                               href={trimUrl} 
+                                               target="_blank" 
+                                               rel="noreferrer" 
+                                               className="text-[7px] text-slate-400 hover:text-indigo-600 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-1 max-w-[80px] truncate"
+                                             >
+                                               <ExternalLink className="w-2 h-2" />
+                                               {driveId ? `ID:${driveId.substring(0, 5)}...` : 'Buka Link'}
+                                             </a>
+                                           </div>
+                                       ) : (
+                                         <a href={trimUrl} target="_blank" rel="noreferrer" className="inline-flex flex-col items-center justify-center w-16 h-20 bg-slate-50 text-slate-400 rounded-xl border border-slate-200 text-[8px] font-bold hover:bg-slate-100 hover:text-indigo-600 transition-all">
+                                           <FileText className="w-6 h-6 mb-1 opacity-40" />
+                                           <span>Link #{uIdx + 1}</span>
+                                         </a>
+                                       )}
+                                     </div>
+                                   );
+                                 })}
+                               </div>
+                             ) : (
+                               <span className="text-[9px] text-slate-400 font-bold bg-slate-50 px-2 py-1 rounded block mt-1 w-full text-center border border-slate-100 border-dashed">-</span>
+                             )}
+                           </td>
                         </tr>
                       );
                     });
@@ -1141,9 +1214,17 @@ export default function Laporan() {
               </tbody>
             </table>
           </div>
-        </div>
+         </div>
 
-      </div>
-    </div>
+       </div>
+     </div>
+
+      <ImageLightbox
+        images={lightboxImages}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </>
   );
 }

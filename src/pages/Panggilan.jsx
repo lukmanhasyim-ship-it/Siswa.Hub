@@ -18,11 +18,13 @@ import {
   Info,
   X,
   Upload,
-  Trash2
+  Trash2,
+  Link2
 } from 'lucide-react';
 import Loading from '../components/Loading';
 import { sendNotification } from '../utils/notifications';
 import { formatDateIndo } from '../utils/logic';
+import ImageLightbox from '../components/ImageLightbox';
 
 export default function Panggilan() {
 
@@ -33,6 +35,12 @@ export default function Panggilan() {
   const [siswa, setSiswa] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [thumbnailLinks, setThumbnailLinks] = useState({});
+
+  // Lightbox state for image preview
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const [nisn, setNisn] = useState('');
   const [kategori, setKategori] = useState('Panggilan Wali');
@@ -74,7 +82,31 @@ export default function Panggilan() {
           fetchGAS('GET_ALL', { sheet: 'Log_Panggilan' })
         ]);
         setSiswa(s.data || []);
-        setLog((l.data || []).sort((a, b) => new Date(b.Tanggal) - new Date(a.Tanggal)));
+        const logs = (l.data || []).sort((a, b) => new Date(b.Tanggal) - new Date(a.Tanggal));
+        setLog(logs);
+
+        // Batch fetch thumbnails for Drive files
+        const driveIds = [];
+        logs.forEach(log => {
+          if (log.Bukti_File_URL) {
+            const urls = log.Bukti_File_URL.split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean);
+            urls.forEach(u => {
+              const dMatch = u.match(/\/d\/([a-zA-Z0-9_-]+)/) || u.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+              if (dMatch) driveIds.push(dMatch[1]);
+            });
+          }
+        });
+
+        if (driveIds.length > 0) {
+          try {
+            const thumbRes = await fetchGAS('GET_THUMBNAILS', { ids: [...new Set(driveIds)] });
+            if (thumbRes.status === 'success') {
+              setThumbnailLinks(thumbRes.data);
+            }
+          } catch (err) {
+            console.error('Failed to fetch thumbnails:', err);
+          }
+        }
       } catch (error) {
         console.error('Panggilan load error:', error);
         showToast('Gagal memuat data panggilan.', 'error');
@@ -430,6 +462,7 @@ export default function Panggilan() {
                     <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-r border-slate-200">Jadwal & Log</th>
                     <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-r border-slate-200">Data Siswa</th>
                     <th className="px-6 py-3 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-r border-slate-200">Kasus / Alasan</th>
+                    <th className="px-6 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest border-r border-slate-200">Bukti</th>
                     <th className="px-6 py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">Aksi</th>
                   </tr>
                   <tr className="bg-slate-50/50">
@@ -506,6 +539,57 @@ export default function Panggilan() {
                             </div>
                             <p className="text-[10px] font-bold text-slate-600 leading-tight">{item.Alasan}</p>
                           </div>
+                        </td>
+                        <td className="px-6 py-4 border-r border-slate-100">
+                          {item.Bukti_File_URL ? (
+                            <div className="flex flex-wrap justify-center gap-1">
+                              {(item.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean).map((url, uIdx) => {
+                                const trimmedUrl = (url || '').trim();
+                                const dMatch = trimmedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || trimmedUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                                const dId = dMatch ? dMatch[1] : null;
+                                const isImg = trimmedUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) || dId;
+                                
+                                return (
+                                   <div key={uIdx} className="flex flex-col items-center gap-1">
+                                     <div className="relative cursor-pointer group" onClick={() => {
+                                        setLightboxImages((item.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean));
+                                        setLightboxIndex(uIdx);
+                                        setLightboxOpen(true);
+                                     }}>
+                                       {isImg ? (
+                                         <img 
+                                           src={dId ? (thumbnailLinks[dId] || `https://lh3.googleusercontent.com/d/${dId}=s200`) : trimmedUrl} 
+                                           className="h-10 w-10 object-cover rounded-lg border-2 border-white shadow-sm group-hover:border-indigo-400 transition-all"
+                                           alt="Bukti"
+                                           loading="lazy"
+                                           onError={(e) => {
+                                              e.target.style.display = 'none';
+                                              if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                           }}
+                                         />
+                                       ) : (
+                                         <div className="h-10 w-10 flex items-center justify-center bg-slate-50 rounded-lg border-2 border-white shadow-sm text-[8px] font-black text-slate-400 group-hover:text-indigo-600 transition-all uppercase">File</div>
+                                       )}
+                                       <div className="hidden h-10 w-10 items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 text-[6px] font-black uppercase text-center leading-none">No Img</div>
+                                     </div>
+                                     <a 
+                                       href={trimmedUrl} 
+                                       target="_blank" 
+                                       rel="noreferrer" 
+                                       className="text-[6px] text-slate-400 hover:text-indigo-600 font-bold flex items-center gap-0.5 opacity-60 hover:opacity-100"
+                                     >
+                                       <Link2 className="w-1.5 h-1.5" />
+                                       Link
+                                     </a>
+                                   </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="text-center">
+                              <span className="text-[10px] font-bold text-slate-200 uppercase tracking-widest italic leading-none">Nihil</span>
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col gap-2">
@@ -779,6 +863,13 @@ export default function Panggilan() {
           </div>
         </div>
       )}
+
+      <ImageLightbox 
+         images={lightboxImages}
+         initialIndex={lightboxIndex}
+         isOpen={lightboxOpen}
+         onClose={() => setLightboxOpen(false)}
+      />
     </div>
   );
 }
