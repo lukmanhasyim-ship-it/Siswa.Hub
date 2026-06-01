@@ -5,7 +5,7 @@ import {
   Wallet, PhoneCall, LogOut, Sun, Moon, FileText,
   Edit3, User, Settings, Bell, BookOpen, LibraryBig,
   ChevronLeft, ChevronRight, Search, Calendar, Menu, X,
-  MessageCircle
+  MessageCircle, ExternalLink, Link2
 } from 'lucide-react';
 import Breadcrumbs from './Breadcrumbs';
 import { useAuth } from '../context/AuthContext';
@@ -296,7 +296,7 @@ export default function Layout() {
        {/* Main Content Wrapper */}
        <div className={`flex-1 flex flex-col h-screen transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-72'}`}>
          {/* Header Bar - Always on top */}
-         <header className="bg-white sticky top-0 z-50 px-4 md:px-8 py-4 border-b border-slate-100 flex items-center justify-between print:hidden">
+         <header className="bg-white/80 backdrop-blur-md sticky top-0 z-[60] px-4 md:px-8 py-3.5 border-b border-slate-100 flex items-center justify-between print:hidden transition-all duration-300">
            <div className="flex items-center gap-3">
              <button 
                className="md:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors"
