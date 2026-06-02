@@ -153,7 +153,7 @@ export default function Notifications() {
           notifications.map((n) => (
             <div
               key={n.id}
-              className={`card p-6 transition-all border-l-4 ${n.isRead ? 'opacity-80 border-slate-200 shadow-sm' : 'border-[#008647] shadow-lg shadow-emerald-500/5'
+              className={`card p-6 transition-all border-l-4 ${n.isRead ? 'opacity-80 border-slate-200 shadow-sm' : 'border-emerald-700 shadow-lg shadow-emerald-500/5'
                 }`}
             >
               <div className="flex gap-6">
@@ -173,7 +173,7 @@ export default function Notifications() {
                     </p>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {!n.isRead && (
-                        <span className="px-3 py-1 bg-emerald-100 text-[#008647] text-[10px] font-black uppercase tracking-widest rounded-full">
+                        <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-full">
                           Baru
                         </span>
                       )}

@@ -546,7 +546,7 @@ export default function DKN() {
 
             <div className="w-px h-6 bg-slate-200 mx-1" />
 
-            <button onClick={handleExportExcel} className="flex items-center gap-2 px-3 py-2 text-slate-600 hover:text-[#008647] hover:bg-emerald-50 rounded-lg transition-all" title="Ekspor Leger ke Excel">
+            <button onClick={handleExportExcel} className="flex items-center gap-2 px-3 py-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Ekspor Leger ke Excel">
               <FileSpreadsheet className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-tight">Ekspor Leger</span>
             </button>

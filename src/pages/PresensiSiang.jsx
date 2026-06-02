@@ -218,7 +218,7 @@ export default function PresensiSiang() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-[#008647] rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
             <Moon className="w-3 h-3" /> Sesi Siang
           </div>
           <h2 className="text-4xl font-black text-slate-900 tracking-tight">
@@ -239,7 +239,7 @@ export default function PresensiSiang() {
           {canEdit && (
             <>
               <button onClick={handleCopyMorningAttendance} className="btn-secondary flex items-center gap-2">
-                <Copy className="w-4 h-4 text-[#008647]" />
+                <Copy className="w-4 h-4 text-emerald-700" />
                 <span className="text-xs">Salin Absen Pagi</span>
               </button>
               <button
@@ -256,7 +256,7 @@ export default function PresensiSiang() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="card bg-[#008647] text-white border-0 shadow-lg shadow-emerald-200/50">
+        <div className="card bg-emerald-700 text-white border-0 shadow-lg shadow-emerald-200/50">
           <p className="text-white text-[10px] font-black uppercase tracking-widest">Total Siswa</p>
           <p className="text-4xl font-black mt-1">{siswa.length}</p>
         </div>
@@ -331,11 +331,11 @@ export default function PresensiSiang() {
                           'B': 'hover:bg-slate-100 hover:text-slate-900 hover:border-slate-200 text-slate-400 border-slate-100'
                         };
                         const activeStyles = {
-                          'H': 'bg-[#008647] text-white border-[#008647] shadow-lg shadow-emerald-100 scale-110 z-10',
-                          'S': 'bg-[#008647] text-white border-[#008647] shadow-lg shadow-emerald-100 scale-110 z-10',
-                          'I': 'bg-[#008647] text-white border-[#008647] shadow-lg shadow-emerald-100 scale-110 z-10',
-                          'A': 'bg-[#008647] text-white border-[#008647] shadow-lg shadow-emerald-100 scale-110 z-10',
-                          'B': 'bg-[#008647] text-white border-[#008647] shadow-lg shadow-emerald-100 scale-110 z-10'
+                          'H': 'bg-emerald-700 text-white border-emerald-700 shadow-lg shadow-emerald-100 scale-110 z-10',
+                          'S': 'bg-emerald-700 text-white border-emerald-700 shadow-lg shadow-emerald-100 scale-110 z-10',
+                          'I': 'bg-emerald-700 text-white border-emerald-700 shadow-lg shadow-emerald-100 scale-110 z-10',
+                          'A': 'bg-emerald-700 text-white border-emerald-700 shadow-lg shadow-emerald-100 scale-110 z-10',
+                          'B': 'bg-emerald-700 text-white border-emerald-700 shadow-lg shadow-emerald-100 scale-110 z-10'
                         };
                         const isActive = statusSiang === s;
 

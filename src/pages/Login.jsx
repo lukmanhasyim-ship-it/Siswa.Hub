@@ -112,7 +112,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Decorative lines matching reference */}
       <div className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-indigo-400">
@@ -126,12 +126,12 @@ export default function Login() {
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden relative z-10 md:min-h-[600px] animate-fade-in">
 
         {/* Left Section - Illustration */}
-        <div className="hidden md:flex md:w-[45%] bg-[#E8F2FB] flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="hidden md:flex md:w-[45%] bg-blue-50 flex-col items-center justify-center p-6 relative overflow-hidden">
           <div className="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply opacity-50 blur-xl"></div>
 
           <div className="text-center z-10 w-full mb-4 px-4">
             <h2 className="text-[1.5rem] lg:text-[1.8rem] font-bold text-slate-800 leading-tight">
-              Sistem<span className="text-[#fdb813]"> Cerdas</span> dan <span className="text-[#008647]">Canggih</span> Untuk Monitoring Siswa yang Lebih Presisi.
+              Sistem<span className="text-amber-400"> Cerdas</span> dan <span className="text-emerald-700">Canggih</span> Untuk Monitoring Siswa yang Lebih Presisi.
             </h2>
           </div>
 

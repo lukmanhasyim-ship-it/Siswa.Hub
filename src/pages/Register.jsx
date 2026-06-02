@@ -41,7 +41,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-indigo-400">

@@ -244,7 +244,7 @@ export default function PresensiPagi() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card bg-[#008647] text-white border-0 shadow-lg shadow-emerald-200/50">
+        <div className="card bg-emerald-700 text-white border-0 shadow-lg shadow-emerald-200/50">
           <p className="text-white text-[10px] font-black uppercase tracking-widest">Total Siswa</p>
           <p className="text-4xl font-black mt-1">{siswa.length}</p>
         </div>

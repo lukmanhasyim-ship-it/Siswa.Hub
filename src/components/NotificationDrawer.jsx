@@ -60,7 +60,7 @@ export default function NotificationDrawer({ isOpen, onClose, notifications, onM
                 key={n.id}
                 className={`p-4 rounded-2xl transition-all border border-transparent ${
                   n.isRead ? 'bg-transparent text-slate-500' : 'bg-white shadow-sm border-slate-100 text-slate-900'
-                } hover:border-[#008647]/20 cursor-pointer group`}
+                } hover:border-emerald-700/20 cursor-pointer group`}
                 onClick={() => onMarkAsRead(n.id)}
               >
                 <div className="flex gap-4">
@@ -96,7 +96,7 @@ export default function NotificationDrawer({ isOpen, onClose, notifications, onM
                     </p>
                   </div>
                   {!n.isRead && (
-                    <div className="w-2 h-2 bg-[#008647] rounded-full mt-2" />
+                    <div className="w-2 h-2 bg-emerald-700 rounded-full mt-2" />
                   )}
                 </div>
               </div>
@@ -111,7 +111,7 @@ export default function NotificationDrawer({ isOpen, onClose, notifications, onM
                 onClose();
                 navigate('/notifications');
               }}
-              className="w-full py-3 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-[#008647] transition-all"
+              className="w-full py-3 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-600 transition-all"
             >
               Lihat Semua Notifikasi
             </button>
