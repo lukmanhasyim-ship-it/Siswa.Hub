@@ -21,7 +21,11 @@ export async function fetchGAS(action, payload = {}) {
 
     const result = await response.json();
     if (result.status === 'error') {
-      throw new Error(result.message);
+      let msg = result.message;
+      if (msg.includes('Unknown action')) {
+        msg += '. Silakan DEPLOY ULANG Google Apps Script Anda sebagai "New Version" untuk menerapkan pembaruan fungsi.';
+      }
+      throw new Error(msg);
     }
     return result;
   } catch (error) {

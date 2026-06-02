@@ -17,6 +17,7 @@ import {
   History,
   Info,
   X,
+  XCircle,
   Upload,
   Trash2,
   Link2,

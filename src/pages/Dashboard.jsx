@@ -418,7 +418,7 @@ export default function Dashboard() {
         <div className="lg:col-span-1 card">
           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Komposisi Presensi</h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <PieChart>
                 <Pie
                   data={stats.pieData}
@@ -445,7 +445,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 card">
           <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Tren Transaksi Kas (7 Hari)</h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={stats.financialTrendData}>
                 <defs>
                   <linearGradient id="colorMasuk" x1="0" y1="0" x2="0" y2="1">

@@ -648,7 +648,7 @@ export default function Laporan() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-emerald-600">
             <FileText className="w-5 h-5" />
-            <span className="text-xs font-black uppercase tracking-[0.2em] tracking-widest">Wali Kelas Center</span>
+            <span className="text-xs font-black uppercase tracking-widest">Wali Kelas Center</span>
           </div>
           <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
@@ -747,7 +747,7 @@ export default function Laporan() {
 
         {/* SECTION 0: KOMPOSISI SISWA */}
         <div className="space-y-6">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-blue-600">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 report-section-title before:bg-blue-600">
             I. Komposisi Kelas
           </h3>
           <div className="grid grid-cols-3 gap-4">
@@ -768,7 +768,7 @@ export default function Laporan() {
 
         {/* SECTION 1: REKAP ABSENSI UMUM */}
         <div className="space-y-6">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-emerald-600">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 report-section-title before:bg-emerald-600">
             II. Ringkasan Kehadiran
           </h3>
           <div className="grid grid-cols-5 gap-2 px-1">
@@ -788,7 +788,7 @@ export default function Laporan() {
 
           <div className="grid grid-cols-2 gap-3 h-[200px] print-grid-cols-2">
             <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-2 overflow-hidden">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie
                     data={chartDataGeneral}
@@ -808,7 +808,7 @@ export default function Laporan() {
               </ResponsiveContainer>
             </div>
             <div className="bg-slate-50/50 rounded-2xl border border-slate-100 p-2 overflow-hidden">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={chartDataGeneral}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 7, fontWeight: 800, fill: '#64748b' }} interval={0} />
@@ -825,7 +825,7 @@ export default function Laporan() {
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Trend Kehadiran Periodik</h4>
             </div>
-            <ResponsiveContainer width="100%" height="85%">
+            <ResponsiveContainer width="100%" height="85%" minWidth={0} minHeight={0}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 8, fontWeight: 800, fill: '#94a3b8' }} />
@@ -844,7 +844,7 @@ export default function Laporan() {
 
         {/* SECTION 2: REKAP SISWA TIDAK MASUK */}
         <div className="space-y-6" style={{ pageBreakBefore: 'always' }}>
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-rose-600">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 report-section-title before:bg-rose-600">
             III. Detail Ketidakhadiran
           </h3>
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
@@ -910,7 +910,7 @@ export default function Laporan() {
 
         {/* SECTION 3: KEUANGAN */}
         <div className="space-y-6 print-page-2">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-indigo-600">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 report-section-title before:bg-indigo-600">
             IV. Rekapitulasi Keuangan
           </h3>
           <div className="grid grid-cols-4 gap-4">
@@ -980,7 +980,7 @@ export default function Laporan() {
 
         {/* SECTION 4: PANGGILAN & HOME VISIT */}
         <div className="space-y-6 print-page-2">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-amber-600">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 report-section-title before:bg-amber-600">
             V. Rekapitulasi Panggilan & Home Visit
           </h3>
           <div className="grid grid-cols-4 gap-4">
@@ -1208,7 +1208,7 @@ export default function Laporan() {
         </div>
         {/* SECTION 5: SISWA KELUAR */}
         <div className="space-y-6 print-page-2">
-          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-slate-400">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 report-section-title before:bg-slate-400">
             VI. Rekapitulasi Siswa Keluar
           </h3>
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
