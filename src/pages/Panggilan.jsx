@@ -19,7 +19,8 @@ import {
   X,
   Upload,
   Trash2,
-  Link2
+  Link2,
+  ExternalLink
 } from 'lucide-react';
 import Loading from '../components/Loading';
 import { sendNotification } from '../utils/notifications';
@@ -35,7 +36,7 @@ export default function Panggilan() {
   const [siswa, setSiswa] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [thumbnailLinks, setThumbnailLinks] = useState({});
+  const [fileDataUrls, setFileDataUrls] = useState({});
 
   // Lightbox state for image preview
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -85,7 +86,7 @@ export default function Panggilan() {
         const logs = (l.data || []).sort((a, b) => new Date(b.Tanggal) - new Date(a.Tanggal));
         setLog(logs);
 
-        // Batch fetch thumbnails for Drive files
+        // Batch fetch file data for Drive files via proxy
         const driveIds = [];
         logs.forEach(log => {
           if (log.Bukti_File_URL) {
@@ -99,12 +100,22 @@ export default function Panggilan() {
 
         if (driveIds.length > 0) {
           try {
-            const thumbRes = await fetchGAS('GET_THUMBNAILS', { ids: [...new Set(driveIds)] });
-            if (thumbRes.status === 'success') {
-              setThumbnailLinks(thumbRes.data);
-            }
+            const uniqueIds = [...new Set(driveIds)];
+            const results = await Promise.all(
+              uniqueIds.map(id =>
+                fetchGAS('GET_FILE', { id }).then(res => ({
+                  id,
+                  dataUrl: res.status === 'success'
+                    ? `data:${res.data.mimeType};base64,${res.data.base64}`
+                    : null
+                }))
+              )
+            );
+            const urlMap = {};
+            results.forEach(r => { if (r.dataUrl) urlMap[r.id] = r.dataUrl; });
+            setFileDataUrls(urlMap);
           } catch (err) {
-            console.error('Failed to fetch thumbnails:', err);
+            console.error('Failed to fetch files:', err);
           }
         }
       } catch (error) {
@@ -542,46 +553,66 @@ export default function Panggilan() {
                         </td>
                         <td className="px-6 py-4 border-r border-slate-100">
                           {item.Bukti_File_URL ? (
-                            <div className="flex flex-wrap justify-center gap-1">
+                            <div className="flex flex-wrap justify-center gap-1.5 max-w-[140px] mx-auto">
                               {(item.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean).map((url, uIdx) => {
                                 const trimmedUrl = (url || '').trim();
                                 const dMatch = trimmedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || trimmedUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
                                 const dId = dMatch ? dMatch[1] : null;
                                 const isImg = trimmedUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) || dId;
-                                
+
+                                const proxyUrl = dId && fileDataUrls[dId] ? fileDataUrls[dId] : null;
+
                                 return (
-                                   <div key={uIdx} className="flex flex-col items-center gap-1">
-                                     <div className="relative cursor-pointer group" onClick={() => {
-                                        setLightboxImages((item.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean));
-                                        setLightboxIndex(uIdx);
-                                        setLightboxOpen(true);
-                                     }}>
-                                       {isImg ? (
-                                         <img 
-                                           src={dId ? (thumbnailLinks[dId] || `https://lh3.googleusercontent.com/d/${dId}=s200`) : trimmedUrl} 
-                                           className="h-10 w-10 object-cover rounded-lg border-2 border-white shadow-sm group-hover:border-indigo-400 transition-all"
-                                           alt="Bukti"
-                                           loading="lazy"
-                                           onError={(e) => {
-                                              e.target.style.display = 'none';
-                                              if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-                                           }}
-                                         />
-                                       ) : (
-                                         <div className="h-10 w-10 flex items-center justify-center bg-slate-50 rounded-lg border-2 border-white shadow-sm text-[8px] font-black text-slate-400 group-hover:text-indigo-600 transition-all uppercase">File</div>
-                                       )}
-                                       <div className="hidden h-10 w-10 items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg text-slate-400 text-[6px] font-black uppercase text-center leading-none">No Img</div>
-                                     </div>
-                                     <a 
-                                       href={trimmedUrl} 
-                                       target="_blank" 
-                                       rel="noreferrer" 
-                                       className="text-[6px] text-slate-400 hover:text-indigo-600 font-bold flex items-center gap-0.5 opacity-60 hover:opacity-100"
-                                     >
-                                       <Link2 className="w-1.5 h-1.5" />
-                                       Link
-                                     </a>
-                                   </div>
+                                  <div key={uIdx} className="relative group">
+                                    {isImg ? (
+                                      <div
+                                        onClick={() => {
+                                          const rawUrls = (item.Bukti_File_URL || '').split(/[,\n\s]+/).map(u => u.trim()).filter(Boolean);
+                                          setLightboxImages(rawUrls.map(u => {
+                                            const dm = u.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                                            const did = dm ? dm[1] : null;
+                                            return did && fileDataUrls[did] ? fileDataUrls[did] : u;
+                                          }));
+                                          setLightboxIndex(uIdx);
+                                          setLightboxOpen(true);
+                                        }}
+                                        className="block cursor-pointer print-block"
+                                      >
+                                        <img
+                                          src={proxyUrl || (dId ? `https://lh3.googleusercontent.com/d/${dId}=s400` : trimmedUrl)}
+                                          className="h-20 w-24 object-cover rounded-xl shadow-sm border border-slate-200 group-hover:border-indigo-400 group-hover:shadow-md transition-all duration-200"
+                                          alt={`Bukti ${uIdx + 1}`}
+                                          loading="lazy"
+                                          onError={(e) => {
+                                             e.target.style.display = 'none';
+                                             if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                                          }}
+                                        />
+                                        <div className="hidden h-20 w-24 items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-[8px] font-black uppercase tracking-widest">
+                                           No Img
+                                        </div>
+                                        {(item.Bukti_File_URL || '').split(/[,\n\s]+/).filter(Boolean).length > 1 && (
+                                          <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center shadow-lg ring-2 ring-white">
+                                            {uIdx + 1}
+                                          </span>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <a href={trimmedUrl} target="_blank" rel="noreferrer" className="inline-flex flex-col items-center justify-center w-24 h-20 bg-slate-50 text-slate-400 rounded-xl border border-slate-200 text-[8px] font-bold hover:bg-slate-100 hover:text-indigo-600 transition-all">
+                                        <FileText className="w-6 h-6 mb-1 opacity-40" />
+                                        <span>Link #{uIdx + 1}</span>
+                                      </a>
+                                    )}
+                                    <a
+                                      href={trimmedUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-[7px] text-slate-400 hover:text-indigo-600 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-1 max-w-[80px] truncate mt-1"
+                                    >
+                                      <ExternalLink className="w-2 h-2" />
+                                      {dId ? `ID:${dId.substring(0, 5)}...` : 'Buka Link'}
+                                    </a>
+                                  </div>
                                 );
                               })}
                             </div>
