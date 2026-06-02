@@ -253,6 +253,15 @@ function handleResponse(e) {
       },
       GET_THUMBNAILS: function() {
         return { status: 'success', data: getThumbnails(payload && payload.ids) };
+      },
+      CREATE_TERLAMBAT: function() {
+        return { status: 'success', data: createTerlambat(payload && payload.data) };
+      },
+      GET_TERLAMBAT: function() {
+        return { status: 'success', data: getTerlambat(payload && payload.filter) };
+      },
+      DELETE_TERLAMBAT: function() {
+        return { status: 'success', data: deleteData('Catatan_Terlambat', payload && payload.id) };
       }
     };
 
@@ -882,6 +891,9 @@ function setupSpreadsheet() {
 
   var piket = ss.insertSheet('Piket');
   piket.appendRow(['ID_Piket', 'Hari', 'ID_Siswa', 'Nama_Siswa', 'Email']);
+
+  var catatanTerlambat = ss.insertSheet('Catatan_Terlambat');
+  catatanTerlambat.appendRow(['ID_Terlambat', 'Tanggal', 'ID_Siswa', 'NISN', 'Nama_Siswa', 'Keterangan', 'Dicatat_Oleh', 'Created_At']);
   
   // Seed initial notification
   createNotification('Selamat datang di SISWA.HUB! Sistem manajemen kelas digital Anda sudah siap digunakan.', 'success', 'ALL');
@@ -1354,6 +1366,56 @@ function getThumbnails(ids) {
     }
   });
   return result;
+}
+
+/**
+ * CATATAN TERLAMBAT
+ */
+function createTerlambat(data) {
+  if (!data || !data.Tanggal || !data.ID_Siswa) throw new Error('Data tanggal dan siswa harus diisi.');
+  
+  var sheetName = 'Catatan_Terlambat';
+  var existing = getTerlambat({ tanggal: data.Tanggal });
+  
+  // Cegah duplikat: 1 siswa maksimal 1 catatan per hari
+  var duplicate = existing.some(function(r) {
+    return r.ID_Siswa.toString() === data.ID_Siswa.toString();
+  });
+  if (duplicate) throw new Error('Siswa sudah tercatat terlambat pada tanggal ini.');
+  
+  var row = {
+    ID_Terlambat: 'TL' + new Date().getTime() + Math.random().toString(36).substr(2, 5),
+    Tanggal: data.Tanggal,
+    ID_Siswa: data.ID_Siswa,
+    NISN: data.NISN || '',
+    Nama_Siswa: data.Nama_Siswa || '',
+    Keterangan: data.Keterangan || '',
+    Dicatat_Oleh: data.Dicatat_Oleh || '',
+    Created_At: formatDateValue(new Date(), 'Created_At')
+  };
+  
+  return appendData(sheetName, row);
+}
+
+function getTerlambat(filter) {
+  var all = readData('Catatan_Terlambat');
+  if (!filter) return all;
+  
+  return all.filter(function(r) {
+    var match = true;
+    if (filter.tanggal) {
+      match = match && r.Tanggal === filter.tanggal;
+    }
+    if (filter.tanggalMulai && filter.tanggalSelesai) {
+      match = match && r.Tanggal >= filter.tanggalMulai && r.Tanggal <= filter.tanggalSelesai;
+    }
+    if (filter.idSiswa) {
+      match = match && r.ID_Siswa.toString() === filter.idSiswa.toString();
+    }
+    return match;
+  }).sort(function(a, b) {
+    return new Date(b.Tanggal) - new Date(a.Tanggal);
+  });
 }
 
 // Dummy helper if needed, but we use OAuth Token above

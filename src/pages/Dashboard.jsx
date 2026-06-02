@@ -5,7 +5,7 @@ import { format, startOfWeek, endOfWeek, parseISO } from 'date-fns';
 import { fetchGAS } from '../utils/gasClient';
 import { calculateDisciplineStatus, formatIDR, formatDateIndo } from '../utils/logic';
 import StudentCard from '../components/StudentCard';
-import { Users, Wallet, AlertTriangle, CheckCircle2, Bell, ChevronRight, Calendar, Info } from 'lucide-react';
+import { Users, Wallet, AlertTriangle, CheckCircle2, Bell, ChevronRight, Calendar, Info, Clock } from 'lucide-react';
 import Loading from '../components/Loading';
 import Skeleton, { SkeletonStats, SkeletonDashboard } from '../components/Skeleton';
 import EmptyState from '../components/EmptyState';
@@ -23,7 +23,8 @@ export default function Dashboard() {
     presensi: [],
     keuangan: [],
     archiveKeuangan: [],
-    piket: []
+    piket: [],
+    terlambat: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +32,7 @@ export default function Dashboard() {
     async function load() {
       try {
         // Fetch all data in parallel using Promise.all
-        const [s, p, k, rk, ar, ad, pg, pk] = await Promise.all([
+        const [s, p, k, rk, ar, ad, pg, pk, tl] = await Promise.all([
           fetchGAS('GET_ALL', { sheet: 'Master_Siswa' }),
           fetchGAS('GET_ALL', { sheet: 'Presensi' }),
           fetchGAS('GET_ALL', { sheet: 'Keuangan' }),
@@ -39,7 +40,8 @@ export default function Dashboard() {
           fetchGAS('GET_ALL', { sheet: 'Archive_Rekap_Absensi' }),
           fetchGAS('GET_ALL', { sheet: 'Archive_Detail_Absensi' }),
           fetchGAS('GET_ALL', { sheet: 'Log_Panggilan' }),
-          fetchGAS('GET_ALL', { sheet: 'Piket' })
+          fetchGAS('GET_ALL', { sheet: 'Piket' }),
+          fetchGAS('GET_TERLAMBAT', { filter: { tanggal: format(new Date(), 'yyyy-MM-dd') } })
         ]);
 
         // Trigger daily piket notifications once per day
@@ -58,7 +60,8 @@ export default function Dashboard() {
           archiveAbsensi: ar.data || [],
           archiveDetail: ad.data || [],
           panggilan: pg.data || [],
-          piket: (typeof pk !== 'undefined' ? pk.data : []) || []
+          piket: (typeof pk !== 'undefined' ? pk.data : []) || [],
+          terlambat: tl.data || []
         });
       } catch (error) {
         console.error('Dashboard load error:', error);
@@ -147,6 +150,9 @@ export default function Dashboard() {
       };
     });
 
+    const terlambatHariIni = data.terlambat.length;
+    const percentageTerlambat = totalSiswa ? Math.round((terlambatHariIni / totalSiswa) * 100) : 0;
+
     return { 
       hadirHariIni, 
       totalSiswa, 
@@ -157,7 +163,9 @@ export default function Dashboard() {
       kasWeekKeluar,
       pieData,
       financialTrendData,
-      piketHariIni: data.piket.filter(p => p.Hari === ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][new Date().getDay()])
+      piketHariIni: data.piket.filter(p => p.Hari === ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][new Date().getDay()]),
+      terlambatHariIni,
+      percentageTerlambat
     };
   }, [data, getEffectiveStatus]);
 
@@ -262,7 +270,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card Kehadiran */}
         <div className="card bg-gradient-to-br from-emerald-600 to-emerald-800 text-white border-none">
           <div className="flex items-start justify-between">
@@ -273,6 +281,20 @@ export default function Dashboard() {
             </div>
             <div className="bg-white/20 p-3 rounded-full">
               <Users className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* Card Keterlambatan */}
+        <div className="card bg-gradient-to-br from-orange-500 to-orange-700 text-white border-none">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-orange-100 text-sm font-medium">Terlambat Hari Ini</p>
+              <h3 className="text-4xl font-bold mt-2">{stats.percentageTerlambat}%</h3>
+              <p className="text-sm text-orange-100 mt-1">{stats.terlambatHariIni} dari {stats.totalSiswa} Siswa</p>
+            </div>
+            <div className="bg-white/20 p-3 rounded-full">
+              <Clock className="w-6 h-6 text-white" />
             </div>
           </div>
         </div>
@@ -294,7 +316,7 @@ export default function Dashboard() {
         </div>
 
         {/* Card Piket Hari Ini */}
-        <div className="md:col-span-2 card border-l-4 border-l-emerald-500 overflow-hidden relative group hover:shadow-lg transition-all duration-500">
+        <div className="md:col-span-3 card border-l-4 border-l-emerald-500 overflow-hidden relative group hover:shadow-lg transition-all duration-500">
            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
              <Calendar className="w-24 h-24" />
            </div>

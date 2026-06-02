@@ -44,7 +44,8 @@ import {
   ChevronLeft,
   Clock,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Timer
 } from 'lucide-react';
 import Loading from '../components/Loading';
 import Skeleton, { SkeletonStats, SkeletonTable } from '../components/Skeleton';
@@ -65,6 +66,7 @@ export default function Laporan() {
   const [archiveAbsensi, setArchiveAbsensi] = useState([]);
   const [archiveKeuangan, setArchiveKeuangan] = useState([]);
   const [archiveDetail, setArchiveDetail] = useState([]);
+  const [terlambat, setTerlambat] = useState([]);
   const [loading, setLoading] = useState(true);
   const [thumbnailLinks, setThumbnailLinks] = useState({});
 
@@ -84,14 +86,15 @@ export default function Laporan() {
     async function load() {
       try {
         setLoading(true);
-        const [s, p, k, pg, ar, rk, ad] = await Promise.all([
+        const [s, p, k, pg, ar, rk, ad, tl] = await Promise.all([
           fetchGAS('GET_ALL', { sheet: 'Master_Siswa' }),
           fetchGAS('GET_ALL', { sheet: 'Presensi' }),
           fetchGAS('GET_ALL', { sheet: 'Keuangan' }),
           fetchGAS('GET_ALL', { sheet: 'Log_Panggilan' }),
           fetchGAS('GET_ALL', { sheet: 'Archive_Rekap_Absensi' }),
           fetchGAS('GET_ALL', { sheet: 'Archive_Rekap_Keuangan' }),
-          fetchGAS('GET_ALL', { sheet: 'Archive_Detail_Absensi' })
+          fetchGAS('GET_ALL', { sheet: 'Archive_Detail_Absensi' }),
+          fetchGAS('GET_ALL', { sheet: 'Catatan_Terlambat' })
         ]);
 
         const allSiswa = s.data || [];
@@ -102,6 +105,7 @@ export default function Laporan() {
         setArchiveAbsensi(ar.data || []);
         setArchiveKeuangan(rk.data || []);
         setArchiveDetail(ad.data || []);
+        setTerlambat(tl.data || []);
 
         // Batch fetch thumbnails for Drive files
         const driveIds = [];
@@ -377,6 +381,32 @@ export default function Laporan() {
     });
     return stats;
   }, [filteredPanggilan]);
+
+  // 5. Terlambat Stats
+  const filteredTerlambat = useMemo(() => {
+    return terlambat.filter(t => {
+      try {
+        const d = parseISO(t.Tanggal);
+        return d >= dateRange.start && d <= dateRange.end;
+      } catch { return false; }
+    });
+  }, [terlambat, dateRange]);
+
+  const terlambatStats = useMemo(() => {
+    const perSiswa = {};
+    filteredTerlambat.forEach(t => {
+      const id = t.ID_Siswa;
+      if (!perSiswa[id]) perSiswa[id] = { total: 0, records: [] };
+      perSiswa[id].total++;
+      perSiswa[id].records.push(t);
+    });
+    return Object.entries(perSiswa)
+      .map(([id, data]) => {
+        const s = siswa.find(item => item.ID_Siswa === id);
+        return { id, name: s?.Nama_Siswa || id, ...data };
+      })
+      .sort((a, b) => b.total - a.total);
+  }, [filteredTerlambat, siswa]);
 
   // Memoized Student Groups
   const activeStudents = useMemo(() => {
@@ -1216,8 +1246,75 @@ export default function Laporan() {
           </div>
          </div>
 
-       </div>
-     </div>
+        {/* SECTION 7: REKAP KETERLAMBATAN */}
+        <div className="space-y-6 print-page-2">
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2 report-section-title before:bg-orange-600">
+            VII. Rekapitulasi Keterlambatan
+          </h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-orange-50 p-4 rounded-2xl border border-white shadow-sm flex flex-col items-center justify-center text-center">
+              <span className="text-2xl font-black text-orange-600">{filteredTerlambat.length}</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">Total Keterlambatan</span>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-white shadow-sm flex flex-col items-center justify-center text-center">
+              <span className="text-2xl font-black text-slate-700">{terlambatStats.length}</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">Siswa Terlambat</span>
+            </div>
+            <div className="bg-amber-50 p-4 rounded-2xl border border-white shadow-sm flex flex-col items-center justify-center text-center">
+              <span className="text-2xl font-black text-amber-600">
+                {activeStudents.length > 0 ? Math.round((terlambatStats.length / activeStudents.length) * 100) : 0}%
+              </span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 mt-1">Prosentase</span>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <table className="modern-table">
+              <thead>
+                <tr>
+                  <th className="text-left w-12">No.</th>
+                  <th className="text-left">Nama Siswa</th>
+                  <th className="text-center w-24">Jumlah Terlambat</th>
+                  <th className="text-left">Keterangan</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {terlambatStats.length > 0 ? terlambatStats.map((data, idx) => (
+                  <tr key={data.id} className="hover:bg-slate-50 transition-colors font-bold">
+                    <td className="text-slate-400 font-black text-[10px] text-center">{idx + 1}</td>
+                    <td className="text-left font-extrabold text-slate-800 leading-none">
+                      <p>{data.name}</p>
+                      <p className="text-[8px] text-slate-400 font-black mt-1 uppercase leading-none">{data.id}</p>
+                    </td>
+                    <td className="text-center">
+                      <span className="px-3 py-1 rounded-full text-[10px] font-black bg-orange-100 text-orange-700">
+                        {data.total} Kali
+                      </span>
+                    </td>
+                    <td className="text-left">
+                      <div className="flex flex-wrap gap-1">
+                        {data.records.map((r, ridx) => (
+                          <span key={ridx} className="text-[9px] bg-slate-50 text-slate-600 border border-slate-200 px-2 py-1 rounded-md font-bold whitespace-nowrap">
+                            {formatDateIndo(r.Tanggal)}{r.Keterangan ? `: ${r.Keterangan}` : ''}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="4" className="py-8 text-center text-slate-300 font-black uppercase tracking-widest text-xs">
+                      Tidak ada data keterlambatan
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+         </div>
+
+        </div>
+      </div>
 
       <ImageLightbox
         images={lightboxImages}

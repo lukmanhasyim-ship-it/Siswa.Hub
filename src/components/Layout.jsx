@@ -5,7 +5,7 @@ import {
   Wallet, PhoneCall, LogOut, Sun, Moon, FileText,
   Edit3, User, Settings, Bell, BookOpen, LibraryBig,
   ChevronLeft, ChevronRight, Search, Calendar, Menu, X,
-  MessageCircle, ExternalLink, Link2
+  MessageCircle, ExternalLink, Link2, Clock
 } from 'lucide-react';
 import Breadcrumbs from './Breadcrumbs';
 import { useAuth } from '../context/AuthContext';
@@ -247,6 +247,7 @@ export default function Layout() {
           {access.presensiPagi && <NavItem to="presensi-pagi" icon={Sun} label="Presensi Pagi" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
           {access.presensiSiang && <NavItem to="presensi-siang" icon={Moon} label="Presensi Siang" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
           <NavItem to="piket" icon={Calendar} label="Jadwal Piket" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />
+          {access.siswa && <NavItem to="catatan-terlambat" icon={Clock} label="Catatan Terlambat" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
 
           <div className={`${isSidebarCollapsed ? 'my-2 mx-auto w-8' : 'my-4 px-4'} h-px bg-slate-200`} />
           <span className={`${isSidebarCollapsed ? 'hidden' : 'block'} text-[9px] font-black text-slate-300 uppercase tracking-widest px-4`}>Pelaporan</span>

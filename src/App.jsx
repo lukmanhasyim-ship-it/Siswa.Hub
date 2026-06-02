@@ -25,6 +25,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Piket from './pages/Piket';
 import Feedback from './pages/Feedback';
+import CatatanTerlambat from './pages/CatatanTerlambat';
 
 // Google OAuth Client ID dari .env
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -128,6 +129,14 @@ function AppRoutes() {
           element={
             <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
               <DKN key={location.key} />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="catatan-terlambat"
+          element={
+            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
+              <CatatanTerlambat key={location.key} />
             </RoleProtectedRoute>
           }
         />
