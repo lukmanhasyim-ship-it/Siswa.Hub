@@ -65,7 +65,9 @@ export default function Laporan() {
   const [panggilan, setPanggilan] = useState([]);
   const [archiveAbsensi, setArchiveAbsensi] = useState([]);
   const [archiveKeuangan, setArchiveKeuangan] = useState([]);
+  const [archiveDetailKeuangan, setArchiveDetailKeuangan] = useState([]);
   const [archiveDetail, setArchiveDetail] = useState([]);
+  const [archiveTerlambat, setArchiveTerlambat] = useState([]);
   const [terlambat, setTerlambat] = useState([]);
   const [loading, setLoading] = useState(true);
   const [thumbnailLinks, setThumbnailLinks] = useState({});
@@ -86,7 +88,7 @@ export default function Laporan() {
     async function load() {
       try {
         setLoading(true);
-        const [s, p, k, pg, ar, rk, ad, tl] = await Promise.all([
+        const [s, p, k, pg, ar, rk, ad, tl, atl, adk] = await Promise.all([
           fetchGAS('GET_ALL', { sheet: 'Master_Siswa' }),
           fetchGAS('GET_ALL', { sheet: 'Presensi' }),
           fetchGAS('GET_ALL', { sheet: 'Keuangan' }),
@@ -94,7 +96,9 @@ export default function Laporan() {
           fetchGAS('GET_ALL', { sheet: 'Archive_Rekap_Absensi' }),
           fetchGAS('GET_ALL', { sheet: 'Archive_Rekap_Keuangan' }),
           fetchGAS('GET_ALL', { sheet: 'Archive_Detail_Absensi' }),
-          fetchGAS('GET_ALL', { sheet: 'Catatan_Terlambat' })
+          fetchGAS('GET_ALL', { sheet: 'Catatan_Terlambat' }),
+          fetchGAS('GET_ALL', { sheet: 'Archive_Catatan_Terlambat' }),
+          fetchGAS('GET_ALL', { sheet: 'Archive_Detail_Keuangan' })
         ]);
 
         const allSiswa = s.data || [];
@@ -105,6 +109,8 @@ export default function Laporan() {
         setArchiveAbsensi(ar.data || []);
         setArchiveKeuangan(rk.data || []);
         setArchiveDetail(ad.data || []);
+        setArchiveTerlambat(atl.data || []);
+        setArchiveDetailKeuangan(adk.data || []);
         setTerlambat(tl.data || []);
 
         // Batch fetch thumbnails for Drive files
@@ -192,7 +198,13 @@ export default function Laporan() {
   }, [filterType, selectedMonth, selectedWeek]);
 
   const filteredPresensi = useMemo(() => {
-    const combined = [...presensi, ...archiveDetail];
+    const seen = new Set();
+    const combined = [...presensi, ...archiveDetail].filter(p => {
+      const key = p.ID_Presensi;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
     return combined.filter(p => {
       try {
         const d = parseISO(p.Tanggal);
@@ -202,11 +214,18 @@ export default function Laporan() {
   }, [presensi, archiveDetail, dateRange]);
 
   const filteredKeuangan = useMemo(() => {
-    return keuangan.filter(k => {
+    const seen = new Set();
+    const combined = [...keuangan, ...archiveDetailKeuangan].filter(k => {
+      const key = k.ID_Transaksi;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return combined.filter(k => {
       const d = parseISO(k.Tanggal);
       return d >= dateRange.start && d <= dateRange.end;
     });
-  }, [keuangan, dateRange]);
+  }, [keuangan, archiveDetailKeuangan, dateRange]);
 
   const filteredPanggilan = useMemo(() => {
     return panggilan.filter(pg => {
@@ -384,13 +403,20 @@ export default function Laporan() {
 
   // 5. Terlambat Stats
   const filteredTerlambat = useMemo(() => {
-    return terlambat.filter(t => {
+    const seen = new Set();
+    const combined = [...terlambat, ...archiveTerlambat].filter(t => {
+      const key = t.ID_Terlambat;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return combined.filter(t => {
       try {
         const d = parseISO(t.Tanggal);
         return d >= dateRange.start && d <= dateRange.end;
       } catch { return false; }
     });
-  }, [terlambat, dateRange]);
+  }, [terlambat, archiveTerlambat, dateRange]);
 
   const terlambatStats = useMemo(() => {
     const perSiswa = {};

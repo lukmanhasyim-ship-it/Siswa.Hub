@@ -23,6 +23,8 @@ export default function Dashboard() {
     presensi: [],
     keuangan: [],
     archiveKeuangan: [],
+    archiveAbsensi: [],
+    archiveDetail: [],
     piket: [],
     terlambat: []
   });

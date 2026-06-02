@@ -239,6 +239,12 @@ function handleResponse(e) {
       SETUP_TRIGGERS: function() {
         return { status: 'success', data: setupArchiveTriggers() };
       },
+      GET_TRIGGER_STATUS: function() {
+        return { status: 'success', data: getTriggerStatus() };
+      },
+      CLEAR_ACTIVE_DATA: function() {
+        return { status: 'success', data: clearActiveData() };
+      },
       RESET_DATABASE: function() {
         return { status: 'success', data: resetDatabase(payload && payload.email) };
       },
@@ -897,6 +903,9 @@ function setupSpreadsheet() {
   
   // Seed initial notification
   createNotification('Selamat datang di SISWA.HUB! Sistem manajemen kelas digital Anda sudah siap digunakan.', 'success', 'ALL');
+  
+  // Buat sheet arsip sekaligus
+  ensureArchiveSheets(ss);
 }
 
 /**
@@ -922,6 +931,22 @@ function setupArchiveTriggers() {
   return "Trigger pengarsipan otomatis berhasil disetup untuk tanggal 1 setiap bulan.";
 }
 
+function getTriggerStatus() {
+  var triggers = ScriptApp.getProjectTriggers();
+  var archiveTrigger = null;
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'runMonthlyArchive') {
+      archiveTrigger = triggers[i];
+      break;
+    }
+  }
+  return {
+    active: !!archiveTrigger,
+    handler: archiveTrigger ? archiveTrigger.getHandlerFunction() : null,
+    triggerSource: archiveTrigger ? archiveTrigger.getTriggerSource().toString() : null
+  };
+}
+
 function runMonthlyArchive(targetMonth) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var now = new Date();
@@ -937,13 +962,15 @@ function runMonthlyArchive(targetMonth) {
     
     var resAbsensi = archiveAbsensi(ss, targetMonth);
     var resKeuangan = archiveKeuangan(ss, targetMonth);
+    var resTerlambat = archiveTerlambat(ss, targetMonth);
     
     createNotification('Pengarsipan otomatis bulan ' + targetMonth + ' berhasil dilakukan.', 'success', 'Wali');
     
     return {
       month: targetMonth,
       absensi: resAbsensi,
-      keuangan: resKeuangan
+      keuangan: resKeuangan,
+      terlambat: resTerlambat
     };
   } catch (e) {
     createNotification('Gagal melakukan pengarsipan otomatis: ' + e.toString(), 'alert', 'Wali');
@@ -960,6 +987,12 @@ function ensureArchiveSheets(ss) {
   }
   if (!ss.getSheetByName('Archive_Detail_Absensi')) {
     ss.insertSheet('Archive_Detail_Absensi').appendRow(['ID_Presensi', 'Tanggal', 'ID_Siswa', 'NISN', 'Status_Pagi', 'Timestamp_Pagi', 'Status_Siang', 'Timestamp_Siang', 'Keterangan']);
+  }
+  if (!ss.getSheetByName('Archive_Catatan_Terlambat')) {
+    ss.insertSheet('Archive_Catatan_Terlambat').appendRow(['ID_Terlambat', 'Tanggal', 'ID_Siswa', 'NISN', 'Nama_Siswa', 'Keterangan', 'Dicatat_Oleh', 'Created_At']);
+  }
+  if (!ss.getSheetByName('Archive_Detail_Keuangan')) {
+    ss.insertSheet('Archive_Detail_Keuangan').appendRow(['ID_Transaksi', 'Tanggal', 'ID_Siswa', 'NISN', 'Tipe', 'Jumlah', 'Keterangan']);
   }
 }
 
@@ -1032,8 +1065,8 @@ function archiveAbsensi(ss, monthStr) {
   for (var sid in rekapMap) {
     rekapSheet.appendRow([
       sid, monthStr,
-      rekapMap[sid].H, rekapMap[sid].S,
-      rekapMap[sid].I, rekapMap[sid].A, rekapMap[sid].B
+      rekapMap[sid].H, rekapMap[sid].I,
+      rekapMap[sid].S, rekapMap[sid].A, rekapMap[sid].B
     ]);
   }
   
@@ -1053,9 +1086,11 @@ function archiveAbsensi(ss, monthStr) {
 function archiveKeuangan(ss, monthStr) {
   var keuanganSheet = ss.getSheetByName('Keuangan');
   var rekapSheet = ss.getSheetByName('Archive_Rekap_Keuangan');
+  var detailSheet = ss.getSheetByName('Archive_Detail_Keuangan');
   
   if (!keuanganSheet) return 'Sheet Keuangan tidak ditemukan.';
   if (!rekapSheet) return 'Sheet Archive_Rekap_Keuangan belum siap.';
+  if (!detailSheet) return 'Sheet Archive_Detail_Keuangan belum siap.';
 
   var lastRow = keuanganSheet.getLastRow();
   if (lastRow <= 1) {
@@ -1075,6 +1110,7 @@ function archiveKeuangan(ss, monthStr) {
   
   var totalMasuk = 0;
   var totalKeluar = 0;
+  var rowsToMove = [];
   var rowsToDelete = [];
   
   // Hitung Saldo Awal (Saldo Akhir dari rekap bulan terakhir)
@@ -1100,6 +1136,7 @@ function archiveKeuangan(ss, monthStr) {
     if (tipe === 'Masuk') totalMasuk += jumlah;
     else if (tipe === 'Keluar') totalKeluar += jumlah;
     
+    rowsToMove.push(data[i]);
     rowsToDelete.push(i + 1);
   }
   
@@ -1108,12 +1145,65 @@ function archiveKeuangan(ss, monthStr) {
   // Simpan Rekap Mutasi
   rekapSheet.appendRow([monthStr, saldoAwal, totalMasuk, totalKeluar, saldoAkhir]);
   
+  // Simpan Detail Transaksi ke Archive
+  if (rowsToMove.length > 0) {
+    detailSheet.getRange(detailSheet.getLastRow() + 1, 1, rowsToMove.length, headers.length).setValues(rowsToMove);
+  }
+  
   // Hapus baris lama dari bawah ke atas
   for (var k = rowsToDelete.length - 1; k >= 0; k--) {
     keuanganSheet.deleteRow(rowsToDelete[k]);
   }
   
   return 'Berhasil mutasi kas bulan ' + monthStr + '. Saldo Akhir: Rp ' + saldoAkhir.toLocaleString('id-ID');
+}
+
+function archiveTerlambat(ss, monthStr) {
+  var sheet = ss.getSheetByName('Catatan_Terlambat');
+  var archiveSheet = ss.getSheetByName('Archive_Catatan_Terlambat');
+  
+  if (!sheet) return 'Sheet Catatan_Terlambat tidak ditemukan.';
+  if (!archiveSheet) return 'Sheet Archive_Catatan_Terlambat belum siap.';
+  
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 'Tidak ada data keterlambatan untuk diarsip.';
+  
+  var data = sheet.getRange(1, 1, lastRow, sheet.getLastColumn()).getValues();
+  var headers = data[0];
+  var hMap = buildHeaderIndex(headers);
+  var dateIdx = hMap['Tanggal'];
+  
+  if (dateIdx === undefined) return 'Kolom Tanggal tidak ditemukan di sheet Catatan_Terlambat.';
+  
+  var rowsToMove = [];
+  var rowsToDelete = [];
+  
+  for (var i = 1; i < data.length; i++) {
+    var rawDate = data[i][dateIdx];
+    var rowMonth = '';
+    if (rawDate instanceof Date) {
+      rowMonth = Utilities.formatDate(rawDate, Session.getScriptTimeZone(), 'yyyy-MM');
+    } else if (typeof rawDate === 'string' && rawDate.indexOf('-') > -1) {
+      rowMonth = rawDate.substring(0, 7);
+    }
+    
+    if (rowMonth !== monthStr) continue;
+    
+    rowsToMove.push(data[i]);
+    rowsToDelete.push(i + 1);
+  }
+  
+  if (rowsToDelete.length === 0) return 'Tidak ada data keterlambatan bulan ' + monthStr + '.';
+  
+  // Simpan ke archive
+  archiveSheet.getRange(archiveSheet.getLastRow() + 1, 1, rowsToMove.length, headers.length).setValues(rowsToMove);
+  
+  // Hapus dari sheet utama (dari bawah ke atas)
+  for (var j = rowsToDelete.length - 1; j >= 0; j--) {
+    sheet.deleteRow(rowsToDelete[j]);
+  }
+  
+  return 'Berhasil mengarsip ' + rowsToDelete.length + ' baris keterlambatan bulan ' + monthStr + '.';
 }
 
 /**
@@ -1143,6 +1233,29 @@ function resetDatabase(requesterEmail) {
   createNotification('Database telah direset sepenuhnya oleh ' + requesterEmail + '. Semua data siswa, transaksi, dan arsip telah dihapus.', 'alert', 'Wali Kelas', requesterEmail);
   
   return "Database berhasil direset. Seluruh records pada semua sheet telah dihapus, menyisakan header dan data Wali Kelas.";
+}
+
+function clearActiveData() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var targetSheets = ['Presensi', 'Catatan_Terlambat', 'Keuangan'];
+  var results = [];
+  
+  for (var i = 0; i < targetSheets.length; i++) {
+    var sheet = ss.getSheetByName(targetSheets[i]);
+    if (sheet) {
+      var lastRow = sheet.getLastRow();
+      if (lastRow > 1) {
+        sheet.deleteRows(2, lastRow - 1);
+        results.push(targetSheets[i] + ': ' + (lastRow - 1) + ' baris');
+      } else {
+        results.push(targetSheets[i] + ': kosong');
+      }
+    } else {
+      results.push(targetSheets[i] + ': tidak ditemukan');
+    }
+  }
+  
+  return 'Berhasil membersihkan data aktif. ' + results.join('; ');
 }
 
 function renameMapel(oldMapel, oldTopik, newName, newTopik, kategori) {
@@ -1385,6 +1498,15 @@ function createTerlambat(data) {
 
 function getTerlambat(filter) {
   var all = readData('Catatan_Terlambat');
+  
+  // Gabung dengan data arsip
+  try {
+    var archived = readData('Archive_Catatan_Terlambat');
+    all = all.concat(archived);
+  } catch (e) {
+    // Archive sheet mungkin belum ada
+  }
+  
   if (!filter) return all;
   
   return all.filter(function(r) {

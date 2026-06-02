@@ -17,6 +17,13 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [archiving, setArchiving] = useState(false);
+  const [setupTriggerMsg, setSetupTriggerMsg] = useState('');
+  const [triggerStatus, setTriggerStatus] = useState(null);
+  const [triggerLoading, setTriggerLoading] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [clearConfirmInput, setClearConfirmInput] = useState('');
+  const [clearing, setClearing] = useState(false);
   const [error, setError] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -85,6 +92,27 @@ export default function Profile() {
 
     loadProfile();
   }, [user, sheetName, isSiswaRole, showToast]);
+
+  useEffect(() => {
+    async function checkTrigger() {
+      if (!isWaliKelas) return;
+      setTriggerLoading(true);
+      try {
+        const res = await fetchGAS('GET_TRIGGER_STATUS');
+        if (res.status === 'success') {
+          setTriggerStatus(res.data);
+          if (res.data.active) {
+            setSetupTriggerMsg('Trigger aktif: arsip otomatis tiap tanggal 1 jam 01:00.');
+          }
+        }
+      } catch (err) {
+        console.error('Check trigger status error:', err);
+      } finally {
+        setTriggerLoading(false);
+      }
+    }
+    checkTrigger();
+  }, [isWaliKelas]);
 
   const normalizeDecimalString = (value) => {
     if (value === undefined || value === null) return '';
@@ -249,6 +277,62 @@ export default function Profile() {
       console.error('Reset database error:', err);
       showToast('Gagal mereset database.', 'error');
       setResetting(false);
+    }
+  };
+
+  const handleSetupTrigger = async () => {
+    setArchiving(true);
+    setSetupTriggerMsg('');
+    try {
+      const response = await fetchGAS('SETUP_TRIGGERS');
+      showToast(response.data || 'Trigger otomatis berhasil disetup.', 'success');
+      setSetupTriggerMsg('Trigger aktif: arsip otomatis tiap tanggal 1 jam 01:00.');
+      const statusRes = await fetchGAS('GET_TRIGGER_STATUS');
+      if (statusRes.status === 'success') setTriggerStatus(statusRes.data);
+    } catch (err) {
+      console.error('Setup trigger error:', err);
+      showToast('Gagal menyetup trigger.', 'error');
+    } finally {
+      setArchiving(false);
+    }
+  };
+
+  const handleManualArchive = async () => {
+    setArchiving(true);
+    try {
+      const response = await fetchGAS('RUN_MANUAL_ARCHIVE');
+      if (response.status === 'success') {
+        showToast('Arsip bulan lalu berhasil dijalankan.', 'success');
+      }
+    } catch (err) {
+      console.error('Manual archive error:', err);
+      showToast('Gagal menjalankan arsip manual.', 'error');
+    } finally {
+      setArchiving(false);
+    }
+  };
+
+  const handleClearData = () => {
+    setShowClearModal(true);
+    setClearConfirmInput('');
+  };
+
+  const confirmClearData = async () => {
+    if (clearConfirmInput !== 'BERSIHKAN') {
+      showToast("Teks konfirmasi tidak sesuai.", "error");
+      return;
+    }
+
+    setShowClearModal(false);
+    setClearing(true);
+    try {
+      const response = await fetchGAS('CLEAR_ACTIVE_DATA');
+      showToast(response.data || 'Data aktif berhasil dibersihkan.', 'success');
+    } catch (err) {
+      console.error('Clear data error:', err);
+      showToast('Gagal membersihkan data.', 'error');
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -497,6 +581,95 @@ export default function Profile() {
       </div>
 
       {isWaliKelas && (
+        <div className="card p-6 border-blue-100 bg-blue-50/30">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                {triggerLoading ? (
+                  <span className="inline-block w-2 h-2 rounded-full bg-slate-300 animate-pulse" />
+                ) : triggerStatus?.active ? (
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" title="Aktif" />
+                ) : (
+                  <span className="inline-block w-2 h-2 rounded-full bg-slate-300" title="Tidak Aktif" />
+                )}
+                <h3 className="text-lg font-bold text-blue-700">Pengelolaan Arsip</h3>
+                {!triggerLoading && (
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    triggerStatus?.active
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-slate-200 text-slate-500'
+                  }`}>
+                    {triggerStatus?.active ? 'Aktif' : 'Tidak Aktif'}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-slate-600">
+                Arsip otomatis memindahkan data absensi, keuangan, dan keterlambatan bulan lalu ke sheet arsip. 
+                Jadwal otomatis berjalan setiap tanggal 1 jam 01:00 pagi.
+              </p>
+              {setupTriggerMsg && (
+                <p className="text-xs font-semibold text-emerald-600 mt-1">{setupTriggerMsg}</p>
+              )}
+            </div>
+            <div className="flex gap-2 flex-shrink-0">
+              <button
+                type="button"
+                onClick={handleSetupTrigger}
+                disabled={archiving}
+                className={`px-4 py-2.5 rounded-xl font-bold transition-all duration-200 text-sm ${
+                  archiving 
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95'
+                }`}
+              >
+                {archiving ? 'Memproses...' : 'Setup Trigger Otomatis'}
+              </button>
+              <button
+                type="button"
+                onClick={handleManualArchive}
+                disabled={archiving}
+                className={`px-4 py-2.5 rounded-xl font-bold transition-all duration-200 text-sm ${
+                  archiving 
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 active:scale-95'
+                }`}
+              >
+                {archiving ? 'Memproses...' : 'Arsip Bulan Lalu'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isWaliKelas && (
+        <div className="card p-6 border-amber-100 bg-amber-50/30">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-amber-700">Bersihkan Data Aktif</h3>
+              <p className="text-sm text-slate-600">
+                Hapus semua data <b>Presensi</b>, <b>Catatan Terlambat</b>, dan <b>Keuangan</b> dari sheet aktif untuk menghemat penyimpanan spreadsheet.
+              </p>
+              <p className="text-xs font-semibold text-amber-600">
+                ⚠ Pastikan sudah menjalankan <b>Arsip Bulan Lalu</b> terlebih dahulu. Data di sheet arsip tidak terhapus, tetapi detail transaksi keuangan & absensi Hadir yang sudah diarsip tidak bisa dikembalikan ke sheet aktif.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleClearData}
+              disabled={clearing}
+              className={`px-6 py-2.5 rounded-xl font-bold transition-all duration-200 flex-shrink-0 ${
+                clearing 
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                  : 'bg-amber-600 text-white hover:bg-amber-700 shadow-lg shadow-amber-200 active:scale-95'
+              }`}
+            >
+              {clearing ? 'Membersihkan...' : 'Bersihkan Data Aktif'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isWaliKelas && (
         <div className="card p-6 border-red-100 bg-red-50/30">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
@@ -566,6 +739,68 @@ export default function Profile() {
                   }`}
                 >
                   Ya, Reset Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Konfirmasi Clear Data Aktif */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100">
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Hapus Data Aktif?</h3>
+              <div className="text-slate-500 mb-6 text-sm leading-relaxed text-left bg-slate-50 rounded-xl p-4 space-y-2">
+                <p>Tindakan ini akan menghapus <b>seluruh baris data</b> dari sheet aktif:</p>
+                <ul className="list-disc list-inside space-y-1 text-slate-600">
+                  <li><b>Presensi</b> — data absensi harian</li>
+                  <li><b>Catatan Terlambat</b> — data keterlambatan</li>
+                  <li><b>Keuangan</b> — data transaksi kas</li>
+                </ul>
+                <div className="border-t border-slate-200 pt-2 mt-2">
+                  <p className="text-emerald-700 font-semibold">✅ Data di sheet ARSIP tetap aman.</p>
+                  <p className="text-amber-700 font-semibold">⚠ Pastikan sudah menjalankan arsip sebelum membersihkan.</p>
+                </div>
+                <p className="text-red-600 font-bold text-xs">Tindakan ini TIDAK DAPAT DIBATALKAN.</p>
+              </div>
+
+              <div className="mb-8">
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Ketik "BERSIHKAN" untuk konfirmasi</label>
+                <input 
+                  type="text" 
+                  className="input-field text-center font-bold tracking-[0.5em] focus:border-amber-500 focus:ring-amber-500/20"
+                  placeholder="BERSIHKAN"
+                  value={clearConfirmInput}
+                  onChange={(e) => setClearConfirmInput(e.target.value.toUpperCase())}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setShowClearModal(false)}
+                  className="btn-secondary py-3 rounded-2xl"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="button" 
+                  disabled={clearConfirmInput !== 'BERSIHKAN'}
+                  onClick={confirmClearData}
+                  className={`py-3 rounded-2xl font-bold transition-all shadow-lg ${
+                    clearConfirmInput === 'BERSIHKAN' 
+                      ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-amber-200 active:scale-95' 
+                      : 'bg-slate-100 text-slate-300 cursor-not-allowed shadow-none'
+                  }`}
+                >
+                  Ya, Bersihkan
                 </button>
               </div>
             </div>
