@@ -183,21 +183,34 @@ export default function Dashboard() {
       const latestPg = studentPanggilan[0];
       const cutOffDate = (latestPg && latestPg.Status_Selesai === 'Selesai') ? new Date(latestPg.Tanggal) : null;
 
-      // Hanya presensi bulan berjalan (archive adalah bulan lalu — tidak dihitung)
+      // Presensi bulan berjalan + minggu terakhir bulan sebelumnya (dari archive)
+      const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+      const prevMonthWeekStart = new Date(prevMonthEnd);
+      prevMonthWeekStart.setDate(prevMonthEnd.getDate() - 6);
+
       const currentMonthRecords = (data.presensi || [])
         .filter(p => p.ID_Siswa === student.ID_Siswa)
-        .filter(p => new Date(p.Tanggal) >= monthStart)
+        .filter(p => new Date(p.Tanggal) >= monthStart);
+
+      const archiveWeekRecords = (data.archiveDetail || [])
+        .filter(p => p.ID_Siswa === student.ID_Siswa)
+        .filter(p => {
+          const d = new Date(p.Tanggal);
+          return d >= prevMonthWeekStart && d <= prevMonthEnd;
+        });
+
+      const combinedRecords = [...currentMonthRecords, ...archiveWeekRecords]
         .filter(p => {
           if (!cutOffDate) return true;
           return new Date(p.Tanggal) > cutOffDate;
         });
 
-      const statuses = currentMonthRecords.map(r => getEffectiveStatus(r));
+      const statuses = combinedRecords.map(r => getEffectiveStatus(r));
       const totalAlfas = statuses.filter(s => s === 'A').length;
       const totalBolos = statuses.filter(s => s === 'B').length;
 
-      const alfasList = currentMonthRecords.filter(r => getEffectiveStatus(r) === 'A').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
-      const bolosList = currentMonthRecords.filter(r => getEffectiveStatus(r) === 'B').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
+      const alfasList = combinedRecords.filter(r => getEffectiveStatus(r) === 'A').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
+      const bolosList = combinedRecords.filter(r => getEffectiveStatus(r) === 'B').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
 
       const disciplineStatus = calculateDisciplineStatus(statuses, totalBolos);
       const isProcessed = latestPg && latestPg.Status_Selesai !== 'Selesai' && latestPg.Status_Selesai !== 'Ditolak';
@@ -227,7 +240,7 @@ export default function Dashboard() {
       }
     });
     return result;
-  }, [data.siswa, data.presensi, data.panggilan, getEffectiveStatus, user.email, user.role]);
+  }, [data.siswa, data.presensi, data.archiveDetail, data.panggilan, getEffectiveStatus, user.email, user.role]);
 
   const handleDirectCall = useCallback((student, discipline, detailReason) => {
     navigate('/panggilan', { 
