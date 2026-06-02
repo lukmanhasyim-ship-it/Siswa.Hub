@@ -273,6 +273,7 @@ export default function Panggilan() {
     total: log.length,
     pending: log.filter(l => l.Status_Selesai === 'Pending').length,
     selesai: log.filter(l => l.Status_Selesai === 'Selesai').length,
+    ditolak: log.filter(l => l.Status_Selesai === 'Ditolak').length,
     today: log.filter(l => l.Tanggal === format(new Date(), 'yyyy-MM-dd')).length
   };
 
@@ -308,11 +309,12 @@ export default function Panggilan() {
       </div>
 
       {/* Stats Quick View */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: 'Total Record', val: stats.total, color: 'slate', icon: History },
           { label: 'Pending', val: stats.pending, color: 'rose', icon: AlertCircle },
           { label: 'Selesai', val: stats.selesai, color: 'emerald', icon: CheckCircle2 },
+          { label: 'Ditolak', val: stats.ditolak, color: 'slate', icon: XCircle },
           { label: 'Hari Ini', val: stats.today, color: 'amber', icon: PlusCircle }
         ].map((s, i) => (
           <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
@@ -500,6 +502,7 @@ export default function Panggilan() {
                   ) : filteredLog.slice(0, 5).map((item, idx) => {
                     const s = siswa.find(s => String(s.NISN) === String(item.NISN));
                     const isSelesai = item.Status_Selesai === 'Selesai';
+                    const isDitolak = item.Status_Selesai === 'Ditolak';
                     const isSelected = selectedLogs.includes(item.ID_Panggilan);
                     return (
                       <tr key={item.ID_Panggilan} className={`hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0 ${isSelected ? 'bg-red-50/30' : ''}`}>
@@ -636,6 +639,18 @@ export default function Panggilan() {
                                   </div>
                                 )}
                               </div>
+                            ) : isDitolak ? (
+                              <div className="flex flex-col gap-1.5">
+                                <div className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg border border-rose-100 flex items-center justify-center gap-2">
+                                  <XCircle className="w-3 h-3" />
+                                  <span className="text-[9px] font-black uppercase tracking-widest">Ditolak</span>
+                                </div>
+                                {item.Hasil_Pertemuan && (
+                                  <div className="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                    <p className="text-[9px] text-slate-500 italic leading-tight line-clamp-2">{item.Hasil_Pertemuan}</p>
+                                  </div>
+                                )}
+                              </div>
                             ) : (
                               <button
                                 onClick={() => { setActiveCallId(item.ID_Panggilan); setIsTindakLanjutOpen(true); }}
@@ -646,12 +661,30 @@ export default function Panggilan() {
                               </button>
                             )}
                             <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleUpdateStatus(item.ID_Panggilan, isSelesai ? 'Pending' : 'Selesai')}
-                                className="flex-1 text-[8px] font-bold text-slate-400 hover:text-emerald-500 uppercase tracking-tighter transition-colors text-center"
-                              >
-                                {isSelesai ? 'Batalkan Selesai' : 'Tandai Selesai'}
-                              </button>
+                              {!isDitolak ? (
+                                <button
+                                  onClick={() => handleUpdateStatus(item.ID_Panggilan, isSelesai ? 'Pending' : 'Selesai')}
+                                  className="flex-1 text-[8px] font-bold text-slate-400 hover:text-emerald-500 uppercase tracking-tighter transition-colors text-center"
+                                >
+                                  {isSelesai ? 'Batalkan Selesai' : 'Tandai Selesai'}
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleUpdateStatus(item.ID_Panggilan, 'Pending')}
+                                  className="flex-1 text-[8px] font-bold text-slate-400 hover:text-emerald-500 uppercase tracking-tighter transition-colors text-center"
+                                >
+                                  Batalkan Tolak
+                                </button>
+                              )}
+                              {!isSelesai && !isDitolak && (
+                                <button
+                                  onClick={() => handleUpdateStatus(item.ID_Panggilan, 'Ditolak')}
+                                  className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                                  title="Tolak Panggilan"
+                                >
+                                  <XCircle className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleDeleteLog(item)}
                                 className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"

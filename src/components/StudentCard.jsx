@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
 import { Phone, FileText, AlertTriangle, Edit3, MapPin, Trash2, MessageCircle, Crown, XCircle } from 'lucide-react';
+import { formatDateIndo } from '../utils/logic';
 
-function StudentCard({ student, disciplineStatus, detailReason, onWaClick, onWaStudentClick, onContactClick, onReject, onEdit, onDelete, canSeeLocation }) {
+function StudentCard({ student, disciplineStatus, detailReason, panggilanDetail, onWaClick, onWaStudentClick, onContactClick, onReject, onEdit, onDelete, canSeeLocation }) {
   const getAvatarColor = (gender) => {
     return gender === 'P' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700';
   };
@@ -121,28 +122,69 @@ function StudentCard({ student, disciplineStatus, detailReason, onWaClick, onWaS
       
       {/* Indicator for Alert */}
       {disciplineStatus && (
-        <div className={`mt-2 pt-2 border-t ${disciplineStatus === 'Sudah Dipanggil' ? 'border-amber-100' : 'border-red-100'} flex items-center justify-between`}>
-          <span className={`text-[9px] font-black ${disciplineStatus === 'Sudah Dipanggil' ? 'text-amber-600' : 'text-red-600'} uppercase tracking-widest flex items-center gap-1`}>
-            {disciplineStatus}
-          </span>
-          {onReject && disciplineStatus !== 'Sudah Dipanggil' && (
-            <button
-              onClick={() => onReject(student)}
-              className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 rounded-md hover:bg-red-600 hover:text-white transition-all duration-300 text-[8px] font-black uppercase tracking-widest"
-              title="Abaikan Panggilan"
-            >
-              <XCircle className="w-3 h-3" />
-              Abaikan
-            </button>
+        <div className={`mt-2 pt-2 border-t ${disciplineStatus === 'Sudah Dipanggil' ? 'border-amber-100' : 'border-red-100'}`}>
+          <div className="flex items-center justify-between">
+            <span className={`text-[9px] font-black ${disciplineStatus === 'Sudah Dipanggil' ? 'text-amber-600' : 'text-red-600'} uppercase tracking-widest flex items-center gap-1`}>
+              {disciplineStatus}
+            </span>
+            {disciplineStatus === 'Sudah Dipanggil' && onReject && (
+              <button
+                onClick={() => onReject(student)}
+                className="flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-600 hover:text-white transition-all duration-300 text-[8px] font-black uppercase tracking-widest"
+                title="Tolak Panggilan"
+              >
+                <XCircle className="w-3 h-3" />
+                Tolak
+              </button>
+            )}
+          </div>
+
+          {/* Detail Pemanggilan */}
+          {disciplineStatus === 'Sudah Dipanggil' && panggilanDetail && (
+            <div className="mt-2 p-2 bg-amber-50/80 rounded-xl border border-amber-100 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest min-w-[52px]">Jadwal</span>
+                <span className="text-[10px] font-bold text-slate-700">
+                  {panggilanDetail.Tanggal_Pemanggilan
+                    ? formatDateIndo(panggilanDetail.Tanggal_Pemanggilan)
+                    : formatDateIndo(panggilanDetail.Tanggal)}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest min-w-[52px]">Kategori</span>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${
+                  panggilanDetail.Kategori === 'Home Visit' ? 'bg-amber-100 text-amber-700' :
+                  panggilanDetail.Kategori === 'Teguran' ? 'bg-rose-100 text-rose-700' :
+                  'bg-emerald-100 text-emerald-700'
+                }`}>
+                  {panggilanDetail.Kategori}
+                </span>
+              </div>
+              <div className="flex items-start gap-1.5">
+                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest min-w-[52px] mt-0.5">Alasan</span>
+                <span className="text-[9px] font-medium text-slate-600 leading-snug">{panggilanDetail.Alasan || '-'}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest min-w-[52px]">Status</span>
+                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${
+                  panggilanDetail.Status_Selesai === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                  panggilanDetail.Status_Selesai === 'Selesai' ? 'bg-emerald-100 text-emerald-700' :
+                  'bg-rose-100 text-rose-700'
+                }`}>
+                  {panggilanDetail.Status_Selesai || 'Pending'}
+                </span>
+              </div>
+            </div>
           )}
-        </div>
-      )}
-      
-      {disciplineStatus && detailReason && (
-        <div className="mt-1">
-          <p className="text-[9px] text-slate-500 font-medium italic leading-tight">
-            {detailReason}
-          </p>
+
+          {/* Detail alasan untuk Siap Panggil / Panggilan Orang Tua */}
+          {disciplineStatus !== 'Sudah Dipanggil' && detailReason && (
+            <div className="mt-1">
+              <p className="text-[9px] text-slate-500 font-medium italic leading-tight">
+                {detailReason}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

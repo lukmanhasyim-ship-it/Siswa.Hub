@@ -169,36 +169,41 @@ export default function Dashboard() {
     };
   }, [data, getEffectiveStatus]);
 
-  // Alerts - memoized
+  // Alerts - memoized (per bulan)
   const alerts = useMemo(() => {
     const result = [];
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
     data.siswa.forEach(student => {
-      // 1. Cari riwayat panggilan terbaru
       const studentPanggilan = (data.panggilan || [])
         .filter(pg => String(pg.NISN) === String(student.NISN) || String(pg.NISN) === String(student.ID_Siswa))
         .sort((a, b) => new Date(b.Tanggal) - new Date(a.Tanggal));
-      
+
       const latestPg = studentPanggilan[0];
       const cutOffDate = (latestPg && latestPg.Status_Selesai === 'Selesai') ? new Date(latestPg.Tanggal) : null;
 
-      // 2. Kumpulkan record presensi (hanya yang setelah cutOffDate)
-      const allHistory = [...data.presensi, ...(data.archiveDetail || [])]
+      // Hanya presensi bulan berjalan (archive adalah bulan lalu — tidak dihitung)
+      const currentMonthRecords = (data.presensi || [])
         .filter(p => p.ID_Siswa === student.ID_Siswa)
+        .filter(p => new Date(p.Tanggal) >= monthStart)
         .filter(p => {
           if (!cutOffDate) return true;
           return new Date(p.Tanggal) > cutOffDate;
         });
 
-      const statuses = allHistory.map(r => getEffectiveStatus(r));
+      const statuses = currentMonthRecords.map(r => getEffectiveStatus(r));
       const totalAlfas = statuses.filter(s => s === 'A').length;
       const totalBolos = statuses.filter(s => s === 'B').length;
 
-      const alfasList = allHistory.filter(r => getEffectiveStatus(r) === 'A').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
-      const bolosList = allHistory.filter(r => getEffectiveStatus(r) === 'B').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
+      const alfasList = currentMonthRecords.filter(r => getEffectiveStatus(r) === 'A').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
+      const bolosList = currentMonthRecords.filter(r => getEffectiveStatus(r) === 'B').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
 
       const disciplineStatus = calculateDisciplineStatus(statuses, totalBolos);
+      const isProcessed = latestPg && latestPg.Status_Selesai !== 'Selesai' && latestPg.Status_Selesai !== 'Ditolak';
 
-      if (disciplineStatus) {
+      // Tampilkan alert jika: ada pelanggaran bulan ini ATAU ada panggilan pending
+      if (disciplineStatus || isProcessed) {
         let reason = "Masalah Kedisiplinan";
         if (totalBolos >= 6) {
           reason = `Ketidakdisiplinan (Bolos) telah mencapai batas maksimal ${totalBolos} kali. [Tanggal: ${bolosList.join(', ')}]`;
@@ -208,24 +213,21 @@ export default function Dashboard() {
           reason = `Terdapat ${totalAlfas} kali ketidakhadiran tanpa keterangan (Alfa). [Tanggal: ${alfasList.join(', ')}]`;
         }
 
-        // Tentukan label proses (jika ada panggilan pending)
-        const isProcessed = latestPg && latestPg.Status_Selesai !== 'Selesai';
-
-        // Filter personal: Jika role bukan Wali Kelas, hanya tampilkan alert MILIK SENDIRI
         const isSelf = String(student.Email).toLowerCase() === String(user.email).toLowerCase();
-        
+
         if (user.role === 'Wali Kelas' || isSelf) {
-          result.push({ 
-            student, 
-            discipline: isProcessed ? 'Sudah Dipanggil' : disciplineStatus, 
+          result.push({
+            student,
+            discipline: isProcessed ? 'Sudah Dipanggil' : disciplineStatus,
             detailReason: reason,
-            isProcessed
+            isProcessed,
+            panggilanDetail: latestPg || null
           });
         }
       }
     });
     return result;
-  }, [data.siswa, data.presensi, data.archiveDetail, data.panggilan, getEffectiveStatus, user.email, user.role]);
+  }, [data.siswa, data.presensi, data.panggilan, getEffectiveStatus, user.email, user.role]);
 
   const handleDirectCall = useCallback((student, discipline, detailReason) => {
     navigate('/panggilan', { 
@@ -250,36 +252,40 @@ export default function Dashboard() {
   }, []);
 
   const handleRejectCall = useCallback(async (student) => {
-    if (!window.confirm(`Apakah Anda yakin ingin mengabaikan panggilan untuk ${student.Nama_Siswa}? Alert ini akan hilang sampai terdapat ketidakhadiran baru.`)) {
+    if (!window.confirm(`Abaikan panggilan untuk ${student.Nama_Siswa}? Status akan berubah menjadi Ditolak.`)) {
       return;
     }
 
     try {
-      const alertInfo = alerts.find(a => a.student.ID_Siswa === student.ID_Siswa);
-      const newRow = {
-        ID_Panggilan: 'PG' + Date.now(),
-        Tanggal: format(new Date(), 'yyyy-MM-dd'),
-        NISN: student.NISN || student.ID_Siswa,
-        Kategori: 'Abaikan Panggilan',
-        Alasan: alertInfo?.detailReason || 'Panggilan Diabaikan',
-        Tanggal_Pemanggilan: format(new Date(), 'yyyy-MM-dd'),
-        Hasil_Pertemuan: 'Panggilan Diabaikan oleh Wali Kelas',
-        Status_Selesai: 'Selesai'
-      };
+      const pg = (data.panggilan || []).find(p =>
+        (String(p.NISN) === String(student.NISN) || String(p.NISN) === String(student.ID_Siswa)) &&
+        p.Status_Selesai !== 'Selesai' &&
+        p.Status_Selesai !== 'Ditolak'
+      );
+      if (!pg) return;
 
-      await fetchGAS('CREATE', { sheet: 'Log_Panggilan', data: newRow });
-      
-      // Update local state to reflect the change
+      await fetchGAS('UPDATE', {
+        sheet: 'Log_Panggilan',
+        id: pg.ID_Panggilan,
+        data: {
+          Status_Selesai: 'Ditolak',
+          Hasil_Pertemuan: 'Panggilan diabaikan oleh Wali Kelas'
+        }
+      });
+
       setData(prev => ({
         ...prev,
-        panggilan: [newRow, ...(prev.panggilan || [])]
+        panggilan: (prev.panggilan || []).map(p =>
+          p.ID_Panggilan === pg.ID_Panggilan
+            ? { ...p, Status_Selesai: 'Ditolak', Hasil_Pertemuan: 'Panggilan diabaikan oleh Wali Kelas' }
+            : p
+        )
       }));
-
     } catch (error) {
       console.error('Reject panggilan error:', error);
       alert('Gagal mengabaikan panggilan.');
     }
-  }, [alerts]);
+  }, [data.panggilan]);
 
   if (loading) return <SkeletonDashboard />;
 
@@ -490,6 +496,7 @@ export default function Dashboard() {
                 student={alert.student}
                 disciplineStatus={alert.discipline}
                 detailReason={alert.detailReason}
+                panggilanDetail={alert.panggilanDetail}
                 onContactClick={user.role === 'Wali Kelas' ? (stu) => handleDirectCall(stu, alert.discipline, alert.detailReason) : undefined}
                 onWaStudentClick={user.role === 'Wali Kelas' ? (stu) => handleWaStudent(stu, alert.detailReason) : undefined}
                 onWaClick={user.role === 'Wali Kelas' ? (stu) => handleWA(stu, alert.discipline) : undefined}
