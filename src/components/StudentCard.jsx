@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
-import { Phone, FileText, AlertTriangle, Edit3, MapPin, Trash2, MessageCircle, Crown } from 'lucide-react';
+import { Phone, FileText, AlertTriangle, Edit3, MapPin, Trash2, MessageCircle, Crown, XCircle } from 'lucide-react';
 
-function StudentCard({ student, disciplineStatus, onWaClick, onWaStudentClick, onContactClick, onEdit, onDelete, canSeeLocation }) {
+function StudentCard({ student, disciplineStatus, detailReason, onWaClick, onWaStudentClick, onContactClick, onReject, onEdit, onDelete, canSeeLocation }) {
   const getAvatarColor = (gender) => {
     return gender === 'P' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700';
   };
@@ -125,6 +125,24 @@ function StudentCard({ student, disciplineStatus, onWaClick, onWaStudentClick, o
           <span className={`text-[9px] font-black ${disciplineStatus === 'Sudah Dipanggil' ? 'text-amber-600' : 'text-red-600'} uppercase tracking-widest flex items-center gap-1`}>
             {disciplineStatus}
           </span>
+          {onReject && disciplineStatus !== 'Sudah Dipanggil' && (
+            <button
+              onClick={() => onReject(student)}
+              className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 rounded-md hover:bg-red-600 hover:text-white transition-all duration-300 text-[8px] font-black uppercase tracking-widest"
+              title="Abaikan Panggilan"
+            >
+              <XCircle className="w-3 h-3" />
+              Abaikan
+            </button>
+          )}
+        </div>
+      )}
+      
+      {disciplineStatus && detailReason && (
+        <div className="mt-1">
+          <p className="text-[9px] text-slate-500 font-medium italic leading-tight">
+            {detailReason}
+          </p>
         </div>
       )}
     </div>

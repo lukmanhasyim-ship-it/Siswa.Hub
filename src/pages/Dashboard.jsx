@@ -193,16 +193,19 @@ export default function Dashboard() {
       const totalAlfas = statuses.filter(s => s === 'A').length;
       const totalBolos = statuses.filter(s => s === 'B').length;
 
+      const alfasList = allHistory.filter(r => getEffectiveStatus(r) === 'A').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
+      const bolosList = allHistory.filter(r => getEffectiveStatus(r) === 'B').map(r => format(parseISO(r.Tanggal), 'dd/MM'));
+
       const disciplineStatus = calculateDisciplineStatus(statuses, totalBolos);
 
       if (disciplineStatus) {
         let reason = "Masalah Kedisiplinan";
         if (totalBolos >= 6) {
-          reason = `Ketidakdisiplinan (Bolos) telah mencapai batas maksimal ${totalBolos} kali.`;
+          reason = `Ketidakdisiplinan (Bolos) telah mencapai batas maksimal ${totalBolos} kali. [Tanggal: ${bolosList.join(', ')}]`;
         } else if (totalAlfas >= 5) {
-          reason = `Akumulasi ketidakhadiran tanpa keterangan (Alfa) mencapai ${totalAlfas} kali.`;
+          reason = `Akumulasi ketidakhadiran tanpa keterangan (Alfa) mencapai ${totalAlfas} kali. [Tanggal: ${alfasList.join(', ')}]`;
         } else if (totalAlfas >= 3) {
-          reason = `Terdapat ${totalAlfas} kali ketidakhadiran tanpa keterangan (Alfa).`;
+          reason = `Terdapat ${totalAlfas} kali ketidakhadiran tanpa keterangan (Alfa). [Tanggal: ${alfasList.join(', ')}]`;
         }
 
         // Tentukan label proses (jika ada panggilan pending)
@@ -245,6 +248,38 @@ export default function Dashboard() {
     const url = `https://wa.me/${whatsappNumber}?text=${message}`;
     window.open(url, '_blank');
   }, []);
+
+  const handleRejectCall = useCallback(async (student) => {
+    if (!window.confirm(`Apakah Anda yakin ingin mengabaikan panggilan untuk ${student.Nama_Siswa}? Alert ini akan hilang sampai terdapat ketidakhadiran baru.`)) {
+      return;
+    }
+
+    try {
+      const alertInfo = alerts.find(a => a.student.ID_Siswa === student.ID_Siswa);
+      const newRow = {
+        ID_Panggilan: 'PG' + Date.now(),
+        Tanggal: format(new Date(), 'yyyy-MM-dd'),
+        NISN: student.NISN || student.ID_Siswa,
+        Kategori: 'Abaikan Panggilan',
+        Alasan: alertInfo?.detailReason || 'Panggilan Diabaikan',
+        Tanggal_Pemanggilan: format(new Date(), 'yyyy-MM-dd'),
+        Hasil_Pertemuan: 'Panggilan Diabaikan oleh Wali Kelas',
+        Status_Selesai: 'Selesai'
+      };
+
+      await fetchGAS('CREATE', { sheet: 'Log_Panggilan', data: newRow });
+      
+      // Update local state to reflect the change
+      setData(prev => ({
+        ...prev,
+        panggilan: [newRow, ...(prev.panggilan || [])]
+      }));
+
+    } catch (error) {
+      console.error('Reject panggilan error:', error);
+      alert('Gagal mengabaikan panggilan.');
+    }
+  }, [alerts]);
 
   if (loading) return <SkeletonDashboard />;
 
@@ -454,9 +489,11 @@ export default function Dashboard() {
                 key={idx}
                 student={alert.student}
                 disciplineStatus={alert.discipline}
+                detailReason={alert.detailReason}
                 onContactClick={user.role === 'Wali Kelas' ? (stu) => handleDirectCall(stu, alert.discipline, alert.detailReason) : undefined}
                 onWaStudentClick={user.role === 'Wali Kelas' ? (stu) => handleWaStudent(stu, alert.detailReason) : undefined}
                 onWaClick={user.role === 'Wali Kelas' ? (stu) => handleWA(stu, alert.discipline) : undefined}
+                onReject={user.role === 'Wali Kelas' ? handleRejectCall : undefined}
                 canSeeLocation={user.role === 'Wali Kelas'}
               />
             ))}
