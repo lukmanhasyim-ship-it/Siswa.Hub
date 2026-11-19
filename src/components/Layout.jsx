@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, ClipboardList, CalendarCheck,
-  Wallet, PhoneCall, LogOut, Sun, Moon, FileText,
-  Edit3, User, Settings, Bell, BookOpen, LibraryBig,
-  ChevronLeft, ChevronRight, Search, Calendar, Menu, X,
-  MessageCircle, ExternalLink, Link2, Clock
+  LogOut, Settings, User, Bell, ChevronLeft, ChevronRight,
+  Search, X
 } from 'lucide-react';
 import Breadcrumbs from './Breadcrumbs';
+import BottomNav from './navigation/BottomNav';
 import { useAuth } from '../context/AuthContext';
+import { NAV_GROUPS, canAccess } from '../config/navigation';
 import Toast from './Toast';
 import NotificationDrawer from './NotificationDrawer';
 import SearchModal from './SearchModal';
@@ -16,25 +15,41 @@ import appLogo from '../assets/logo.png';
 import { fetchGAS } from '../utils/gasClient';
 import { getCurrentVersion } from '../utils/version';
 
-function NavItem({ to, icon: Icon, label, collapsed, onClick }) {
+function NavItem({ to, icon, label, collapsed, onClick }) {
+  const Icon = icon;
+
   return (
     <NavLink
       to={to}
       onClick={onClick}
+      title={collapsed ? label : undefined}
       className={({ isActive }) =>
-        `flex items-center ${collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-4 py-3'} rounded-2xl transition-all duration-300 group ${
+        [
+          'group relative flex items-center rounded-xl outline-none transition-colors duration-200',
+          'focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+          collapsed ? 'h-12 w-12 mx-auto justify-center' : 'min-h-[48px] gap-3 px-4 py-3 md:min-h-0 md:py-2.5',
           isActive
-            ? 'bg-emerald-50 text-emerald-700'
-            : 'text-slate-500 hover:bg-emerald-50 hover:text-emerald-600'
-        }`
+            ? `bg-emerald-50 font-bold text-emerald-700 ${
+                collapsed ? 'ring-1 ring-emerald-100' : "before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-emerald-600 before:content-['']"
+              }`
+            : 'text-slate-500 hover:bg-slate-50 hover:text-emerald-700',
+        ].join(' ')
       }
-      title={collapsed ? label : ''}
     >
-      <Icon className={`w-5 h-5 transition-all duration-300 ${collapsed ? 'group-hover:scale-125' : 'group-hover:scale-110'}`} />
-      {!collapsed && (
-        <span className="text-[13px] font-bold tracking-tight animate-in fade-in slide-in-from-left-2 duration-300">
-          {label}
-        </span>
+      {({ isActive }) => (
+        <>
+          <Icon
+            className={`h-5 w-5 shrink-0 transition-transform duration-200 ${
+              isActive ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-600 group-hover:scale-110'
+            }`}
+            aria-hidden="true"
+          />
+          {collapsed ? (
+            <span className="sr-only">{label}</span>
+          ) : (
+            <span className="min-w-0 truncate text-[13px] tracking-tight">{label}</span>
+          )}
+        </>
       )}
     </NavLink>
   );
@@ -49,44 +64,86 @@ export default function Layout() {
     navigate('/login');
   };
 
-  const [isNotifOpen, setIsNotifOpen] = React.useState(false);
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     return localStorage.getItem('sidebarCollapsed') === 'true';
   });
-  const [notifications, setNotifications] = React.useState([]);
-  const [students, setStudents] = React.useState([]);
-  const prevNotifIds = React.useRef(new Set());
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
+  );
+  const [notifications, setNotifications] = useState([]);
+  const [students, setStudents] = useState([]);
+  const prevNotifIds = useRef(new Set());
+  const moreButtonRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const wasMobileOpenRef = useRef(false);
+
+  const role = user?.role || 'Siswa';
+
+  // Mode ringkas hanya berlaku di desktop; drawer mobile selalu memakai label penuh.
+  const isCompact = isDesktop && isSidebarCollapsed;
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 768px)');
+    const handleChange = (event) => {
+      setIsDesktop(event.matches);
+      if (event.matches) setIsMobileOpen(false);
+    };
+    query.addEventListener('change', handleChange);
+    return () => query.removeEventListener('change', handleChange);
+  }, []);
+
+  // Menu ditampilkan sebagai daftar datar, tanpa judul maupun pemisah grup.
+  const visibleItems = useMemo(
+    () => NAV_GROUPS.flatMap((group) => group.items).filter((item) => canAccess(item.roles, role)),
+    [role]
+  );
+
+  const requestNotificationPermission = async () => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
+  };
+
+  const showBrowserNotification = (message) => {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+    new Notification('SISWA.HUB', {
+      body: message,
+      icon: appLogo,
+    });
+  };
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', isSidebarCollapsed);
   }, [isSidebarCollapsed]);
 
-  const role = user?.role || 'Siswa';
-
-  React.useEffect(() => {
+  useEffect(() => {
     async function loadNotifs() {
       try {
         const res = await fetchGAS('GET_NOTIFICATIONS', { role, email: user?.email });
         if (res.status === 'success') {
-          const mapped = res.data.map(n => ({
+          const mapped = res.data.map((n) => ({
             id: String(n.ID),
             message: String(n.Message),
             type: String(n.Type || 'info'),
             timestamp: n.Timestamp,
-            isRead: String(n.Is_Read).toLowerCase() === 'true'
+            isRead: String(n.Is_Read).toLowerCase() === 'true',
           }));
 
           // Browser Notification Logic
-          if (prevNotifIds.current.size > 0) { // Don't notify on first load
-            mapped.forEach(n => {
+          if (prevNotifIds.current.size > 0) {
+            // Don't notify on first load
+            mapped.forEach((n) => {
               if (!prevNotifIds.current.has(n.id) && !n.isRead) {
                 showBrowserNotification(n.message);
               }
             });
           }
-          prevNotifIds.current = new Set(mapped.map(n => n.id));
+          prevNotifIds.current = new Set(mapped.map((n) => n.id));
 
           setNotifications(mapped);
         }
@@ -94,6 +151,7 @@ export default function Layout() {
         console.error('Failed to load notifications:', err);
       }
     }
+
     async function loadStudents() {
       try {
         const res = await fetchGAS('GET_ALL', { sheet: 'Master_Siswa' });
@@ -111,44 +169,51 @@ export default function Layout() {
       requestNotificationPermission();
     }
 
-    // Optional: Refresh notifications every 2 minutes
-    const interval = setInterval(() => {
-      if (user) loadNotifs();
-    }, 120000);
+    // Refresh notifikasi hanya saat tab terlihat; fetchGAS sudah menghindari request identik.
+    const loadIfVisible = () => {
+      if (user && document.visibilityState === 'visible') loadNotifs();
+    };
+    const interval = setInterval(loadIfVisible, 120000);
+    document.addEventListener('visibilitychange', loadIfVisible);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', loadIfVisible);
+    };
   }, [user, role]);
 
   // Global Shortcuts
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
-        setIsSearchOpen(prev => !prev);
+        setIsSearchOpen((prev) => !prev);
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        setIsMobileOpen(false);
+        setIsNotifOpen(false);
+        setIsSearchOpen(false);
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) return;
-    if (Notification.permission === "default") {
-      await Notification.requestPermission();
+  useEffect(() => {
+    if (isMobileOpen) {
+      closeButtonRef.current?.focus();
+    } else if (wasMobileOpenRef.current) {
+      moreButtonRef.current?.focus();
     }
-  };
+    wasMobileOpenRef.current = isMobileOpen;
+  }, [isMobileOpen]);
 
-  const showBrowserNotification = (message) => {
-    if (!("Notification" in window) || Notification.permission !== "granted") return;
-
-    new Notification("SISWA.HUB", {
-      body: message,
-      icon: appLogo,
-    });
-  };
   const handleMarkAsRead = async (id) => {
     try {
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
       await fetchGAS('MARK_NOTIF_READ', { id });
     } catch (err) {
       console.error('Failed to mark notification as read:', err);
@@ -157,241 +222,277 @@ export default function Layout() {
 
   const handleMarkAllAsRead = async () => {
     try {
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       await fetchGAS('MARK_ALL_NOTIFS_READ', { role, email: user?.email });
     } catch (err) {
       console.error('Failed to mark all notifications as read:', err);
     }
   };
 
-  const access = {
-    dashboard: ['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Bendahara', 'Wakil Bendahara', 'Sekretaris', 'Wakil Sekretaris', 'Siswa'].includes(role),
-    siswa: ['Wali Kelas'].includes(role),
-    laporan: ['Wali Kelas'].includes(role),
-    bukuKlaper: ['Wali Kelas'].includes(role),
-    dkn: ['Wali Kelas'].includes(role),
-    presensiPagi: ['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Sekretaris', 'Wakil Sekretaris'].includes(role),
-    presensiSiang: ['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Sekretaris', 'Wakil Sekretaris'].includes(role),
-    keuangan: ['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Bendahara', 'Wakil Bendahara'].includes(role),
-    panggilan: ['Wali Kelas'].includes(role),
-    laporanHarian: ['Wali Kelas'].includes(role),
-    feedback: ['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Bendahara', 'Wakil Bendahara', 'Sekretaris', 'Wakil Sekretaris', 'Siswa'].includes(role),
-  };
-
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-slate-50 font-sans relative">
+    <div className="relative flex min-h-screen flex-col bg-slate-50 font-sans md:flex-row">
       {/* Mobile Backdrop */}
       {isMobileOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/50 z-[90] md:hidden backdrop-blur-sm transition-opacity"
+        <div
+          className="fixed inset-0 z-[90] bg-slate-900/50 backdrop-blur-sm transition-opacity md:hidden"
           onClick={() => setIsMobileOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar for Desktop and Mobile */}
-      <aside 
-        className={`fixed inset-y-0 left-0 z-[100] h-screen bg-white border-r border-slate-100/50 transition-all duration-300 ease-in-out print:hidden flex flex-col ${
-          isMobileOpen ? 'translate-x-0 w-72 shadow-2xl' : '-translate-x-full md:translate-x-0'
+      <aside
+        aria-label="Navigasi utama"
+        className={`fixed inset-y-0 left-0 z-[100] flex h-screen flex-col border-r border-slate-100/50 bg-white transition-all duration-300 ease-in-out print:hidden ${
+          isMobileOpen ? 'w-72 translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
         } ${isSidebarCollapsed ? 'md:w-20 md:shadow-sm' : 'md:w-72 md:shadow-xl'}`}
       >
-        <div className={`p-4 ${isSidebarCollapsed ? 'md:p-4' : 'md:p-6'} mb-2 relative flex items-center justify-between`}>
-          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center w-full' : 'gap-4'} transition-all duration-300`}>
-            <div className={`bg-white p-2 rounded-2xl border border-slate-50 transition-all duration-300 ${isSidebarCollapsed ? 'shadow-sm' : ''}`}>
+        <div
+          className={`relative mb-2 flex items-center justify-between p-4 ${
+            isCompact ? 'md:p-4' : 'md:p-6'
+          }`}
+        >
+          <div
+            className={`flex items-center transition-all duration-300 ${
+              isCompact ? 'w-full justify-center' : 'gap-4'
+            }`}
+          >
+            <div
+              className={`rounded-2xl border border-slate-50 bg-white p-2 transition-all duration-300 ${
+                isCompact ? 'shadow-sm' : ''
+              }`}
+            >
               <img src={appLogo} alt="Logo SMK" className="h-10 w-auto object-contain" />
             </div>
-            {!isSidebarCollapsed && (
-              <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-300 whitespace-nowrap overflow-hidden">
-                <h1 className="text-xl font-black text-slate-900 tracking-tighter leading-none">
+            {!isCompact && (
+              <div className="flex animate-in flex-col overflow-hidden whitespace-nowrap fade-in slide-in-from-left-2 duration-300">
+                <h1 className="text-xl font-black leading-none tracking-tighter text-slate-900">
                   SISWA<span className="text-emerald-700">.HUB</span>
                 </h1>
-                <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                <p className="mt-1 text-[8px] font-bold uppercase tracking-widest text-slate-400">
                   SMKS AL AZHAR SEMPU
                 </p>
               </div>
             )}
           </div>
-          
+
           {/* Mobile Close Button */}
-          <button 
-            className="md:hidden p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg absolute right-4"
+          <button
+            ref={closeButtonRef}
+            type="button"
+            aria-label="Tutup menu navigasi"
+            className="absolute right-3 rounded-xl p-3 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 md:hidden"
             onClick={() => setIsMobileOpen(false)}
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
 
           {/* Desktop Toggle Button */}
-          <button 
-            className="hidden md:flex absolute -right-3 top-8 bg-white border border-slate-200 text-slate-400 hover:text-emerald-600 hover:border-emerald-600 rounded-full p-1 shadow-sm transition-all z-10"
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          <button
+            type="button"
+            aria-label={isSidebarCollapsed ? 'Perbesar sidebar' : 'Perkecil sidebar'}
+            aria-expanded={!isSidebarCollapsed}
+            title={isSidebarCollapsed ? 'Perbesar sidebar' : 'Perkecil sidebar'}
+            className="absolute -right-3 top-8 z-10 hidden rounded-full border border-slate-200 bg-white p-1 text-slate-400 shadow-sm transition-all hover:border-emerald-600 hover:text-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 md:flex"
+            onClick={() => setIsSidebarCollapsed((prev) => !prev)}
           >
-            {isSidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {isSidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            )}
           </button>
         </div>
 
-        <nav className={`flex-1 ${isSidebarCollapsed ? 'px-2' : 'px-4'} space-y-1 overflow-y-auto custom-scrollbar`}>
-          {access.dashboard && <NavItem to="dashboard" icon={LayoutDashboard} label="Dashboard" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          
-          <div className={`${isSidebarCollapsed ? 'my-2 mx-auto w-8' : 'my-4 px-4'} h-px bg-slate-200`} />
-          <span className={`${isSidebarCollapsed ? 'hidden' : 'block'} text-[9px] font-black text-slate-300 uppercase tracking-widest px-4`}>Manajemen Data</span>
-          {access.siswa && <NavItem to="master-siswa" icon={Users} label="Data Siswa" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          {access.bukuKlaper && <NavItem to="buku-klaper" icon={BookOpen} label="Buku Klaper" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          {access.dkn && <NavItem to="dkn" icon={LibraryBig} label="Leger" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-
-          <div className={`${isSidebarCollapsed ? 'my-2 mx-auto w-8' : 'my-4 px-4'} h-px bg-slate-200`} />
-          <span className={`${isSidebarCollapsed ? 'hidden' : 'block'} text-[9px] font-black text-slate-300 uppercase tracking-widest px-4`}>Keuangan</span>
-          {access.keuangan && <NavItem to="tanggungan" icon={ClipboardList} label="Tanggungan KAS" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          {access.keuangan && <NavItem to="keuangan" icon={Wallet} label="KAS Kelas" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-
-          <div className={`${isSidebarCollapsed ? 'my-2 mx-auto w-8' : 'my-4 px-4'} h-px bg-slate-200`} />
-          <span className={`${isSidebarCollapsed ? 'hidden' : 'block'} text-[9px] font-black text-slate-300 uppercase tracking-widest px-4`}>Presensi</span>
-          {access.presensiPagi && <NavItem to="presensi-pagi" icon={Sun} label="Presensi Pagi" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          {access.presensiSiang && <NavItem to="presensi-siang" icon={Moon} label="Presensi Siang" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          <NavItem to="piket" icon={Calendar} label="Jadwal Piket" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />
-          {access.siswa && <NavItem to="catatan-terlambat" icon={Clock} label="Catatan Terlambat" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-
-          <div className={`${isSidebarCollapsed ? 'my-2 mx-auto w-8' : 'my-4 px-4'} h-px bg-slate-200`} />
-          <span className={`${isSidebarCollapsed ? 'hidden' : 'block'} text-[9px] font-black text-slate-300 uppercase tracking-widest px-4`}>Pelaporan</span>
-          {access.laporan && <NavItem to="laporan" icon={FileText} label="Laporan Akhir" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          {access.laporanHarian && <NavItem to="laporan-harian" icon={CalendarCheck} label="Laporan Harian" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-
-          <div className={`${isSidebarCollapsed ? 'my-2 mx-auto w-8' : 'my-4 px-4'} h-px bg-slate-200`} />
-          <span className={`${isSidebarCollapsed ? 'hidden' : 'block'} text-[9px] font-black text-slate-300 uppercase tracking-widest px-4`}>Komunikasi</span>
-          {access.panggilan && <NavItem to="panggilan" icon={PhoneCall} label="Log Panggilan" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />}
-          <NavItem to="feedback" icon={MessageCircle} label="Feedback" collapsed={isSidebarCollapsed} onClick={() => setIsMobileOpen(false)} />
+        <nav
+          id="sidebar-navigation"
+          aria-label="Menu utama"
+          className={`custom-scrollbar flex-1 space-y-1 overflow-y-auto ${
+            isCompact ? 'px-2' : 'px-4'
+          }`}
+        >
+          {visibleItems.map((item) => (
+            <NavItem
+              key={item.id}
+              {...item}
+              collapsed={isCompact}
+              onClick={() => setIsMobileOpen(false)}
+            />
+          ))}
         </nav>
 
-        <div className={`${isSidebarCollapsed ? 'p-2' : 'p-6'} mt-auto`}>
-          <div className={`${isSidebarCollapsed ? 'p-2' : 'p-4'} bg-slate-50 rounded-2xl border border-slate-100 relative overflow-hidden group`}>
-            {!isSidebarCollapsed && (
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:rotate-12 transition-transform">
-                <Settings className="w-12 h-12" />
+        <div className={`mt-auto ${isCompact ? 'p-2' : 'p-6'}`}>
+          <div
+            className={`group relative overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 ${
+              isCompact ? 'p-2' : 'p-4'
+            }`}
+          >
+            {!isCompact && (
+              <div className="absolute right-0 top-0 p-2 opacity-10 transition-transform group-hover:rotate-12">
+                <Settings className="h-12 w-12" aria-hidden="true" />
               </div>
             )}
-            <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'} relative z-10`}>
+            <div
+              className={`relative z-10 flex items-center ${
+                isCompact ? 'justify-center' : 'gap-3'
+              }`}
+            >
               {user?.picture ? (
-                <img src={user.picture} alt="User" className="w-10 h-10 rounded-2xl shadow-sm border-2 border-white" />
+                <img
+                  src={user.picture}
+                  alt="Foto profil"
+                  className="h-10 w-10 rounded-2xl border-2 border-white shadow-sm"
+                />
               ) : (
-                <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center font-bold text-sm uppercase">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-100 text-sm font-bold uppercase text-indigo-600">
                   {user?.name?.charAt(0)}
                 </div>
               )}
-              {!isSidebarCollapsed && (
-                <div className="overflow-hidden animate-in fade-in slide-in-from-left-2 duration-300">
-                  <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
-                  <p className="text-[10px] text-slate-500 font-semibold">{role}</p>
+              {!isCompact && (
+                <div className="animate-in overflow-hidden fade-in slide-in-from-left-2 duration-300">
+                  <p className="truncate text-xs font-bold text-slate-900">{user?.name}</p>
+                  <p className="text-[10px] font-semibold text-slate-500">{role}</p>
                 </div>
               )}
             </div>
             <button
+              type="button"
               onClick={handleLogout}
-              className={`mt-4 flex w-full items-center justify-center gap-2 ${isSidebarCollapsed ? 'p-2' : 'p-2.5'} text-red-500 hover:bg-red-50 rounded-xl transition-all font-bold text-[11px] uppercase tracking-wider`}
-              title={isSidebarCollapsed ? 'Keluar' : ''}
+              title={isCompact ? 'Keluar' : undefined}
+              className={`mt-4 flex w-full items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-wider text-red-500 transition-all hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 ${
+                isCompact ? 'p-2' : 'p-2.5 text-[11px]'
+              }`}
             >
-              <LogOut className="w-4 h-4" />
-              {!isSidebarCollapsed && <span>Keluar Sesi</span>}
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              {!isCompact && <span>Keluar Sesi</span>}
+              {isCompact && <span className="sr-only">Keluar Sesi</span>}
             </button>
           </div>
         </div>
       </aside>
 
-       {/* Main Content Wrapper */}
-       <div className={`flex-1 flex flex-col h-screen transition-all duration-300 ${isSidebarCollapsed ? 'md:ml-20' : 'md:ml-72'}`}>
-         {/* Header Bar - Always on top */}
-         <header className="bg-white/80 backdrop-blur-md sticky top-0 z-[60] px-4 md:px-8 py-3.5 border-b border-slate-100 flex items-center justify-between print:hidden transition-all duration-300">
-           <div className="flex items-center gap-3">
-             <button 
-               className="md:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors"
-               onClick={() => setIsMobileOpen(true)}
-             >
-               <Menu className="w-5 h-5" />
-             </button>
-             <div className="flex flex-col">
-               <Breadcrumbs />
-               <h2 className="hidden md:block text-sm font-black text-slate-800 uppercase tracking-tight">SISWA.HUB Platform</h2>
-             </div>
-           </div>
+      {/* Main Content Wrapper */}
+      <div
+        className={`flex h-screen flex-1 flex-col transition-all duration-300 ${
+          isSidebarCollapsed ? 'md:ml-20' : 'md:ml-72'
+        }`}
+      >
+        {/* Header Bar - Always on top */}
+        <header className="sticky top-0 z-[60] flex items-center justify-between border-b border-slate-100 bg-white/80 px-4 py-3.5 backdrop-blur-md transition-all duration-300 print:hidden md:px-8">
+          <div className="flex min-w-0 items-center gap-2 md:gap-3">
+            <div className="min-w-0">
+              <Breadcrumbs />
+              <h2 className="hidden truncate text-sm font-black uppercase tracking-tight text-slate-800 md:block">
+                SISWA.HUB Platform
+              </h2>
+              <span className="text-xs font-black tracking-tight text-slate-800 md:hidden">
+                SISWA<span className="text-emerald-700">.HUB</span>
+              </span>
+            </div>
+          </div>
 
-           <div className="flex items-center gap-3 md:gap-4">
-             <button
-               onClick={() => setIsSearchOpen(true)}
-               className="p-2 rounded-xl hover:bg-slate-50 text-slate-400 group transition-all"
-               title="Cari Siswa... (Ctrl+K)"
-             >
-               <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-             </button>
+          <div className="flex shrink-0 items-center gap-1.5 md:gap-3">
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              aria-label="Cari siswa (Ctrl+K)"
+              className="rounded-xl p-3 text-slate-400 transition-all hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 md:p-2"
+            >
+              <Search className="h-5 w-5 transition-transform hover:scale-110" aria-hidden="true" />
+            </button>
 
-             <div className="relative">
-               <button
-                 onClick={() => setIsNotifOpen(!isNotifOpen)}
-                 className={`relative p-2 rounded-xl transition-all ${isNotifOpen ? 'bg-emerald-50 text-emerald-700' : 'hover:bg-slate-50 hover:text-slate-400'}`}
-               >
-                 <Bell className="w-5 h-5 transition-transform group-hover:rotate-12" />
-                 {notifications.some(n => !n.isRead) && (
-                   <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white shadow-sm animate-pulse z-10" />
-                 )}
-               </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsNotifOpen((prev) => !prev)}
+                aria-label="Lihat notifikasi"
+                aria-expanded={isNotifOpen}
+                className={`rounded-xl p-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 md:p-2 ${
+                  isNotifOpen ? 'bg-emerald-50 text-emerald-700' : 'text-slate-400 hover:bg-slate-50'
+                }`}
+              >
+                <Bell className="h-5 w-5" aria-hidden="true" />
+                {notifications.some((n) => !n.isRead) && (
+                  <span className="absolute right-1.5 top-1.5 z-10 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-rose-500 shadow-sm" />
+                )}
+              </button>
 
-               <NotificationDrawer
-                 isOpen={isNotifOpen}
-                 onClose={() => setIsNotifOpen(false)}
-                 notifications={notifications}
-                 onMarkAsRead={handleMarkAsRead}
-                 onMarkAllAsRead={handleMarkAllAsRead}
-               />
-             </div>
+              <NotificationDrawer
+                isOpen={isNotifOpen}
+                onClose={() => setIsNotifOpen(false)}
+                notifications={notifications}
+                onMarkAsRead={handleMarkAsRead}
+                onMarkAllAsRead={handleMarkAllAsRead}
+              />
+            </div>
 
-             <div className="h-4 w-px bg-slate-100 mx-1" />
+            <div className="mx-1 hidden h-4 w-px bg-slate-100 sm:block" />
 
-             <div className="text-right hidden sm:block">
-               <p className="text-[11px] font-black text-slate-900 leading-none">{user?.name}</p>
-               <div className="flex items-center justify-end gap-1.5 mt-1">
-                 <p className="text-[9px] font-bold text-amber-400 uppercase tracking-widest">{role}</p>
-                 {user?.managedClass && (
-                   <>
-                     <span className="text-[8px] text-slate-300">•</span>
-                     <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border border-emerald-100/50">
-                       Kelas {user.managedClass}
-                     </span>
-                   </>
-                 )}
-               </div>
-             </div>
+            <div className="hidden min-w-0 text-right sm:block">
+              <p className="truncate text-[11px] font-black leading-none text-slate-900">{user?.name}</p>
+              <div className="mt-1 flex items-center justify-end gap-1.5">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400">{role}</p>
+                {user?.managedClass && (
+                  <>
+                    <span className="text-[8px] text-slate-300">•</span>
+                    <span className="rounded-md border border-emerald-100/50 bg-emerald-50 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-emerald-700">
+                      Kelas {user.managedClass}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
 
-             <button
-               onClick={() => navigate('/profile')}
-               className="w-10 h-10 rounded-2xl overflow-hidden hover:ring-4 hover:ring-emerald-50 transition-all border-2 border-white flex-shrink-0"
-             >
-               {user?.picture ? (
-                 <img src={user.picture} alt="Profil" className="w-full h-full object-cover" />
-               ) : (
-                 <div className="w-full h-full bg-slate-100 flex items-center justify-center"><User className="w-5 h-5 text-slate-400" /></div>
-               )}
-             </button>
-           </div>
-         </header>
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              aria-label="Buka profil"
+              className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-white transition-all hover:ring-4 hover:ring-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 md:h-10 md:w-10"
+            >
+              {user?.picture ? (
+                <img src={user.picture} alt="Profil" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-slate-100">
+                  <User className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                </div>
+              )}
+            </button>
+          </div>
+        </header>
 
-         {/* Scrollable Content Area */}
-         <main className="flex-1 overflow-y-auto overflow-x-hidden">
-           <div className="p-4 sm:p-8 pb-8">
-             <div className="max-w-[1600px] mx-auto space-y-8 animate-slide-up">
-               <Outlet />
+        {/* Scrollable Content Area */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="p-4 pb-28 sm:p-8 sm:pb-32 md:pb-8">
+            <div className="mx-auto max-w-[1600px] animate-slide-up space-y-8">
+              <Outlet />
 
-               <footer className="mt-20 pt-8 border-t border-slate-100 print:hidden">
-                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Wali Kelas Digital Project &copy; 2026 <span className="ml-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">v{getCurrentVersion()}</span></p>
-                   <p className="text-[10px] font-medium text-slate-500 italic">Designed with precision by Mohamad Lukman Nurhasyim, S.Kom, Gr.</p>
-                 </div>
-               </footer>
-             </div>
-           </div>
-         </main>
-       </div>
+              <footer className="mt-20 border-t border-slate-100 pt-8 print:hidden">
+                <div className="flex flex-col items-center justify-between gap-4 grayscale opacity-40 transition-all duration-500 hover:grayscale-0 hover:opacity-100 md:flex-row">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    Wali Kelas Digital Project &copy; 2026{' '}
+                    <span className="ml-1 rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">
+                      v{getCurrentVersion()}
+                    </span>
+                  </p>
+                  <p className="text-[10px] font-medium italic text-slate-500">
+                    Designed with precision by Mohamad Lukman Nurhasyim, S.Kom, Gr.
+                  </p>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </main>
+      </div>
 
-      <SearchModal 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
-        students={students}
+      <BottomNav
+        role={role}
+        moreButtonRef={moreButtonRef}
+        moreOpen={isMobileOpen}
+        hidden={isMobileOpen}
+        onMore={() => setIsMobileOpen(true)}
       />
+
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} students={students} />
       <Toast />
     </div>
   );

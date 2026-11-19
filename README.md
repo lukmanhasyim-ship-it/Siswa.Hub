@@ -1,7 +1,7 @@
-# Siswa.Hub v4.9.4 — Ekosistem Manajemen Kelas Digital Premium
+# Siswa.Hub v5.0.0 — Ekosistem Manajemen Kelas Digital Premium
 
 ![License](https://img.shields.io/badge/License-Private-red.svg)
-![Version](https://img.shields.io/badge/Version-4.9.4-emerald.svg)
+![Version](https://img.shields.io/badge/Version-5.0.0-emerald.svg)
 ![React](https://img.shields.io/badge/Frontend-React%2019-blue.svg)
 ![Backend](https://img.shields.io/badge/Backend-Google%20Apps%20Script-orange.svg)
 
@@ -9,7 +9,16 @@
 
 ---
 
-## 🆕 Versi 4.9.4 — Alert Per-Bulan & Catatan Terlambat
+## 🆕 Versi 5.0.0 — Antrean Kas Massal & Performa Navigasi
+
+*   **Antrean Transaksi Kas**: Tombol **Catat Kas** memasukkan transaksi ke daftar antrean lokal per akun. Banyak siswa bisa dicatat berurutan, lalu disimpan sekaligus lewat tombol **Simpan Transaksi** di bawah daftar antrean.
+*   **Simpan Massal & Notifikasi Ringkas**: Seluruh antrean dikirim dalam satu permintaan `BULK_CREATE` dengan satu notifikasi ringkasan. Draft form tetap tersimpan otomatis dan antrean bertahan setelah halaman di-refresh.
+*   **Cache & Responsivitas**: Data sheet memakai cache memori TanStack Query dengan invalidasi otomatis, `GET_ALL` memakai `CacheService` di Apps Script, dan font Google di-cache oleh service worker.
+*   **Navigasi & Stabilitas**: Navigasi bawah dan sidebar lebih ramah layar kecil, perpindahan halaman tidak lagi mereset state form, serta pengecekan versi dan polling notifikasi lebih hemat.
+
+---
+
+## Versi 4.9.4 — Alert Per-Bulan & Catatan Terlambat
 
 *   **Evaluasi Kedisiplinan Per-Bulan**: Alert Alfa/Bolos kini dihitung per bulan (bukan akumulasi global). Data minggu terakhir bulan sebelumnya tetap diperhitungkan untuk transisi yang mulus. Panggilan yang sudah ditindaklanjuti (Selesai/Ditolak) tidak memicu alert ganda.
 *   **Catatan Terlambat (Mandiri)**: Modul khusus untuk mencatat siswa terlambat, terpisah dari Presensi. Seorang siswa bisa Hadir tetapi tetap tercatat Terlambat. Dilengkapi pencarian siswa, inline edit keterangan, dan proteksi duplikasi per hari.
@@ -23,7 +32,7 @@
 
 *   **Dashboard Analitik**: Visualisasi kehadiran, keuangan, dan kedisiplinan secara real-time dengan grafik Pie & Area.
 *   **Presensi Dual-Session**: Pencatatan kehadiran pagi dan siang dengan timestamp otomatis per sesi.
-*   **Kas Kelas Digital**: Manajemen iuran dengan sistem draf transaksi massal (Bulk Save).
+*   **Kas Kelas Digital**: Manajemen iuran dengan antrean transaksi massal (Bulk Save).
 *   **Catatan Terlambat**: Pencatatan siswa terlambat mandiri (terpisah dari status presensi).
 *   **Log Panggilan & Home Visit**: Pendataan kasus siswa lengkap dengan dokumentasi foto langsung ke Google Drive.
 *   **Leger & Buku Klaper**: Ekspor data akademik ke format profesional yang siap cetak.

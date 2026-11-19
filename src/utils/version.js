@@ -4,7 +4,12 @@ const GITHUB_OWNER = 'lukmanhasyim-ship-it'
 const GITHUB_REPO = 'Siswa.Hub'
 const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`
 
+const UPDATE_CACHE_KEY = 'last_update_check'
+const UPDATE_TTL = 6 * 60 * 60 * 1000
+const ERROR_TTL = 10 * 60 * 1000
+
 let cachedVersion = null
+let inFlightCheck = null
 
 export function getCurrentVersion() {
   if (cachedVersion) return cachedVersion
@@ -30,7 +35,41 @@ function compareVersions(current, latest) {
   return 0
 }
 
-export async function checkForUpdate() {
+function readCachedCheck() {
+  try {
+    const raw = localStorage.getItem(UPDATE_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed || typeof parsed.checkedAt !== 'number') return null
+
+    const ttl = parsed.result?.error ? ERROR_TTL : UPDATE_TTL
+    if (Date.now() - parsed.checkedAt > ttl) return null
+    return parsed.result
+  } catch {
+    return null
+  }
+}
+
+function writeCachedCheck(result) {
+  try {
+    localStorage.setItem(UPDATE_CACHE_KEY, JSON.stringify({ checkedAt: Date.now(), result }))
+  } catch {
+    // Abaikan kegagalan storage (private mode / quota penuh).
+  }
+}
+
+function emptyResult(error) {
+  return {
+    hasUpdate: false,
+    currentVersion: getCurrentVersion(),
+    latestVersion: null,
+    releaseNotes: null,
+    releaseUrl: null,
+    error,
+  }
+}
+
+async function fetchLatestRelease() {
   try {
     const response = await fetch(`${GITHUB_API_URL}/releases/latest`, {
       headers: {
@@ -39,16 +78,8 @@ export async function checkForUpdate() {
     })
 
     if (!response.ok) {
-      if (response.status === 404) {
-        return {
-          hasUpdate: false,
-          currentVersion: getCurrentVersion(),
-          latestVersion: null,
-          releaseNotes: null,
-          releaseUrl: null,
-          error: 'Belum ada release',
-        }
-      }
+      if (response.status === 404) return emptyResult('Belum ada release')
+      if (response.status === 403) return emptyResult('Batas rate limit GitHub API tercapai')
       throw new Error(`HTTP ${response.status}`)
     }
 
@@ -56,10 +87,8 @@ export async function checkForUpdate() {
     const latestVersion = release.tag_name?.replace(/^v/, '') || release.name || '0.0.0'
     const currentVersion = getCurrentVersion()
 
-    const hasUpdate = compareVersions(currentVersion, latestVersion) < 0
-
     return {
-      hasUpdate,
+      hasUpdate: compareVersions(currentVersion, latestVersion) < 0,
       currentVersion,
       latestVersion,
       releaseNotes: release.body || null,
@@ -68,13 +97,24 @@ export async function checkForUpdate() {
       error: null,
     }
   } catch (err) {
-    return {
-      hasUpdate: false,
-      currentVersion: getCurrentVersion(),
-      latestVersion: null,
-      releaseNotes: null,
-      releaseUrl: null,
-      error: err.message,
-    }
+    return emptyResult(err.message)
+  }
+}
+
+export async function checkForUpdate({ force = false } = {}) {
+  if (!force) {
+    const cached = readCachedCheck()
+    if (cached) return cached
+  }
+
+  if (inFlightCheck) return inFlightCheck
+
+  inFlightCheck = fetchLatestRelease()
+  try {
+    const result = await inFlightCheck
+    writeCachedCheck(result)
+    return result
+  } finally {
+    inFlightCheck = null
   }
 }

@@ -3,7 +3,70 @@
  * Deploy as Web App, set "Execute as: Me" and "Who has access: Anyone".
  */
 
+var DATA_CACHE_TTL = 60; // detik
+var DATA_CACHE_VERSION_KEY = 'DATA_CACHE_VERSION';
+var DATA_CACHE_MAX_BYTES = 90000; // batas aman di bawah kuota 100KB per item CacheService
 
+var READ_ONLY_ACTIONS = {
+  GET_ALL: true,
+  GET_NOTIFICATIONS: true,
+  GET_TERLAMBAT: true,
+  GET_THUMBNAILS: true,
+  GET_FILE: true,
+  GET_PROFILE_WALI: true,
+  LOGIN_WALI: true,
+  GET_TRIGGER_STATUS: true
+};
+
+function getCacheVersion() {
+  var props = PropertiesService.getScriptProperties();
+  var version = props.getProperty(DATA_CACHE_VERSION_KEY);
+  if (!version) {
+    version = '1';
+    props.setProperty(DATA_CACHE_VERSION_KEY, version);
+  }
+  return version;
+}
+
+function invalidateDataCache() {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(5000);
+    var props = PropertiesService.getScriptProperties();
+    var version = Number(props.getProperty(DATA_CACHE_VERSION_KEY) || '1') + 1;
+    props.setProperty(DATA_CACHE_VERSION_KEY, String(version));
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// Cache hanya untuk GET_ALL. Mutation menaikkan versi sehingga key lama otomatis basi.
+function readCachedData(sheetName) {
+  sheetName = (sheetName || '').toString();
+  if (!sheetName) return [];
+
+  var key = 'read:v' + getCacheVersion() + ':' + sheetName;
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get(key);
+  if (hit) {
+    try {
+      return JSON.parse(hit);
+    } catch (e) {
+      // Cache rusak → baca ulang dari Sheet.
+    }
+  }
+
+  var data = readData(sheetName);
+  try {
+    var json = JSON.stringify(data);
+    if (json.length < DATA_CACHE_MAX_BYTES) {
+      cache.put(key, json, DATA_CACHE_TTL);
+    }
+  } catch (e) {
+    // CacheService gagal tidak boleh menggagalkan request.
+  }
+  return data;
+}
 
 function pancingIzin() {
   DriveApp.createFolder("uji siswa.hub");
@@ -163,14 +226,14 @@ function handleResponse(e) {
 
     var actions = {
       GET_ALL: function() {
-        return { status: 'success', data: readData(payload && payload.sheet) };
+        return { status: 'success', data: readCachedData(payload && payload.sheet) };
       },
       CREATE: function() {
         var created = appendData(payload && payload.sheet, payload && payload.data);
         // Otomatis buat notifikasi jika transaksi keuangan (Pembayaran Kas)
         if (payload && payload.sheet === 'Keuangan' && payload.data.Tipe === 'Masuk') {
           try {
-            var student = readData('Master_Siswa').find(function(s) { 
+            var student = readCachedData('Master_Siswa').find(function(s) { 
               return s.NISN.toString() === payload.data.NISN.toString(); 
             });
             if (student && student.Email) {
@@ -274,6 +337,15 @@ function handleResponse(e) {
     var result = actions[action]
       ? actions[action]()
       : { status: 'error', message: 'Unknown action: ' + action };
+
+    // Setiap write mengubah data → versi cache naik, pembacaan berikutnya fresh.
+    if (!READ_ONLY_ACTIONS[action]) {
+      try {
+        invalidateDataCache();
+      } catch (e) {
+        Logger.log('Gagal invalidasi cache: ' + e.toString());
+      }
+    }
 
     var output = ContentService.createTextOutput(JSON.stringify(result));
     output.setMimeType(ContentService.MimeType.JSON);

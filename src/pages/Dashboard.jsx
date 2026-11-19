@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { format, startOfWeek, endOfWeek, parseISO } from 'date-fns';
 import { fetchGAS } from '../utils/gasClient';
-import { calculateDisciplineStatus, formatIDR, formatDateIndo } from '../utils/logic';
+import { calculateDisciplineStatus, formatIDR } from '../utils/logic';
 import StudentCard from '../components/StudentCard';
 import { Users, Wallet, AlertTriangle, CheckCircle2, Bell, ChevronRight, Calendar, Info, Clock } from 'lucide-react';
 import Loading from '../components/Loading';
@@ -46,12 +46,15 @@ export default function Dashboard() {
           fetchGAS('GET_TERLAMBAT', { filter: { tanggal: format(new Date(), 'yyyy-MM-dd') } })
         ]);
 
-        // Trigger daily piket notifications once per day
+        // Trigger notifikasi piket sekali sehari per akun, dan hanya setelah sukses.
         const today = format(new Date(), 'yyyy-MM-dd');
-        const lastNotif = localStorage.getItem('last_piket_notif');
-        if (lastNotif !== today) {
-          fetchGAS('SEND_PIKET_NOTIFICATIONS');
-          localStorage.setItem('last_piket_notif', today);
+        const notifKey = `last_piket_notif_${user?.email || 'anon'}`;
+        if (localStorage.getItem(notifKey) !== today) {
+          fetchGAS('SEND_PIKET_NOTIFICATIONS')
+            .then(() => localStorage.setItem(notifKey, today))
+            .catch(() => {
+              // Guard tidak ditulis agar percobaan berikutnya tetap mencoba.
+            });
         }
   
         setData({
@@ -72,7 +75,7 @@ export default function Dashboard() {
       }
     }
     load();
-  }, []);
+  }, [user?.email]);
 
   const getEffectiveStatus = useCallback((p) => {
     if (p.Status_Siang && p.Status_Siang !== '') return p.Status_Siang;
@@ -110,7 +113,9 @@ export default function Dashboard() {
           if (k.Tipe === 'Masuk') kasWeekMasuk += val;
           else if (k.Tipe === 'Keluar') kasWeekKeluar += val;
         }
-      } catch { }
+      } catch {
+        // Tanggal invalid diabaikan dalam perhitungan kas minggu ini.
+      }
     });
     const kasWeekNet = kasWeekMasuk - kasWeekKeluar;
 

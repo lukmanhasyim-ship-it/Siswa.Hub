@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { fetchGAS } from '../utils/gasClient';
@@ -11,10 +11,105 @@ import PageGuide from '../components/PageGuide';
 import { History, Users, Trash2, Edit2, X } from 'lucide-react';
 import { sendNotification } from '../utils/notifications';
 
+const DRAFT_VERSION = 1;
+const QUEUE_VERSION = 1;
+const SAVED_FLASH_KEY = 'kas_saved_flash';
+
+function getDraftKey(user) {
+  return `kas_draft_v${DRAFT_VERSION}_${user?.email || 'anon'}`;
+}
+
+function getQueueKey(user) {
+  return `kas_queue_v${QUEUE_VERSION}_${user?.email || 'anon'}`;
+}
+
+function normalizeQueueItem(item) {
+  if (!item || typeof item !== 'object') return null;
+  const idSiswa = typeof item.ID_Siswa === 'string' ? item.ID_Siswa : '';
+  const jumlah = Number(item.Jumlah);
+  if (!idSiswa || !Number.isFinite(jumlah) || jumlah <= 0) return null;
+
+  return {
+    localId: typeof item.localId === 'string' ? item.localId : `Q${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
+    ID_Transaksi: typeof item.ID_Transaksi === 'string' && item.ID_Transaksi
+      ? item.ID_Transaksi
+      : `K${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
+    ID_Siswa: idSiswa,
+    NISN: typeof item.NISN === 'string' ? item.NISN : '',
+    Tipe: item.Tipe === 'Keluar' ? 'Keluar' : 'Masuk',
+    Jumlah: jumlah,
+    Keterangan: typeof item.Keterangan === 'string' ? item.Keterangan : '',
+    Tanggal: typeof item.Tanggal === 'string' ? item.Tanggal : format(new Date(), 'yyyy-MM-dd'),
+  };
+}
+
+function readQueue(user) {
+  try {
+    const raw = localStorage.getItem(getQueueKey(user));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map(normalizeQueueItem).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function writeQueue(user, items) {
+  try {
+    localStorage.setItem(getQueueKey(user), JSON.stringify(items));
+  } catch {
+    // Storage tidak tersedia → antrean tetap ada di memori selama halaman terbuka.
+  }
+}
+
+function clearQueue(user) {
+  try {
+    localStorage.removeItem(getQueueKey(user));
+  } catch {
+    // Abaikan kegagalan storage.
+  }
+}
+
+function readDraft(user) {
+  try {
+    const raw = localStorage.getItem(getDraftKey(user));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    return {
+      idSiswa: typeof parsed.idSiswa === 'string' ? parsed.idSiswa : '',
+      jumlahInput: typeof parsed.jumlahInput === 'string' ? parsed.jumlahInput : '',
+      tipe: parsed.tipe === 'Keluar' ? 'Keluar' : 'Masuk',
+      keterangan: typeof parsed.keterangan === 'string' ? parsed.keterangan : '',
+      tanggal: typeof parsed.tanggal === 'string' ? parsed.tanggal : format(new Date(), 'yyyy-MM-dd'),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(user, draft) {
+  try {
+    localStorage.setItem(getDraftKey(user), JSON.stringify(draft));
+  } catch {
+    // Storage tidak tersedia (private mode / quota) → form tetap berfungsi.
+  }
+}
+
+function clearDraft(user) {
+  try {
+    localStorage.removeItem(getDraftKey(user));
+  } catch {
+    // Abaikan kegagalan storage.
+  }
+}
 
 export default function Keuangan() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const userEmail = user?.email || '';
   const [keuangan, setKeuangan] = useState([]);
   const [siswa, setSiswa] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,13 +120,16 @@ export default function Keuangan() {
   const role = user?.role || 'Siswa';
   const canEdit = ['Bendahara', 'Wakil Bendahara'].includes(role);
 
-  // Form State
-  const [idSiswa, setIdSiswa] = useState('');
-  const [jumlahInput, setJumlahInput] = useState('');
-  const [tipe, setTipe] = useState('Masuk');
-  const [keterangan, setKeterangan] = useState('');
-  const [tanggal, setTanggal] = useState(format(new Date(), 'yyyy-MM-dd'));
+  // Form State — dipulihkan dari draft localStorage milik akun ini.
+  const [initialDraft] = useState(() => readDraft(user));
+  const [idSiswa, setIdSiswa] = useState(() => initialDraft?.idSiswa ?? '');
+  const [jumlahInput, setJumlahInput] = useState(() => initialDraft?.jumlahInput ?? '');
+  const [tipe, setTipe] = useState(() => initialDraft?.tipe ?? 'Masuk');
+  const [keterangan, setKeterangan] = useState(() => initialDraft?.keterangan ?? '');
+  const [tanggal, setTanggal] = useState(() => initialDraft?.tanggal ?? format(new Date(), 'yyyy-MM-dd'));
   const [editingTrx, setEditingTrx] = useState(null);
+  const [queue, setQueue] = useState(() => readQueue(user));
+  const skipDraftSaveRef = useRef(false);
 
   const loadKeuangan = useCallback(async () => {
     setLoading(true);
@@ -48,7 +146,7 @@ export default function Keuangan() {
 
       // Ambil nominal iuran dari profil Wali Kelas (bisa dari user email atau yang pertama)
       if (profil.data && profil.data.length > 0) {
-        const waliProfile = profil.data.find((p) => p.Email && p.Email.toLowerCase() === user.email.toLowerCase()) || profil.data[0];
+        const waliProfile = profil.data.find((p) => p.Email && p.Email.toLowerCase() === userEmail.toLowerCase()) || profil.data[0];
         setNominalIuran(Number(waliProfile.Nominal_Iuran) || 0);
       }
     } catch (error) {
@@ -57,17 +155,41 @@ export default function Keuangan() {
     } finally {
       setLoading(false);
     }
-  }, [showToast, user.email]);
+  }, [showToast, userEmail]);
 
   useEffect(() => {
-    loadKeuangan();
+    void Promise.resolve().then(loadKeuangan);
   }, [loadKeuangan]);
+
+  // Draft lokal: hanya untuk transaksi baru dan hanya untuk role yang boleh edit.
+  useEffect(() => {
+    if (!canEdit || editingTrx || skipDraftSaveRef.current) return;
+    writeDraft(user, { idSiswa, jumlahInput, tipe, keterangan, tanggal });
+  }, [canEdit, editingTrx, idSiswa, jumlahInput, tipe, keterangan, tanggal, user]);
+
+  // Toast sukses harus muncul setelah reload halaman.
+  useEffect(() => {
+    let saved = false;
+    try {
+      saved = sessionStorage.getItem(SAVED_FLASH_KEY) === '1';
+      if (saved) sessionStorage.removeItem(SAVED_FLASH_KEY);
+    } catch {
+      // sessionStorage tidak tersedia.
+    }
+    if (saved) showToast('Transaksi berhasil disimpan.', 'success');
+  }, [showToast]);
 
   const totalKas = useMemo(() => {
     return keuangan.reduce((acc, curr) => {
       return curr.Tipe === 'Masuk' ? acc + Number(curr.Jumlah) : acc - Number(curr.Jumlah);
     }, 0);
   }, [keuangan]);
+
+  const totalQueue = useMemo(() => {
+    return queue.reduce((acc, curr) => {
+      return curr.Tipe === 'Masuk' ? acc + Number(curr.Jumlah) : acc - Number(curr.Jumlah);
+    }, 0);
+  }, [queue]);
 
   const currentWeekStart = useMemo(() => startOfWeek(new Date(), { weekStartsOn: 1 }), []);
   const currentWeekEnd = useMemo(() => endOfWeek(new Date(), { weekStartsOn: 1 }), []);
@@ -136,14 +258,51 @@ export default function Keuangan() {
   }, [activeStudents, studentSearch]);
 
   const cancelEdit = useCallback(() => {
+    const draft = readDraft(user);
     setEditingTrx(null);
+    setIdSiswa(draft?.idSiswa ?? '');
+    setJumlahInput(draft?.jumlahInput ?? '');
+    setTipe(draft?.tipe ?? 'Masuk');
+    setKeterangan(draft?.keterangan ?? '');
+    setTanggal(draft?.tanggal ?? format(new Date(), 'yyyy-MM-dd'));
+    setStudentSearch('');
+  }, [user]);
+
+  const handleCatatKas = useCallback(() => {
+    if (!canEdit || editingTrx || !idSiswa || amountValue <= 0 || isAmountWarning) return;
+
+    const selectedStudent = activeStudents.find(s => String(s.ID_Siswa) === String(idSiswa));
+    const item = normalizeQueueItem({
+      localId: `Q${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
+      ID_Transaksi: `K${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
+      ID_Siswa: idSiswa,
+      NISN: selectedStudent?.NISN || '',
+      Tipe: tipe,
+      Jumlah: amountValue,
+      Keterangan: keterangan,
+      Tanggal: tanggal,
+    });
+    if (!item) return;
+
+    const next = [...queue, item];
+    setQueue(next);
+    writeQueue(user, next);
+
     setIdSiswa('');
     setJumlahInput('');
     setTipe('Masuk');
     setKeterangan('');
     setTanggal(format(new Date(), 'yyyy-MM-dd'));
     setStudentSearch('');
-  }, []);
+    showToast(`Transaksi ${selectedStudent?.Nama_Siswa || idSiswa} dicatat. Belum masuk database.`, 'info');
+  }, [canEdit, editingTrx, idSiswa, amountValue, isAmountWarning, activeStudents, tipe, keterangan, tanggal, queue, user, showToast]);
+
+  const handleRemoveQueueItem = useCallback((localId) => {
+    const next = queue.filter(item => item.localId !== localId);
+    setQueue(next);
+    writeQueue(user, next);
+    showToast('Transaksi dihapus dari antrean.', 'info');
+  }, [queue, user, showToast]);
 
   const handleEdit = useCallback((trx) => {
     setEditingTrx(trx);
@@ -157,15 +316,20 @@ export default function Keuangan() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    if (!idSiswa || amountValue <= 0 || isAmountWarning) return;
+  const persistKeuangan = useCallback(async (mode) => {
+    if (!canEdit) return;
+    if (mode === 'edit') {
+      if (!editingTrx || !idSiswa || amountValue <= 0 || isAmountWarning) return;
+    } else if (queue.length === 0) {
+      showToast('Belum ada transaksi yang dicatat. Klik Catat Kas dulu.', 'info');
+      return;
+    }
 
     const selectedStudent = activeStudents.find(s => String(s.ID_Siswa) === String(idSiswa));
     
     setSaving(true);
     try {
-      if (editingTrx) {
+      if (mode === 'edit') {
         const updatedData = {
           ID_Siswa: idSiswa,
           NISN: selectedStudent?.NISN || '',
@@ -190,55 +354,55 @@ export default function Keuangan() {
           selfMessage: `Info Keuangan: Transaksi pembayaran Anda sebesar ${formatIDR(amountValue)} telah diperbarui oleh Bendahara.`,
           includeSelf: true,
           type: 'info',
-          waliEmail: user?.email
+          waliEmail: userEmail
         });
 
-        showToast('Transaksi berhasil diperbarui.', 'success');
       } else {
-        const newTrx = {
-          ID_Transaksi: 'K' + Date.now(),
-          Tanggal: tanggal,
-          ID_Siswa: idSiswa,
-          NISN: selectedStudent?.NISN || '', 
-          Tipe: tipe,
-          Jumlah: amountValue,
-          Keterangan: keterangan
-        };
-
-        await fetchGAS('CREATE', { sheet: 'Keuangan', data: newTrx });
-
-        // Notify relevant parties via utility
-        const payerName = selectedStudent?.Nama_Siswa || idSiswa;
-        const isUnderpaid = tipe === 'Masuk' && amountValue < nominalIuran;
+        // Antrean disimpan sekaligus dalam satu permintaan. localId hanya untuk UI.
+        const items = queue.map((item) => {
+          const row = { ...item };
+          delete row.localId;
+          return row;
+        });
+        await fetchGAS('BULK_CREATE', { sheet: 'Keuangan', data: items });
 
         await sendNotification(activeStudents, {
-          subjectId: idSiswa,
-          targetRoles: ['Bendahara', 'Wakil Bendahara', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Wali Kelas'],
-          message: tipe === 'Masuk'
-            ? `Halo! Ada kontribusi KAS baru nih dari ${payerName} sebesar ${formatIDR(amountValue)}${isUnderpaid ? ' (Belum Lunas)' : ''}. Dompet kelas makin sehat!`
-            : `Info Pengeluaran: Ada dana kelas yang digunakan sebesar ${formatIDR(amountValue)} untuk ${keterangan || 'kebutuhan kelas'}.`,
-          selfMessage: tipe === 'Masuk'
-            ? (isUnderpaid 
-                ? `Terima kasih ya, ${payerName}! Kamu sudah mencicil KAS sebesar ${formatIDR(amountValue)}. Yuk semangat melunasi sisanya pelan-pelan!`
-                : `Terima kasih ya, ${payerName}! Partisipasi KAS sebesar ${formatIDR(amountValue)} sudah kami terima. Kontribusimu sangat berarti untuk kegiatan kelas kita!`)
-            : `Info Pengeluaran: Dana kelas digunakan sebesar ${formatIDR(amountValue)}.`,
-          includeSelf: tipe === 'Masuk',
-          type: isUnderpaid ? 'info' : 'success',
-          waliEmail: user?.email
+          targetRoles: ['Bendahara', 'Wakil Bendahara', 'Wali Kelas'],
+          message: `${queue.length} transaksi kas baru disimpan (total ${formatIDR(totalQueue)}).`,
+          type: 'success',
+          waliEmail: userEmail
         });
 
-        showToast('Transaksi berhasil disimpan.', 'success');
       }
 
-      cancelEdit();
-      await loadKeuangan();
+      // Simpan sukses → buang antrean & draft paksa reload agar data benar-benar baru.
+      skipDraftSaveRef.current = true;
+      clearQueue(user);
+      clearDraft(user);
+      try {
+        sessionStorage.setItem(SAVED_FLASH_KEY, '1');
+      } catch {
+        // Flash toast bersifat opsional.
+      }
+      window.location.reload();
+      return;
     } catch (error) {
       console.error('Simpan transaksi gagal:', error);
       showToast('Gagal menyimpan transaksi.', 'error');
     } finally {
       setSaving(false);
     }
-  }, [idSiswa, amountValue, tipe, keterangan, tanggal, editingTrx, activeStudents, user?.email, nominalIuran, loadKeuangan, showToast, cancelEdit]);
+  }, [canEdit, idSiswa, amountValue, isAmountWarning, tipe, keterangan, tanggal, editingTrx, queue, totalQueue, activeStudents, user, userEmail, showToast]);
+
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    if (!editingTrx) return;
+    void persistKeuangan('edit');
+  }, [editingTrx, persistKeuangan]);
+
+  const handleSaveQueue = useCallback(() => {
+    void persistKeuangan('queue');
+  }, [persistKeuangan]);
 
   const handleDelete = useCallback(async (trxId) => {
     if (!canEdit) return;
@@ -264,7 +428,7 @@ export default function Keuangan() {
           selfMessage: `Info Pembatalan: Transaksi pembayaran KAS Anda sebesar ${formatIDR(trx.Jumlah)} telah dibatalkan oleh pengelola kelas. Silakan hubungi Bendahara jika ini adalah kekeliruan.`,
           includeSelf: true,
           type: 'warning',
-          waliEmail: user?.email
+          waliEmail: userEmail
         });
       }
 
@@ -276,7 +440,7 @@ export default function Keuangan() {
     } finally {
       setLoading(false);
     }
-  }, [canEdit, keuangan, activeStudents, loadKeuangan, showToast, user?.email]);
+  }, [canEdit, keuangan, activeStudents, loadKeuangan, showToast, userEmail]);
 
   if (loading) return <Loading message="Menyatukan aliran dana kelas..." />;
 
@@ -520,19 +684,110 @@ export default function Keuangan() {
                 />
               </div>
 
-               <div className="flex gap-2">
-                <button type="submit" className="btn-primary flex-1" disabled={saving || isAmountWarning}>
-                  {saving ? 'Menyimpan...' : (editingTrx ? 'Update Transaksi' : 'Simpan Transaksi')}
-                </button>
+               <div className="flex flex-wrap gap-2">
+                {editingTrx && (
+                  <button type="submit" className="btn-primary flex-1" disabled={saving || isAmountWarning}>
+                    {saving ? 'Menyimpan...' : 'Update Transaksi'}
+                  </button>
+                )}
+                {!editingTrx && (
+                  <button
+                    type="button"
+                    onClick={handleCatatKas}
+                    disabled={!idSiswa || amountValue <= 0 || isAmountWarning}
+                    className="flex-1 rounded-xl bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Catat Kas
+                  </button>
+                )}
                 {editingTrx && (
                   <button type="button" onClick={cancelEdit} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
                     Batal
                   </button>
                 )}
               </div>
+              {!editingTrx && (
+                <p className="text-[11px] font-medium text-slate-500">
+                  Catat Kas menambah transaksi ke antrean. Tombol Simpan Transaksi ada di bawah daftar antrean. Draft form tersimpan otomatis di perangkat ini.
+                </p>
+              )}
             </form>
           )}
         </div>
+        {/* Queue Table */}
+        {queue.length > 0 && (
+          <div className="card lg:col-span-2 overflow-hidden p-0 border-emerald-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-emerald-100 bg-emerald-50/70 px-4 py-3">
+              <div>
+                <h3 className="font-semibold text-emerald-900">Antrean Transaksi Belum Disimpan</h3>
+                <p className="text-[11px] text-emerald-700">
+                  {queue.length} transaksi menunggu disimpan ke database.
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-[11px] uppercase tracking-wider text-emerald-700">Total Antrean</div>
+                <div className="font-bold text-emerald-900">{formatIDR(totalQueue)}</div>
+              </div>
+            </div>
+            <div className="table-container">
+              <table className="modern-table min-w-[800px] md:min-w-full">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>ID Siswa</th>
+                    <th>Siswa</th>
+                    <th>Tipe</th>
+                    <th>Jumlah</th>
+                    <th>Keterangan</th>
+                    <th className="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {queue.map(item => {
+                    const s = siswa.find(s => s.ID_Siswa === item.ID_Siswa);
+                    return (
+                      <tr key={item.localId} className="border-b last:border-0 bg-emerald-50/30 hover:bg-emerald-50">
+                        <td className="px-4 py-3">{item.Tanggal}</td>
+                        <td className="px-4 py-3 font-medium text-slate-800">{item.ID_Siswa}</td>
+                        <td className="px-4 py-3">{s ? s.Nama_Siswa : '-'}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${item.Tipe === 'Masuk' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {item.Tipe}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 font-medium">{formatIDR(item.Jumlah)}</td>
+                        <td className="px-4 py-3 text-xs">{item.Keterangan || '-'}</td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveQueueItem(item.localId)}
+                            className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                            title="Hapus dari antrean"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-emerald-100 bg-white px-4 py-3">
+              <p className="text-xs text-slate-600">
+                <span className="font-bold text-emerald-800">{queue.length}</span> transaksi siap disimpan ke database.
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveQueue}
+                disabled={saving}
+                className="btn-primary disabled:opacity-50"
+              >
+                {saving ? 'Menyimpan...' : `Simpan Transaksi (${queue.length})`}
+              </button>
+            </div>
+          </div>
+        )}
         {/* History Table */}
         <div className="card lg:col-span-2 overflow-hidden p-0">
           {keuangan.length === 0 ? (

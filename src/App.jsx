@@ -1,8 +1,9 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ROUTE_ROLES } from './config/navigation';
 
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -53,10 +54,10 @@ function RoleProtectedRoute({ children, allowedRoles }) {
   return children;
 }
 
-// AppRoutes: wrapper yang punya akses ke useLocation.
-// key={location.key} memaksa komponen remount setiap navigasi → data selalu fresh.
+// AppRoutes sengaja tidak memakai.
+// Cache TanStack Query yang menjaga kesegaran data; state halaman tetap bertahan
+// saat pengguna berpindah halaman sehingga navigasi terasa instan.
 function AppRoutes() {
-  const location = useLocation();
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
@@ -66,107 +67,107 @@ function AppRoutes() {
 
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard key={location.key} />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route
           path="master-siswa"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <MasterSiswa key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['master-siswa']}>
+              <MasterSiswa />
             </RoleProtectedRoute>
           }
         />
-        <Route path="profile" element={<Profile key={location.key} />} />
+        <Route path="profile" element={<Profile />} />
         <Route
           path="tanggungan"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas', 'Bendahara', 'Wakil Bendahara']}>
-              <Tanggungan key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES.tanggungan}>
+              <Tanggungan />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="presensi-pagi"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Sekretaris', 'Wakil Sekretaris']}>
-              <PresensiPagi key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['presensi-pagi']}>
+              <PresensiPagi />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="presensi-siang"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Sekretaris', 'Wakil Sekretaris']}>
-              <PresensiSiang key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['presensi-siang']}>
+              <PresensiSiang />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="laporan"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <Laporan key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES.laporan}>
+              <Laporan />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="laporan-harian"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <LaporanHarian key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['laporan-harian']}>
+              <LaporanHarian />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="buku-klaper"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <BukuKlaper key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['buku-klaper']}>
+              <BukuKlaper />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="dkn"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <DKN key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES.dkn}>
+              <DKN />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="catatan-terlambat"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <CatatanTerlambat key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['catatan-terlambat']}>
+              <CatatanTerlambat />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="update-presensi"
           element={
-            <RoleProtectedRoute allowedRoles={[]}>
-              <Presensi key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES['update-presensi']}>
+              <Presensi />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="keuangan"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas', 'Ketua Kelas', 'Wakil Ketua Kelas', 'Bendahara', 'Wakil Bendahara']}>
-              <Keuangan key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES.keuangan}>
+              <Keuangan />
             </RoleProtectedRoute>
           }
         />
         <Route
           path="panggilan"
           element={
-            <RoleProtectedRoute allowedRoles={['Wali Kelas']}>
-              <Panggilan key={location.key} />
+            <RoleProtectedRoute allowedRoles={ROUTE_ROLES.panggilan}>
+              <Panggilan />
             </RoleProtectedRoute>
           }
         />
-        <Route path="piket" element={<Piket key={location.key} />} />
-        <Route path="notifications" element={<Notifications key={location.key} />} />
-        <Route path="feedback" element={<Feedback key={location.key} />} />
+        <Route path="piket" element={<Piket />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="feedback" element={<Feedback />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

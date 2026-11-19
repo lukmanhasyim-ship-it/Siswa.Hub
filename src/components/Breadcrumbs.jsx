@@ -16,7 +16,10 @@ const routeMap = {
   'panggilan': 'Log Panggilan',
   'notifications': 'Notifikasi',
   'profile': 'Profil Pengguna',
-  'piket': 'Jadwal Piket'
+  'piket': 'Jadwal Piket',
+  'feedback': 'Feedback',
+  'catatan-terlambat': 'Catatan Terlambat',
+  'update-presensi': 'Perbarui Presensi'
 };
 
 export default function Breadcrumbs() {

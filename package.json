@@ -1,7 +1,7 @@
 {
   "name": "wali-kelas",
   "private": true,
-  "version": "4.9.4",
+  "version": "5.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
+    "@tanstack/react-query": "^5.108.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "firebase": "^11.4.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.8.0",
@@ -22,8 +24,7 @@
     "react-router-dom": "^7.14.0",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.5.0",
-    "xlsx": "^0.18.5",
-    "firebase": "^11.4.0"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
