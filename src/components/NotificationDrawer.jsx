@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Bell, Info, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -83,7 +83,7 @@ export default function NotificationDrawer({ isOpen, onClose, notifications, onM
                            const d = new Date(n.timestamp);
                            if (isNaN(d.getTime())) return 'Baru saja';
                            return format(d, 'HH:mm', { locale: id });
-                         } catch (e) { return '--:--'; }
+                         } catch { return '--:--'; }
                        })()} 
                        <span className="w-1 h-1 bg-slate-300 rounded-full" />
                        {(() => {
@@ -91,7 +91,7 @@ export default function NotificationDrawer({ isOpen, onClose, notifications, onM
                            const d = new Date(n.timestamp);
                            if (isNaN(d.getTime())) return '';
                            return format(d, 'dd MMM yyyy', { locale: id });
-                         } catch (e) { return ''; }
+                         } catch { return ''; }
                        })()}
                     </p>
                   </div>

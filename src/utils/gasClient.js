@@ -120,18 +120,3 @@ export async function fetchGAS(action, payload = {}) {
   }
 }
 
-export function prefetchGAS(action, payload = {}) {
-  if (!GAS_URL || !READ_ACTIONS.has(action)) return Promise.resolve();
-
-  return queryClient.prefetchQuery({
-    queryKey: gasQueryKey(action, payload),
-    queryFn: () => postToGAS(action, payload),
-    staleTime: staleTimeFor(action, payload),
-    gcTime: CACHE_TIME,
-    retry: 0,
-  });
-}
-
-export function clearGASCache() {
-  queryClient.removeQueries({ queryKey: ['gas'] });
-}

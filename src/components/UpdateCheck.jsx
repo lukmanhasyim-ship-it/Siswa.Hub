@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { checkForUpdate, getCurrentVersion } from '../utils/version';
+import { checkForUpdate } from '../utils/version';
 
 export default function UpdateCheck() {
   const [status, setStatus] = useState(null);

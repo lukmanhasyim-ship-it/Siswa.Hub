@@ -19,7 +19,7 @@ const quotes = [
 ];
 
 const Loading = ({ message = 'Memuat data...' }) => {
-  const randomQuote = React.useMemo(() => quotes[Math.floor(Math.random() * quotes.length)], []);
+  const randomQuote = quotes[message.length % quotes.length];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8 animate-in fade-in duration-700">

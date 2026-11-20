@@ -6,7 +6,7 @@ import Loading from '../components/Loading';
 import EmptyState from '../components/EmptyState';
 import PageGuide from '../components/PageGuide';
 import { BookOpen, Plus, Save, FileSpreadsheet, Trash2, Edit2, X, Info, FileUp, Download } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { loadXLSX } from '../utils/xlsxLoader';
 
 const KURIKULUM_MERDEKA = [
   { kategori: 'Umum', mapel: 'Pendidikan Agama Islam dan Budi Pekerti' },
@@ -47,11 +47,7 @@ export default function DKN() {
   // Format map: "ID_Siswa_Kategori_Mapel_Topik" -> value
   const [draftNilai, setDraftNilai] = useState({});
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [resSiswa, resNilai] = await Promise.all([
@@ -72,7 +68,11 @@ export default function DKN() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
+
+  useEffect(() => {
+    void Promise.resolve().then(loadData);
+  }, [loadData]);
 
   // Derive dynamic columns from existing data & newly added
   const columns = useMemo(() => {
@@ -259,7 +259,7 @@ export default function DKN() {
         });
         showToast('Nama Mapel di database berhasil diubah!', 'success');
         await loadData();
-      } catch (err) {
+      } catch {
         showToast('Gagal mengubah nama mapel di database.', 'error');
       } finally {
         setSaving(false);
@@ -354,13 +354,14 @@ export default function DKN() {
 
   const isChanged = Object.keys(draftNilai).length > 0;
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (siswa.length === 0) {
       showToast('Tidak ada data siswa untuk diekspor', 'error');
       return;
     }
 
     try {
+      const XLSX = await loadXLSX();
       const wb = XLSX.utils.book_new();
       const levels = ['X', 'XI', 'XII'];
 
@@ -446,13 +447,14 @@ export default function DKN() {
     }
   };
 
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
     if (siswa.length === 0 || columns.length === 0) {
       showToast('Konfigurasi Mapel dulu sebelum unduh template', 'warning');
       return;
     }
 
     try {
+      const XLSX = await loadXLSX();
       const wb = XLSX.utils.book_new();
 
       // Headers
@@ -472,7 +474,7 @@ export default function DKN() {
       XLSX.utils.book_append_sheet(wb, ws, 'Template Leger');
       XLSX.writeFile(wb, `Template_Leger_${jenjang}_${semester}.xlsx`);
       showToast('Template berhasil diunduh.', 'success');
-    } catch (e) {
+    } catch {
       showToast('Gagal membuat template.', 'error');
     }
   };
@@ -482,8 +484,9 @@ export default function DKN() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
+        const XLSX = await loadXLSX();
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];

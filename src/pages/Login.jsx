@@ -14,23 +14,6 @@ export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [waliContact, setWaliContact] = useState('6282330295812'); // Default fallback
-
-  React.useEffect(() => {
-    async function loadContact() {
-      try {
-        const res = await fetchGAS('GET_ALL', { sheet: 'Profil_Wali_Kelas' });
-        if (res.data && res.data.length > 0) {
-          const c = res.data[0].Kontak;
-          if (c) setWaliContact(c.replace(/[^0-9]/g, ''));
-        }
-      } catch (err) {
-        console.error('Login contact fetch error:', err);
-      }
-    }
-    loadContact();
-  }, []);
-
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoading(true);

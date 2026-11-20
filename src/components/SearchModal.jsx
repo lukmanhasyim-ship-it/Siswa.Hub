@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Search, User, X, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,26 +6,31 @@ export default function SearchModal({ isOpen, onClose, students }) {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
+  // Reset the query on close (an event handler, not an effect body) so every open starts empty.
+  const handleClose = useCallback(() => {
+    setQuery('');
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Toggle with Ctrl+K
       if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
-        onClose();
+        handleClose();
       }
       // Close with ESC
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
 
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
-      setQuery(''); // Reset search when opened
     }
     
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const filteredStudents = query.trim() === '' 
     ? [] 
@@ -38,7 +43,7 @@ export default function SearchModal({ isOpen, onClose, students }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] px-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={handleClose} />
       <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-scale-in">
         <div className="p-4 border-b border-slate-100 flex items-center gap-3">
           <Search className="w-5 h-5 text-slate-400" />
@@ -50,7 +55,7 @@ export default function SearchModal({ isOpen, onClose, students }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button onClick={onClose} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400">
+          <button onClick={handleClose} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -70,7 +75,7 @@ export default function SearchModal({ isOpen, onClose, students }) {
                   key={s.NISN || s.ID_Siswa}
                   onClick={() => {
                     navigate('/master-siswa', { state: { highlight: s.NISN || s.ID_Siswa } });
-                    onClose();
+                    handleClose();
                   }}
                   className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-emerald-50 text-left transition-all group"
                 >
@@ -100,7 +105,7 @@ export default function SearchModal({ isOpen, onClose, students }) {
               ].map(link => (
                 <button
                   key={link.path}
-                  onClick={() => { navigate(link.path); onClose(); }}
+                  onClick={() => { navigate(link.path); handleClose(); }}
                   className="p-3 bg-slate-50 rounded-2xl text-left hover:bg-emerald-50 transition-all border border-transparent hover:border-emerald-100"
                 >
                   <p className="text-xs font-bold text-slate-700">{link.label}</p>

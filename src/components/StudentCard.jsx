@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Phone, FileText, AlertTriangle, Edit3, MapPin, Trash2, MessageCircle, Crown, XCircle } from 'lucide-react';
 import { formatDateIndo } from '../utils/logic';
 
-function StudentCard({ student, disciplineStatus, detailReason, panggilanDetail, onWaClick, onWaStudentClick, onContactClick, onReject, onEdit, onDelete, canSeeLocation }) {
+function StudentCard({ student, disciplineStatus, detailReason, panggilanDetail, onWaClick, onWaStudentClick, onContactClick, onReject, onEdit, onDelete }) {
   const getAvatarColor = (gender) => {
     return gender === 'P' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700';
   };

@@ -14,7 +14,7 @@ export default function Presensi() {
   const [originalPresensi, setOriginalPresensi] = useState([]);
   const [keterangan, setKeterangan] = useState({});
   const [loading, setLoading] = useState(true);
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 

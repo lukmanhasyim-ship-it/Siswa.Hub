@@ -57,4 +57,19 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Pisahkan vendor berat agar tidak masuk chunk utama.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('recharts') || id.includes('d3-') || id.includes('victory-vendor')) return 'charts';
+          if (id.includes('/xlsx/')) return 'excel';
+          if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('dompurify') || id.includes('fflate')) return 'pdf';
+          if (id.includes('@tanstack')) return 'query';
+          if (id.includes('react-dom') || id.includes('/react/') || id.includes('react-router') || id.includes('scheduler')) return 'react-vendor';
+        },
+      },
+    },
+  },
 })

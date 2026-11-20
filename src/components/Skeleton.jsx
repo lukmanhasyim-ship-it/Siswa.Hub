@@ -1,5 +1,7 @@
 import React from 'react';
 
+const BAR_HEIGHTS = [45, 78, 36, 88, 52, 70, 30, 95, 58, 82, 42, 66];
+
 const Skeleton = ({ className }) => (
   <div className={`skeleton-shimmer rounded-md ${className}`} />
 );
@@ -65,7 +67,7 @@ export const SkeletonDashboard = () => (
             <Skeleton className="h-4 w-1/4 mb-6" />
             <div className="h-48 flex items-end gap-2 px-4">
                 {[...Array(12)].map((_, i) => (
-                    <Skeleton key={i} className="flex-1" style={{ height: `${Math.random() * 80 + 20}%` }} />
+                    <Skeleton key={i} className="flex-1" style={{ height: `${BAR_HEIGHTS[i % BAR_HEIGHTS.length]}%` }} />
                 ))}
             </div>
         </div>

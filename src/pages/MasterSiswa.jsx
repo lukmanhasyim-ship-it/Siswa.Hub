@@ -10,8 +10,9 @@ import Skeleton, { SkeletonStats, SkeletonTable } from '../components/Skeleton';
 import EmptyState from '../components/EmptyState';
 import PageGuide from '../components/PageGuide';
 import { UserPlus, FileUp, Download, FileDown, X, MapPin } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { loadXLSX } from '../utils/xlsxLoader';
 import { formatPhoneNumber } from '../utils/logic';
+import { decimalToDMS, formatCoordinateInput, createMapsLink } from '../utils/coordinates';
 
 export default function MasterSiswa() {
   const { user } = useAuth();
@@ -72,8 +73,9 @@ export default function MasterSiswa() {
     load();
   }, [showToast]);
 
-  const handleDownloadTemplate = () => {
+  const handleDownloadTemplate = async () => {
     try {
+      const XLSX = await loadXLSX();
       const wb = XLSX.utils.book_new();
       const headers = [
         ['ID_Siswa', 'NIS', 'NISN', 'Nama_Siswa', 'L/P', 'Email', 'No_WA_Siswa', 'Nama_Wali', 'No_WA_Wali', 'Alamat', 'Jabatan', 'Status_Aktif'],
@@ -83,7 +85,7 @@ export default function MasterSiswa() {
       XLSX.utils.book_append_sheet(wb, ws, 'Template Siswa');
       XLSX.writeFile(wb, 'Template_Master_Siswa.xlsx');
       showToast('Template berhasil diunduh.', 'success');
-    } catch (e) {
+    } catch {
       showToast('Gagal membuat template.', 'error');
     }
   };
@@ -96,6 +98,7 @@ export default function MasterSiswa() {
     reader.onload = async (event) => {
       try {
         setIsImporting(true);
+        const XLSX = await loadXLSX();
         const data = new Uint8Array(event.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -154,6 +157,7 @@ export default function MasterSiswa() {
         return;
       }
 
+      const XLSX = await loadXLSX();
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(allSiswa);
       XLSX.utils.book_append_sheet(wb, ws, 'Data Master Siswa');
@@ -254,7 +258,7 @@ export default function MasterSiswa() {
       setSiswa(prev => prev.filter(s => s.ID_Siswa !== idSiswa));
       await fetchGAS('DELETE', { sheet: 'Master_Siswa', id: idSiswa });
       showToast('Siswa berhasil dihapus.', 'success');
-    } catch (err) {
+    } catch {
       showToast('Gagal menghapus siswa.', 'error');
     }
   };
@@ -299,66 +303,6 @@ export default function MasterSiswa() {
     window.open(url, '_blank');
   }, []);
 
-  const normalizeDecimalString = (value) => {
-    if (value === undefined || value === null) return '';
-    let str = value.toString().trim().replace(/,/g, '.');
-    str = str.replace(/[^0-9.\-]/g, '');
-    str = str.replace(/(?!^)-/g, '');
-    const parts = str.split('.');
-    if (parts.length > 2) {
-      const last = parts.pop();
-      const integerPart = parts.join('');
-      str = `${integerPart}.${last}`;
-    }
-    return str;
-  };
-
-  const decimalToDMS = (value, isLatitude) => {
-    if (typeof value !== 'number' || Number.isNaN(value)) return '';
-    const sign = value < 0 ? -1 : 1;
-    const absValue = Math.abs(value);
-    const degrees = Math.floor(absValue);
-    const minutes = Math.floor((absValue - degrees) * 60);
-    const seconds = ((absValue - degrees) * 60 - minutes) * 60;
-    const direction = isLatitude ? (sign < 0 ? 'S' : 'N') : (sign < 0 ? 'W' : 'E');
-    return `${degrees}°${minutes}'${seconds.toFixed(2)}"${direction}`;
-  };
-
-  const dmsToDecimal = (value) => {
-    if (value === undefined || value === null) return null;
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
-    const str = value.toString().trim();
-    const dmsMatch = str.match(/^(-?\d+(?:\.\d*)?)°\s*(\d+(?:\.\d*)?)'\s*(\d+(?:\.\d*)?)"?\s*([NSEW])?$/i);
-    if (dmsMatch) {
-      const degrees = Number(dmsMatch[1]);
-      const minutes = Number(dmsMatch[2]);
-      const seconds = Number(dmsMatch[3]);
-      const direction = dmsMatch[4] ? dmsMatch[4].toUpperCase() : null;
-      let decimal = Math.abs(degrees) + minutes / 60 + seconds / 3600;
-      if (degrees < 0 || direction === 'S' || direction === 'W') decimal *= -1;
-      return decimal;
-    }
-    const normalized = normalizeDecimalString(str);
-    return normalized ? Number(normalized) : null;
-  };
-
-  const isDMSValue = (value) => typeof value === 'string' && /[°'"NSEW]/i.test(value);
-
-  const formatCoordinateInput = (value, isLatitude) => {
-    if (!value && value !== 0) return '';
-    const text = value.toString().trim();
-    if (isDMSValue(text)) return text;
-    const decimal = Number(normalizeDecimalString(text));
-    return Number.isFinite(decimal) ? decimalToDMS(decimal, isLatitude) : '';
-  };
-
-  const createMapsLink = (lat, lng) => {
-    const latDecimal = dmsToDecimal(lat);
-    const lngDecimal = dmsToDecimal(lng);
-    if (latDecimal === null || lngDecimal === null) return '';
-    return `https://www.google.com/maps?q=${latDecimal},${lngDecimal}`;
-  };
-
   const handleGetGPS = useCallback(() => {
     if (!canChangeLocation) {
       setError('Wali Kelas tidak dapat mengubah lokasi.');
@@ -370,7 +314,6 @@ export default function MasterSiswa() {
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          const link = createMapsLink(lat, lng);
           setLatitude(decimalToDMS(lat, true));
           setLongitude(decimalToDMS(lng, false));
           setLokasi(createMapsLink(lat, lng));

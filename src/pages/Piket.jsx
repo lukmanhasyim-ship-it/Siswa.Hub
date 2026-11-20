@@ -18,6 +18,11 @@ import {
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
+// ID generation lives outside the component so render stays pure.
+// The counter guarantees uniqueness even if two clicks happen in the same millisecond.
+let piketIdCounter = 0;
+const createPiketId = () => `PK${Date.now()}_${++piketIdCounter}`;
+
 export default function Piket() {
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -60,7 +65,7 @@ export default function Piket() {
     }
 
     const newItem = {
-      ID_Piket: 'PK' + Date.now(),
+      ID_Piket: createPiketId(),
       Hari: day,
       ID_Siswa: student.ID_Siswa,
       Nama_Siswa: student.Nama_Siswa,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -6,27 +6,30 @@ import { ToastProvider } from './context/ToastContext';
 import { ROUTE_ROLES } from './config/navigation';
 
 import Layout from './components/Layout';
+import Loading from './components/Loading';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import MasterSiswa from './pages/MasterSiswa';
 import Presensi from './pages/Presensi';
 import PresensiPagi from './pages/PresensiPagi';
 import PresensiSiang from './pages/PresensiSiang';
-import Laporan from './pages/Laporan';
 import LaporanHarian from './pages/LaporanHarian';
 import Keuangan from './pages/Keuangan';
 import Panggilan from './pages/Panggilan';
 import Profile from './pages/Profile';
-import Tanggungan from './pages/Tanggungan';
 import Notifications from './pages/Notifications';
-import BukuKlaper from './pages/BukuKlaper';
-import DKN from './pages/DKN';
 import Register from './pages/Register';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Piket from './pages/Piket';
 import Feedback from './pages/Feedback';
 import CatatanTerlambat from './pages/CatatanTerlambat';
+
+// Halaman berat dimuat sesuai rute agar bundle awal tetap ringan.
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const MasterSiswa = lazy(() => import('./pages/MasterSiswa'));
+const Laporan = lazy(() => import('./pages/Laporan'));
+const DKN = lazy(() => import('./pages/DKN'));
+const Tanggungan = lazy(() => import('./pages/Tanggungan'));
+const BukuKlaper = lazy(() => import('./pages/BukuKlaper'));
 
 // Google OAuth Client ID dari .env
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -181,7 +184,9 @@ function App() {
       <ToastProvider>
         <AuthProvider>
           <BrowserRouter>
-            <AppRoutes />
+            <Suspense fallback={<Loading />}>
+              <AppRoutes />
+            </Suspense>
           </BrowserRouter>
         </AuthProvider>
       </ToastProvider>

@@ -16,12 +16,13 @@ export default function Notifications() {
   const [notifications, setNotifications] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
-  const role = user?.role || 'Siswa';
-
   const loadNotifs = React.useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetchGAS('GET_NOTIFICATIONS', { role, email: user?.email });
+      const res = await fetchGAS('GET_NOTIFICATIONS', {
+        role: user?.role || 'Siswa',
+        email: user?.email
+      });
       if (res.status === 'success') {
         const mapped = res.data.map(n => ({
           id: String(n.ID),
@@ -32,26 +33,28 @@ export default function Notifications() {
         }));
         setNotifications(mapped);
       }
-    } catch (err) {
+    } catch {
       showToast('Gagal memuat riwayat notifikasi', 'error');
     } finally {
       setLoading(false);
     }
-  }, [role, user?.email, showToast]);
+  }, [user, showToast]);
 
   const handleDeleteNotif = async (id) => {
     try {
       setNotifications(prev => prev.filter(n => n.id !== id));
       await fetchGAS('DELETE_NOTIF', { id });
       showToast('Notifikasi dihapus', 'success');
-    } catch (err) {
+    } catch {
       showToast('Gagal menghapus notifikasi', 'error');
       loadNotifs(); // Revert on fail
     }
   };
 
   React.useEffect(() => {
-    if (user) loadNotifs();
+    if (!user) return;
+    // Tunda ke mikrotugas agar setState tidak dipanggil sinkron di dalam effect.
+    void Promise.resolve().then(loadNotifs);
   }, [user, loadNotifs]);
 
   const handleMarkAllRead = async () => {
@@ -63,7 +66,7 @@ export default function Notifications() {
       await Promise.all(unread.map(n => fetchGAS('MARK_NOTIF_READ', { id: n.id })));
       loadNotifs();
       showToast('Semua notifikasi ditandai telah dibaca', 'success');
-    } catch (err) {
+    } catch {
       showToast('Gagal memperbarui status', 'error');
     }
   };

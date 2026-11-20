@@ -11,7 +11,7 @@ import {
   UserX,
   FileText
 } from 'lucide-react';
-import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { fetchGAS } from '../utils/gasClient';
 import { useAuth } from '../context/AuthContext';
@@ -52,7 +52,7 @@ export default function LaporanHarian() {
           Tanggal: normalizeDateString(item.Tanggal)
         }));
         setPresensi(presensiData);
-      } catch (err) {
+      } catch {
         showToast('Gagal memuat data laporan harian.', 'error');
       } finally {
         setLoading(false);
@@ -78,7 +78,7 @@ export default function LaporanHarian() {
       const d = new Date(ts);
       if (isNaN(d.getTime())) return '-';
       return format(d, 'HH:mm');
-    } catch (e) {
+    } catch {
       return '-';
     }
   };

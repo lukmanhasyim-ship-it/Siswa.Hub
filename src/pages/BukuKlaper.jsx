@@ -66,7 +66,7 @@ export default function BukuKlaper() {
           day: '2-digit', month: 'long', year: 'numeric'
         }).format(d);
       }
-    } catch (e) { }
+    } catch { /* diabaikan */ }
     return tanggal;
   };
 
@@ -96,7 +96,7 @@ export default function BukuKlaper() {
           </span>
         );
       }
-    } catch (e) { return '-'; }
+    } catch { return '-'; }
   };
 
   return (

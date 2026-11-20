@@ -1,21 +1,13 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import {
   format,
   startOfMonth,
   endOfMonth,
-  startOfWeek,
   endOfWeek,
   eachDayOfInterval,
   isSameDay,
   parseISO,
-  addMonths,
-  startOfYear,
-  subYears,
-  getWeek,
-  eachWeekOfInterval,
-  isSameMonth
+  eachWeekOfInterval
 } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { fetchGAS } from '../utils/gasClient';
@@ -179,10 +171,10 @@ export default function Laporan() {
     }));
   }, [selectedMonth]);
 
-  // Update selected week when month changes
+  // Update selected week when month changes (deferred to avoid cascading render)
   useEffect(() => {
     if (weekOptions.length > 0 && !selectedWeek) {
-      setSelectedWeek(weekOptions[0].value);
+      void Promise.resolve().then(() => setSelectedWeek(weekOptions[0].value));
     }
   }, [weekOptions, selectedWeek]);
 
@@ -275,26 +267,6 @@ export default function Laporan() {
     { name: 'Alfa', value: generalStats.A, color: '#ef4444' },
     { name: 'Bolos', value: generalStats.B, color: '#8b5cf6' },
   ].filter(d => d.value > 0);
-
-  // 2. Non-Attending Students (Capture if either session is non-H)
-  const absentStudents = useMemo(() => {
-    const isNotPresent = (s) => s && ['S', 'I', 'A', 'B'].includes(s);
-
-    const active = filteredPresensi
-      .filter(p => isNotPresent(p.Status_Pagi) || isNotPresent(p.Status_Siang) || isNotPresent(p.Status));
-
-    // Combine with archived detail if month matches
-    const archivedForMonth = filterType === 'month'
-      ? archiveDetail.filter(ad => ad.Tanggal.startsWith(selectedMonth))
-      : [];
-
-    const combined = [...active, ...archivedForMonth].map(p => ({
-      ...p,
-      Nama: siswa.find(item => item.ID_Siswa === p.ID_Siswa)?.Nama_Siswa || p.ID_Siswa
-    }));
-
-    return combined.sort((a, b) => new Date(b.Tanggal) - new Date(a.Tanggal));
-  }, [filteredPresensi, archiveDetail, siswa, selectedMonth, filterType]);
 
   // Total absence per student (Unique per day logic: A+A=1, A+B=1A & 1B)
   const studentAbsenceTotals = useMemo(() => {
@@ -456,8 +428,6 @@ export default function Laporan() {
     const totalSiswaCount = activeStudents.length || 0;
 
     return days.map(day => {
-      const dateStr = format(day, 'yyyy-MM-dd');
-
       // Get from active data
       const dayPresensiActive = filteredPresensi.filter(p => {
         try { return isSameDay(parseISO(p.Tanggal), day); } catch { return false; }
@@ -504,7 +474,7 @@ export default function Laporan() {
         ...counts
       };
     }).filter(d => (d.H + d.S + d.I + d.A + d.B) > 0);
-  }, [filteredPresensi, archiveDetail, dateRange, filterType, siswa]);
+  }, [filteredPresensi, archiveDetail, dateRange, filterType, activeStudents.length]);
 
   const handleDownload = () => {
     window.print();
@@ -525,15 +495,6 @@ export default function Laporan() {
         {status}
       </span>
     );
-  };
-
-  const formatTime = (ts) => {
-    if (!ts || ts === '-') return '--:--';
-    try {
-      return format(parseISO(ts), 'HH:mm');
-    } catch (e) {
-      return '--:--';
-    }
   };
 
   if (loading) return <Loading message="Menganalisis data laporan..." />;

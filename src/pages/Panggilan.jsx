@@ -33,6 +33,9 @@ export default function Panggilan() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const location = useLocation();
+  // Initialize directly from navigation state (dashboard alerts) instead of syncing in an effect.
+  const passedNisn = location.state?.nisn;
+  const passedAlasan = location.state?.alasan;
   const [log, setLog] = useState([]);
   const [siswa, setSiswa] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,10 +47,10 @@ export default function Panggilan() {
   const [lightboxImages, setLightboxImages] = useState([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const [nisn, setNisn] = useState('');
+  const [nisn, setNisn] = useState(passedNisn || '');
   const [kategori, setKategori] = useState('Panggilan Wali');
   const [alasan, setAlasan] = useState('Lainnya');
-  const [keteranganLainnya, setKeteranganLainnya] = useState('');
+  const [keteranganLainnya, setKeteranganLainnya] = useState(passedAlasan || '');
   const [searchTerm, setSearchTerm] = useState('');
   const [isTindakLanjutOpen, setIsTindakLanjutOpen] = useState(false);
   const [activeCallId, setActiveCallId] = useState(null);
@@ -62,19 +65,6 @@ export default function Panggilan() {
   const [selectedLogs, setSelectedLogs] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
-
-  // Handle incoming state (from dashboard alerts)
-  useEffect(() => {
-    if (location.state) {
-      const { nisn: passedNisn, alasan: passedAlasan } = location.state;
-      if (passedNisn) setNisn(passedNisn);
-      if (passedAlasan) {
-        setKategori('Panggilan Wali');
-        setAlasan('Lainnya');
-        setKeteranganLainnya(passedAlasan);
-      }
-    }
-  }, [location.state]);
 
   useEffect(() => {
     async function load() {

@@ -1,3 +1,5 @@
+import colors from 'tailwindcss/colors';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -20,7 +22,7 @@ export default {
           900: '#134e4a',
         },
         slate: {
-          ...require('tailwindcss/colors').slate,
+          ...colors.slate,
         }
       },
       boxShadow: {
