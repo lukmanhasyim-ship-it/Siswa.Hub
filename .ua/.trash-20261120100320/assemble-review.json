@@ -1,0 +1,17 @@
+{
+  "issues": [],
+  "warnings": [
+    "Penamaan node level-file belum seragam: 54 node memakai nama beserta ekstensi (misalnya `App.jsx` dan `Breadcrumbs.jsx`), sementara 13 node memakai nama tanpa ekstensi (misalnya `EmptyState`, `Dashboard`, dan `Node.js CI`). Selain itu, node `file:src/utils/xlsxLoader.js` memakai nama fungsi `loadXLSX`, bukan nama berkas.",
+    "Empat simbol yang tercantum di `exportsByPath` tidak memiliki node fungsi/kelas, yaitu `bottomNavStyles` dari `src/components/navigation/bottom-nav.styles.js` serta `ALL_ROLES`, `ROUTE_ROLES`, dan `NAV_GROUPS` dari `src/config/navigation.js`. Karena semuanya berupa konstanta, hal ini kemungkinan sesuai desain pemodelan, tetapi perlu diperhatikan bila grafik diharapkan mencakup seluruh ekspor.",
+    "Node `function:src/lib/queryClient.js:queryClient` bertipe `function`, padahal `queryClient` merupakan singleton objek `QueryClient`, bukan sebuah fungsi. Klasifikasi ini berpotensi menyesatkan konsumen grafik.",
+    "Ada empat pasangan node dengan ringkasan identik antara `PresensiPagi.jsx` dan `PresensiSiang.jsx`, yaitu `normalizeDateString`, `buildPresensiId`, `handleKeteranganChange`, dan `handleSave`. Ringkasannya sudah cukup spesifik, tetapi tidak membedakan konteks pagi dan siang."
+  ],
+  "notes": [
+    "Seluruh 67 berkas dalam inventaris memiliki node level-file, dengan rincian 52 node `file:`, 10 `config:`, 4 `document:`, dan 1 `pipeline:`. Tidak ada berkas yang hilang.",
+    "Grafik akhir berisi 286 node dan 650 edge. Selisih satu edge dari laporan merge (651) berasal dari duplikasi edge `imports` `file:src/main.jsx` -> `file:src/index.css` yang muncul di batch 6 dan batch 9, lalu dihapus saat penggabungan. Ini adalah deduplikasi yang sah, bukan kehilangan data.",
+    "Laporan 'Imports edge recovery: recovered 0 edges' bukan indikasi masalah: ke-155 entri `importMap` sudah memiliki edge `imports` yang bersesuaian di grafik (jumlah edge `imports` juga 155), dan seluruh path sumber maupun tujuannya ada di inventaris.",
+    "Semua 219 node function/class memiliki tepat satu relasi `contains` dari node level-file pada berkas yang sama. Tidak ditemukan field `parent`, relasi `contains` lintas berkas, atau node function/class tanpa induk.",
+    "Tidak ada ID node duplikat, edge menggantung, field wajib kosong, tag kosong, path import mengarang, maupun ringkasan yang terlalu umum. Seluruh edge memiliki deskripsi dan arah `forward`.",
+    "Seluruh 168 entri `neighborMap` lintas batch juga sudah terwakili oleh edge `imports` di grafik, sehingga tidak ada import antarbatch yang terlewat."
+  ]
+}

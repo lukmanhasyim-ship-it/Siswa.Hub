@@ -1,0 +1,436 @@
+{
+  "files": {
+    "src/pages/Notifications.jsx": {
+      "overview": "Halaman ini menyajikan riwayat notifikasi sesuai peran dan email pengguna, sekaligus menyediakan aksi tandai dibaca dan hapus. Data diambil dari backend GAS lalu dinormalisasi menjadi objek React sebelum dirender.",
+      "sections": [
+        {
+          "title": "Impor dan state awal halaman",
+          "lineRange": [1, 17],
+          "explanation": "Mengimpor React, date-fns untuk format tanggal bahasa Indonesia, ikon lucide, fetchGAS, context Auth/Toast, serta komponen Loading dan PageGuide. State notifications dan loading disiapkan dengan React.useState.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Fungsi loadNotifs untuk mengambil riwayat",
+          "lineRange": [19, 41],
+          "explanation": "useCallback async memanggil aksi GET_NOTIFICATIONS dengan role dan email dari useAuth. Respons GAS dipetakan menjadi field id, message, type, timestamp, dan isRead; kegagalan ditampilkan lewat showToast dan state loading selalu dimatikan di finally.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Hapus satu notifikasi secara optimis",
+          "lineRange": [43, 52],
+          "explanation": "Baris notifikasi langsung dibuang dari state sebelum permintaan DELETE_NOTIF dikirim. Jika gagal, loadNotifs dipanggil kembali untuk mengembalikan data dari server.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Efek pemuatan saat pengguna berubah",
+          "lineRange": [54, 58],
+          "explanation": "useEffect menjalankan loadNotifs hanya ketika user tersedia. Pemanggilan ditunda lewat Promise.resolve().then agar pembaruan state tidak terjadi sinkron di dalam effect.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Tandai semua notifikasi telah dibaca",
+          "lineRange": [60, 72],
+          "explanation": "Filter notifikasi belum dibaca dikirim paralel dengan Promise.all ke MARK_NOTIF_READ, lalu daftar dimuat ulang agar status akhir konsisten dengan sheet.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Hapus seluruh riwayat dengan konfirmasi",
+          "lineRange": [75, 93],
+          "explanation": "Sebelum menghapus, halaman meminta window.confirm. Semua id dikirim paralel ke DELETE_NOTIF; saat berhasil state dikosongkan, saat gagal data dimuat ulang.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Header, penanda loading, dan tombol aksi",
+          "lineRange": [96, 133],
+          "explanation": "Jika masih loading, komponen Loading ditampilkan lebih awal. Header memuat tombol kembali, judul, serta tombol Tandai Dibaca dan Hapus Semua yang dinonaktifkan bila tidak ada data yang memenuhi.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Panduan halaman dan kondisi kosong",
+          "lineRange": [135, 154],
+          "explanation": "PageGuide memberi tiga langkah penggunaan. Bila notifications kosong, ditampilkan card placeholder dengan ikon lonceng dan pesan Tidak Ada Notifikasi Baru.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Daftar kartu notifikasi",
+          "lineRange": [156, 205],
+          "explanation": "Setiap notifikasi dirender sebagai kartu dengan warna border mengikuti status baca. Ikon dan warna dipilih berdasarkan type (alert, success, atau info), tombol hapus menghentikan propagasi klik, dan waktu diformat dengan locale id.",
+          "tourOrder": 8
+        }
+      ]
+    },
+    "src/pages/Panggilan.jsx": {
+      "overview": "Halaman pengelolaan log panggilan wali kelas: membuat surat panggilan, mencatat tindak lanjut beserta bukti foto dari Drive, mengubah status, dan menghapus log. Semua perubahan disimpan ke sheet Log_Panggilan melalui fetchGAS dengan pembaruan state optimis.",
+      "sections": [
+        {
+          "title": "Impor dependensi dan kumpulan state",
+          "lineRange": [1, 68],
+          "explanation": "Komponen memakai useAuth, useToast, dan useLocation; nisn serta alasan awal diambil dari state navigasi dashboard. State mencakup daftar log dan siswa, form panggilan, lightbox foto, array tindakLanjutFiles untuk maksimal dua foto, serta state konfirmasi hapus dan seleksi massal.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Efek memuat data siswa, log, dan berkas Drive",
+          "lineRange": [69, 120],
+          "explanation": "Promise.all mengambil Master_Siswa dan Log_Panggilan sekaligus. Log diurutkan terbaru, ID file Drive diekstrak dari Bukti_File_URL dengan regex, lalu kontennya diambil lewat aksi GET_FILE dan disimpan sebagai data URL di fileDataUrls.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Handler pembuatan surat panggilan",
+          "lineRange": [122, 167],
+          "explanation": "handleSubmit merangkai baris baru Log_Panggilan dengan ID berbasis Date.now(), menyimpannya lewat CREATE, lalu mengirim notifikasi terpusat ke pengurus dan siswa memakai sendNotification. State log diperbarui optimis sebelum form dikosongkan.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Simpan tindak lanjut dan unggah bukti",
+          "lineRange": [170, 223],
+          "explanation": "Setiap file dibaca menjadi base64 dengan FileReader lalu diunggah lewat UPLOAD_FILE. URL hasil unggah digabung dengan koma, baris log diperbarui lewat UPDATE dengan Status_Selesai bernilai Selesai, lalu state log diselaraskan.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Ubah status dan alur konfirmasi hapus",
+          "lineRange": [225, 259],
+          "explanation": "handleUpdateStatus mengubah state lebih dulu sebelum memanggil UPDATE. handleDeleteLog membuka modal, dan confirmDeleteLog hanya berjalan bila pengguna mengetik HAPUS sebelum memanggil DELETE.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Statistik dan filter pencarian",
+          "lineRange": [261, 277],
+          "explanation": "Objek stats dihitung dari log untuk total, pending, selesai, ditolak, dan hari ini. filteredLog menyaring baris berdasarkan nama siswa, kategori, atau alasan yang cocok dengan searchTerm.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Form pembuatan panggilan",
+          "lineRange": [334, 405],
+          "explanation": "Form mengikat state nisn, kategori, alasan, keteranganLainnya, dan tanggalRencana ke input. Kolom keterangan tambahan hanya muncul saat alasan bernilai Lainnya; tombol submit menonaktifkan diri saat isSaving.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Tabel riwayat, bukti, dan tombol aksi",
+          "lineRange": [444, 688],
+          "explanation": "Header tabel memiliki checkbox pilih-semua dengan status indeterminate. Setiap baris menampilkan jadwal, data siswa, bukti gambar dari fileDataUrls atau tautan Drive, serta tombol Tindak Lanjut, ubah status, dan hapus.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Modal tindak lanjut dengan dua slot unggah",
+          "lineRange": [699, 795],
+          "explanation": "Modal menampilkan textarea catatan hasil dan dua slot file gambar. Perubahan file disimpan ke array tindakLanjutFiles pada indeksnya; pratinjau memakai URL.createObjectURL dan tombol hapus slot mengosongkan indeks tersebut.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Modal konfirmasi hapus tunggal dan massal",
+          "lineRange": [797, 920],
+          "explanation": "Kedua modal mengharuskan ketikan HAPUS sebelum tombol aktif. Hapus massal mengulang fetchGAS DELETE untuk setiap id di selectedLogs, lalu membersihkan state log, seleksi, dan modal setelah berhasil.",
+          "tourOrder": 8
+        }
+      ]
+    },
+    "src/utils/coordinates.js": {
+      "overview": "Kumpulan fungsi murni untuk menangani koordinat lokasi siswa: menormalkan input desimal, mengonversi desimal dan DMS dua arah, memformat tampilan, dan membuat tautan Google Maps. Dipakai bersama oleh MasterSiswa dan Profile tanpa menyimpan state.",
+      "sections": [
+        {
+          "title": "Konteks modul helper koordinat",
+          "lineRange": [1, 2],
+          "explanation": "Komentar awal menegaskan bahwa fungsi di file ini berada di level modul dan tidak dibuat ulang tiap render, sehingga aman dipakai lintas komponen.",
+          "tourOrder": 9
+        },
+        {
+          "title": "normalizeDecimalString",
+          "lineRange": [4, 16],
+          "explanation": "Menerima nilai apa pun, mengubah koma menjadi titik, membuang karakter non-angka, menghapus tanda minus di luar posisi awal, dan merapikan lebih dari satu titik desimal.",
+          "tourOrder": 9
+        },
+        {
+          "title": "decimalToDMS",
+          "lineRange": [18, 27],
+          "explanation": "Mengubah derajat desimal menjadi format derajat-menit-detik dengan dua angka desimal. Arah huruf ditentukan dari parameter isLatitude: N/S untuk lintang dan E/W untuk bujur.",
+          "tourOrder": 9
+        },
+        {
+          "title": "dmsToDecimal",
+          "lineRange": [29, 45],
+          "explanation": "Jika input berupa DMS, regex memecah derajat, menit, detik, dan arah lalu menjumlahkannya menjadi desimal. Jika tidak cocok, fungsi jatuh ke normalisasi string desimal.",
+          "tourOrder": 9
+        },
+        {
+          "title": "isDMSValue",
+          "lineRange": [47, 49],
+          "explanation": "Pemeriksa sederhana yang mendeteksi keberadaan simbol derajat, menit, detik, atau huruf arah pada sebuah string.",
+          "tourOrder": 9
+        },
+        {
+          "title": "formatCoordinateInput",
+          "lineRange": [51, 57],
+          "explanation": "Menjaga nilai 0 agar tidak dianggap kosong, mengembalikan teks DMS apa adanya, atau mengonversi angka desimal menjadi DMS sesuai jenis koordinat.",
+          "tourOrder": 9
+        },
+        {
+          "title": "createMapsLink",
+          "lineRange": [59, 64],
+          "explanation": "Mengonversi kedua nilai ke desimal melalui dmsToDecimal, mengembalikan string kosong bila salah satu tidak valid, lalu menyusun URL pencarian Google Maps.",
+          "tourOrder": 9
+        }
+      ]
+    },
+    "src/utils/notifications.js": {
+      "overview": "Utilitas terpusat untuk mengirim notifikasi ke sejumlah peran dan/atau siswa tertentu. Penerima dikumpulkan tanpa duplikat, lalu setiap notifikasi ditulis ke sheet Notifikasi secara paralel lewat fetchGAS.",
+      "sections": [
+        {
+          "title": "Impor dan kontrak opsi",
+          "lineRange": [1, 15],
+          "explanation": "Mengimpor fetchGAS dan mendokumentasikan arti setiap opsi: subjectId, targetRoles, message, type, includeSelf, selfMessage, dan waliEmail.",
+          "tourOrder": 9
+        },
+        {
+          "title": "Deklarasi sendNotification dan nilai bawaan",
+          "lineRange": [16, 25],
+          "explanation": "Fungsi async mendestructuring options dengan nilai bawaan, antara lain targetRoles kosong, type bernilai info, dan includeSelf bernilai false.",
+          "tourOrder": 9
+        },
+        {
+          "title": "Mengumpulkan penerima berdasarkan jabatan",
+          "lineRange": [27, 35],
+          "explanation": "Set digunakan agar email unik. Siswa dimasukkan hanya bila Jabatan ada di targetRoles, memiliki Email, dan Status_Aktif bernilai Aktif.",
+          "tourOrder": 9
+        },
+        {
+          "title": "Menambahkan siswa subjek dan wali kelas",
+          "lineRange": [37, 55],
+          "explanation": "Bila includeSelf aktif, siswa dengan NISN atau ID_Siswa yang cocok mendapat pesan khusus bertipe alert. Email wali kelas ditambahkan bila peran tersebut termasuk target.",
+          "tourOrder": 9
+        },
+        {
+          "title": "Kirim paralel dengan Promise.allSettled",
+          "lineRange": [57, 78],
+          "explanation": "Setiap penerima menghasilkan aksi CREATE ke sheet Notifikasi dengan ID unik, Timestamp ISO, dan Is_Read FALSE. Promise.allSettled mengembalikan hasil semua pengiriman meski sebagian gagal, sehingga satu kegagalan tidak membatalkan yang lain.",
+          "tourOrder": 9
+        }
+      ]
+    },
+    "src/utils/version.js": {
+      "overview": "Modul pengecek versi terbaru aplikasi dari GitHub Releases. Versi saat ini dibaca dari package.json, hasil pengecekan disimpan di localStorage dengan TTL, dan permintaan ganda disatukan agar tidak menghubungi API berulang kali.",
+      "sections": [
+        {
+          "title": "Konstanta GitHub, TTL, dan cache modul",
+          "lineRange": [1, 12],
+          "explanation": "package.json diimpor sebagai teks mentah lewat ?raw. Konstanta menyimpan URL API GitHub, kunci localStorage, TTL enam jam untuk hasil sukses dan sepuluh menit untuk error, serta dua variabel cache dalam memori.",
+          "tourOrder": 9
+        },
+        {
+          "title": "getCurrentVersion",
+          "lineRange": [14, 23],
+          "explanation": "Mengurai package.json sekali lalu menyimpan hasilnya di cachedVersion. Bila parsing gagal, dikembalikan 0.0.0 agar aplikasi tetap bisa berjalan.",
+          "tourOrder": 9
+        },
+        {
+          "title": "compareVersions",
+          "lineRange": [25, 36],
+          "explanation": "Membandingkan tiap komponen versi sebagai angka dari kiri ke kanan, menganggap bagian yang hilang sebagai 0, dan mengembalikan -1, 0, atau 1.",
+          "tourOrder": 9
+        },
+        {
+          "title": "Baca dan tulis cache pengecekan",
+          "lineRange": [38, 63],
+          "explanation": "readCachedCheck menolak cache bila versi aplikasinya berbeda atau TTL terlampaui, sehingga hasil lama tidak dipakai setelah deploy. writeCachedCheck menyimpan checkedAt beserta result ke localStorage.",
+          "tourOrder": 9
+        },
+        {
+          "title": "emptyResult",
+          "lineRange": [65, 74],
+          "explanation": "Membentuk hasil default saat release tidak tersedia atau terjadi kesalahan, dengan hasUpdate false dan currentVersion diisi dari getCurrentVersion().",
+          "tourOrder": 9
+        },
+        {
+          "title": "fetchLatestRelease",
+          "lineRange": [76, 106],
+          "explanation": "Memanggil endpoint releases/latest dengan header Accept GitHub. Kode 404 dan 403 diterjemahkan menjadi pesan error ramah pengguna; tag_name dibersihkan dari awalan v sebelum dibandingkan.",
+          "tourOrder": 9
+        },
+        {
+          "title": "checkForUpdate",
+          "lineRange": [108, 124],
+          "explanation": "Mengembalikan cache bila tidak dipaksa, memakai inFlightCheck untuk berbagi satu permintaan yang sedang berjalan, lalu menulis hasil dan membersihkan variabel tersebut di finally.",
+          "tourOrder": 9
+        }
+      ]
+    },
+    "src/utils/xlsxLoader.js": {
+      "overview": "Pemuat malas untuk pustaka xlsx yang ukurannya sekitar 900 kB. Modul Excel hanya diimpor secara dinamis saat fungsi loadXLSX dipanggil, dan janji yang sama dipakai ulang untuk menghindari unduhan ganda.",
+      "sections": [
+        {
+          "title": "Penanda cache modul",
+          "lineRange": [1, 2],
+          "explanation": "Komentar menjelaskan alasan pemuatan ditunda, dan variabel xlsxPromise menyimpan janji hasil dynamic import agar hanya ada satu proses unduh.",
+          "tourOrder": 9
+        },
+        {
+          "title": "Fungsi loadXLSX",
+          "lineRange": [4, 9],
+          "explanation": "Bila xlsxPromise belum ada, fungsi menjalankan import('xlsx') lalu mengembalikan janji tersebut pada pemanggil berikutnya tanpa mengimpor ulang.",
+          "tourOrder": 9
+        }
+      ]
+    },
+    ".clasp.json": {
+      "overview": "Konfigurasi CLI clasp yang menghubungkan direktori lokal gas dengan proyek Google Apps Script tertentu. scriptId menentukan proyek tujuan, sedangkan rootDir memberi tahu clasp bahwa sumber backend ada di folder gas.",
+      "sections": [
+        {
+          "title": "Identitas proyek Apps Script dan direktori sumber",
+          "lineRange": [1, 4],
+          "explanation": "Objek JSON hanya berisi dua kunci: scriptId untuk menargetkan proyek Apps Script saat push/pull, dan rootDir bernilai gas sebagai akar kode backend.",
+          "tourOrder": 10
+        }
+      ]
+    },
+    "gas/appsscript.json": {
+      "overview": "Manifest Google Apps Script yang mengatur lingkungan eksekusi backend. File ini menentukan zona waktu, runtime V8, izin OAuth yang dibutuhkan, dan cara web app dijalankan serta diakses.",
+      "sections": [
+        {
+          "title": "Zona waktu, logging, dan runtime",
+          "lineRange": [1, 5],
+          "explanation": "timeZone Asia/Jakarta memastikan format tanggal sesuai konteks kelas, exceptionLogging STACKDRIVER mengirim log ke Stackdriver, dan runtimeVersion V8 menentukan versi JavaScript.",
+          "tourOrder": 10
+        },
+        {
+          "title": "Daftar cakupan OAuth",
+          "lineRange": [6, 13],
+          "explanation": "Enam scope diminta: akses spreadsheet, Drive hanya-baca dan Drive untuk pembuatan file, pengiriman email, permintaan eksternal, serta email pengguna. Scope ini harus selaras dengan API yang dipakai Code.gs.",
+          "tourOrder": 10
+        },
+        {
+          "title": "Konfigurasi web app",
+          "lineRange": [14, 17],
+          "explanation": "executeAs USER_DEPLOYING membuat web app berjalan sebagai akun yang melakukan deploy, sementara access ANYONE_ANONYMOUS mengizinkan frontend memanggilnya tanpa login Google.",
+          "tourOrder": 10
+        }
+      ]
+    },
+    "gas/Code.gs": {
+      "overview": "Backend Google Apps Script yang berperan sebagai API web app untuk seluruh aplikasi. File ini merutekan aksi dari frontend, mengelola cache pembacaan sheet, menyediakan operasi tulis massal dengan penguncian, menyiapkan struktur spreadsheet, dan menjalankan pengarsipan bulanan.",
+      "sections": [
+        {
+          "title": "Konstanta cache dan daftar aksi baca-saja",
+          "lineRange": [1, 19],
+          "explanation": "DATA_CACHE_TTL, kunci versi, dan batas ukuran cache disiapkan di level global. READ_ONLY_ACTIONS mencatat aksi yang tidak mengubah data agar router tidak perlu membatalkan cache untuknya.",
+          "tourOrder": 10
+        },
+        {
+          "title": "Versi cache dan readCachedData",
+          "lineRange": [21, 69],
+          "explanation": "getCacheVersion membaca nomor versi dari ScriptProperties. invalidateDataCache menaikkannya di bawah LockService. readCachedData memakai versi tersebut sebagai bagian dari kunci CacheService dan hanya menyimpan hasil bila ukuran JSON di bawah batas aman.",
+          "tourOrder": 10
+        },
+        {
+          "title": "Entrypoint dan router aksi",
+          "lineRange": [213, 360],
+          "explanation": "doGet dan doPost meneruskan event ke handleResponse. Router mengurai JSON body, memilih handler dari objek actions, membatalkan cache untuk aksi tulis, lalu mengembalikan JSON lewat ContentService; kesalahan ditangkap menjadi payload error.",
+          "tourOrder": 10
+        },
+        {
+          "title": "readData: sheet menjadi array objek",
+          "lineRange": [362, 397],
+          "explanation": "Baris pertama dipakai sebagai header, lalu setiap baris berikutnya diubah menjadi objek. Nilai Date otomatis diformat YYYY-MM-DD kecuali pada kolom timestamp pagi dan siang.",
+          "tourOrder": 10
+        },
+        {
+          "title": "appendData dan updateData dengan LockService",
+          "lineRange": [413, 507],
+          "explanation": "appendData menunggu kunci, memastikan header, mengisi timestamp Presensi, lalu menambah baris. updateData mencari primary key yang cocok dan menimpa seluruh baris; kunci selalu dilepas di finally.",
+          "tourOrder": 10
+        },
+        {
+          "title": "bulkUpdatePresensi",
+          "lineRange": [531, 665],
+          "explanation": "Membangun peta baris berbasis kunci tanggal dan ID siswa, memperbarui status hanya bila berubah, mencatat timestamp perubahan, menyiapkan baris baru, lalu mengirim notifikasi ke siswa dan wali kelas.",
+          "tourOrder": 10
+        },
+        {
+          "title": "Pembaruan massal nilai dan history siswa",
+          "lineRange": [667, 811],
+          "explanation": "bulkUpdateNilai memakai kunci gabungan siswa, semester, mapel, dan topik untuk memperbarui atau menambah nilai. bulkUpdateMasterHistory memperbarui data induk berdasarkan ID_Siswa maupun NISN di dalam satu kunci.",
+          "tourOrder": 10
+        },
+        {
+          "title": "setupSpreadsheet",
+          "lineRange": [947, 984],
+          "explanation": "Membuat seluruh sheet utama beserta header kolomnya, antara lain Master_Siswa, Presensi, Keuangan, Daftar_Nilai, Log_Panggilan, Notifikasi, dan Catatan_Terlambat, lalu menambah notifikasi awal dan sheet arsip.",
+          "tourOrder": 10
+        },
+        {
+          "title": "Trigger dan pengarsipan bulanan",
+          "lineRange": [990, 1054],
+          "explanation": "setupArchiveTriggers menghapus trigger lama lalu menjadwalkan runMonthlyArchive setiap tanggal 1 pukul 01.00. runMonthlyArchive memanggil pengarsipan absensi, keuangan, dan keterlambatan untuk bulan target.",
+          "tourOrder": 10
+        },
+        {
+          "title": "bulkCreateTerlambat dengan validasi duplikat",
+          "lineRange": [1579, 1647],
+          "explanation": "Di bawah kunci, fungsi mengumpulkan kunci tanggal dan ID siswa yang sudah ada maupun yang ada di antrean. Jika ada duplikat, seluruh operasi dibatalkan sebelum baris ditulis; jika aman, semua baris ditambahkan sekaligus.",
+          "tourOrder": 10
+        }
+      ]
+    },
+    ".firebaserc": {
+      "overview": "Berkas konfigurasi Firebase CLI yang memetakan alias proyek lokal siswa.hub ke ID proyek Firebase hosting. Ini memastikan perintah deploy ditujukan ke project yang benar tanpa mengulang ID di setiap perintah.",
+      "sections": [
+        {
+          "title": "Pemetaan alias ke ID proyek",
+          "lineRange": [1, 7],
+          "explanation": "Kunci projects berisi pasangan alias siswa.hub dan siswa-hub-94aa1. Objek targets dan etags kosong karena aplikasi tidak memakai targeted deploy.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    ".github/workflows/node.js.yml": {
+      "overview": "Workflow GitHub Actions untuk continuous integration. Setiap push atau pull request ke main memicu instalasi bersih, build, dan test pada tiga versi Node.js.",
+      "sections": [
+        {
+          "title": "Nama workflow dan pemicu",
+          "lineRange": [1, 10],
+          "explanation": "Komentar awal merujuk dokumentasi GitHub Actions. name Node.js CI, lalu on menentukan workflow berjalan pada push dan pull_request yang menargetkan branch main.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Job build dan matriks versi",
+          "lineRange": [12, 20],
+          "explanation": "Job build berjalan di ubuntu-latest dengan strategy matrix untuk node-version 18.x, 20.x, dan 22.x, sehingga kompatibilitas diuji pada tiga runtime sekaligus.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Langkah-langkah pipeline",
+          "lineRange": [22, 31],
+          "explanation": "Checkout kode dengan actions/checkout@v4, menyiapkan Node via actions/setup-node@v4 dengan cache npm, lalu menjalankan npm ci, npm run build --if-present, dan npm test --if-present.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    "eslint.config.js": {
+      "overview": "Konfigurasi ESLint mode flat untuk proyek. File ini menggabungkan aturan dasar JavaScript, react-hooks, dan react-refresh untuk berkas JS/JSX, mengabaikan hasil build, serta menyesuaikan aturan variabel yang tidak dipakai.",
+      "sections": [
+        {
+          "title": "Impor preset dan helper konfigurasi",
+          "lineRange": [1, 5],
+          "explanation": "Mengimpor @eslint/js, globals, plugin react-hooks dan react-refresh, serta defineConfig dan globalIgnores dari eslint/config untuk menyusun konfigurasi flat.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Cakupan berkas dan preset yang dipakai",
+          "lineRange": [7, 15],
+          "explanation": "defineConfig dimulai dengan globalIgnores(['dist']), lalu blok berikutnya hanya berlaku untuk pola **/*.{js,jsx} dan mewarisi js.configs.recommended, reactHooks.configs.flat.recommended, serta reactRefresh.configs.vite.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Opsi parser dan globals browser",
+          "lineRange": [16, 24],
+          "explanation": "languageOptions menetapkan ecmaVersion 2020, globals.browser, parser dengan dukungan JSX, serta sourceType module agar import dan export dikenali.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Aturan khusus no-unused-vars",
+          "lineRange": [25, 28],
+          "explanation": "Aturan no-unused-vars berlevel error dengan varsIgnorePattern berupa pola identifier yang diawali huruf besar atau garis bawah, sehingga konstanta semacam itu boleh tidak dipakai.",
+          "tourOrder": 11
+        }
+      ]
+    }
+  }
+}

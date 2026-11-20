@@ -1,0 +1,498 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/components/ImageLightbox.jsx",
+      "type": "file",
+      "name": "ImageLightbox.jsx",
+      "filePath": "src/components/ImageLightbox.jsx",
+      "summary": "Komponen lightbox untuk menampilkan bukti gambar dari Google Drive secara penuh layar, lengkap dengan navigasi panah, penomoran, dan penutupan lewat tombol atau tombol Escape. Komponen ini juga mengubah URL Drive menjadi thumbnail yang lebih andal serta menyediakan fallback saat gambar gagal dimuat.",
+      "tags": ["komponen", "lightbox", "gambar", "google-drive", "navigasi-keyboard"],
+      "complexity": "moderate",
+      "languageNotes": "Menggunakan hook useState, useEffect, dan useCallback untuk mengelola indeks gambar sekaligus membersihkan event listener dan overflow body."
+    },
+    {
+      "id": "file:src/pages/Keuangan.jsx",
+      "type": "file",
+      "name": "Keuangan.jsx",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Halaman administrasi kas kelas yang menampilkan saldo, status pembayaran mingguan, dan tanggungan siswa sekaligus menyediakan form transaksi masuk dan keluar. Transaksi baru ditampung dalam antrean localStorage sebelum disimpan massal ke Google Sheets, lengkap dengan draft form dan notifikasi otomatis.",
+      "tags": ["halaman", "kas", "keuangan", "antrean", "localStorage", "notifikasi"],
+      "complexity": "complex",
+      "languageNotes": "Memakai banyak hook (useState, useEffect, useMemo, useCallback, useRef) serta penyimpanan lokal yang terikat pada email pengguna."
+    },
+    {
+      "id": "file:src/pages/Login.jsx",
+      "type": "file",
+      "name": "Login.jsx",
+      "filePath": "src/pages/Login.jsx",
+      "summary": "Halaman masuk yang memakai Google OAuth untuk memverifikasi akun siswa maupun wali kelas terhadap data Master_Siswa dan Profil_Wali_Kelas. Setelah status aktif dan jabatan terverifikasi, halaman ini memanggil login dari AuthContext dan mengalihkan pengguna ke dashboard.",
+      "tags": ["halaman", "autentikasi", "google-oauth", "login", "wali-kelas"],
+      "complexity": "moderate",
+      "languageNotes": "Memakai hook useGoogleLogin dan useNavigate; nomor versi aplikasi diambil dari getCurrentVersion."
+    },
+    {
+      "id": "file:src/pages/Panggilan.jsx",
+      "type": "file",
+      "name": "Panggilan.jsx",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Halaman pencatatan panggilan orang tua, home visit, dan teguran yang mengelola pembuatan surat, tindak lanjut beserta unggahan bukti, perubahan status, hingga penghapusan log tunggal atau massal. Halaman ini juga mengambil file dari Google Drive lewat proxy dan menampilkannya melalui ImageLightbox.",
+      "tags": ["halaman", "panggilan", "home-visit", "bukti", "notifikasi", "lightbox"],
+      "complexity": "complex",
+      "languageNotes": "Memiliki banyak state lokal dan beberapa modal; unggahan foto dibaca menjadi base64 sebelum dikirim lewat fetchGAS."
+    },
+    {
+      "id": "file:src/pages/Register.jsx",
+      "type": "file",
+      "name": "Register.jsx",
+      "filePath": "src/pages/Register.jsx",
+      "summary": "Halaman registrasi siswa baru yang mengambil nomor kontak wali kelas dari sheet Profil_Wali_Kelas lalu membuka WhatsApp dengan pesan permohonan pendaftaran yang sudah terisi nama dan email. Halaman ini juga menyediakan tautan ke syarat penggunaan dan kebijakan privasi.",
+      "tags": ["halaman", "registrasi", "whatsapp", "form"],
+      "complexity": "moderate",
+      "languageNotes": "Memakai useEffect untuk memuat kontak dan encodeURIComponent untuk menyusun pesan WhatsApp."
+    },
+    {
+      "id": "file:src/utils/gasClient.js",
+      "type": "file",
+      "name": "gasClient.js",
+      "filePath": "src/utils/gasClient.js",
+      "summary": "Klien terpusat untuk memanggil Google Apps Script Web App dengan dukungan cache React Query, kunci query yang stabil, dan waktu kedaluwarsa per sheet. Aksi baca memakai strategi stale-while-revalidate, sedangkan mutation segera menghapus seluruh cache gas.",
+      "tags": ["utilitas", "api-client", "cache", "react-query", "google-apps-script"],
+      "complexity": "complex",
+      "languageNotes": "Membaca VITE_GAS_API_URL dari import.meta.env dan berbagi instance queryClient dari src/lib/queryClient.js."
+    },
+    {
+      "id": "file:src/utils/notifications.js",
+      "type": "file",
+      "name": "notifications.js",
+      "filePath": "src/utils/notifications.js",
+      "summary": "Utilitas untuk mengirim notifikasi ke peran tertentu, siswa yang menjadi subjek, dan wali kelas dengan mencegah penerima ganda. Setiap notifikasi ditulis ke sheet Notifikasi lewat fetchGAS secara paralel dan hasilnya dikembalikan dengan Promise.allSettled.",
+      "tags": ["utilitas", "notifikasi", "google-sheets", "parallel"],
+      "complexity": "moderate",
+      "languageNotes": "Memakai Set untuk memastikan alamat email unik dan menangani kegagalan pengiriman per penerima."
+    },
+    {
+      "id": "file:src/utils/version.js",
+      "type": "file",
+      "name": "version.js",
+      "filePath": "src/utils/version.js",
+      "summary": "Utilitas pembacaan versi aplikasi dari package.json serta pengecekan rilis terbaru melalui GitHub API dengan cache localStorage. Pengecekan dibatasi oleh TTL, dibedakan antara hasil sukses dan error, serta dihindari duplikasi permintaan yang sedang berjalan.",
+      "tags": ["utilitas", "versi", "github", "cache", "update"],
+      "complexity": "moderate",
+      "languageNotes": "package.json diimpor sebagai teks mentah melalui suffix ?raw dan dibaca dengan JSON.parse."
+    },
+
+    {
+      "id": "function:src/components/ImageLightbox.jsx:ImageLightbox",
+      "type": "function",
+      "name": "ImageLightbox",
+      "filePath": "src/components/ImageLightbox.jsx",
+      "summary": "Merender gambar bukti dalam overlay penuh layar dengan tombol navigasi, indikator halaman, dan dukungan tombol Escape, ArrowLeft, serta ArrowRight. URL Google Drive diubah ke endpoint thumbnail dan dialihkan ke uc?export=view jika gagal dimuat.",
+      "tags": ["komponen", "lightbox", "keyboard", "fallback"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:src/pages/Keuangan.jsx:Keuangan",
+      "type": "function",
+      "name": "Keuangan",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Komponen halaman kas yang menggabungkan ringkasan saldo, daftar siswa belum bayar, form transaksi, antrean, dan riwayat. Hak edit hanya diberikan kepada Bendahara dan Wakil Bendahara.",
+      "tags": ["komponen", "halaman", "kas", "otorisasi"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:normalizeQueueItem",
+      "type": "function",
+      "name": "normalizeQueueItem",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Memvalidasi dan mensterilkan item antrean transaksi, termasuk memastikan ID siswa ada dan jumlah berupa angka positif serta mengisi ID dan tanggal default. Mengembalikan null untuk data yang tidak valid.",
+      "tags": ["validasi", "antrean", "normalisasi"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:readQueue",
+      "type": "function",
+      "name": "readQueue",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Membaca antrean transaksi dari localStorage berdasarkan kunci unik email pengguna dan menyaringnya lewat normalizeQueueItem.",
+      "tags": ["localStorage", "antrean", "pembacaan"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:writeQueue",
+      "type": "function",
+      "name": "writeQueue",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Menyimpan antrean transaksi ke localStorage dengan kunci yang terikat pada akun pengguna dan mengabaikan kegagalan penyimpanan.",
+      "tags": ["localStorage", "antrean", "penulisan"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:readDraft",
+      "type": "function",
+      "name": "readDraft",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Memulihkan draf form transaksi dari localStorage milik akun tertentu dengan nilai default yang aman untuk setiap field.",
+      "tags": ["localStorage", "draft", "form"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:writeDraft",
+      "type": "function",
+      "name": "writeDraft",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Menyimpan draf form transaksi ke localStorage agar tetap bertahan saat halaman dimuat ulang.",
+      "tags": ["localStorage", "draft", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:loadKeuangan",
+      "type": "function",
+      "name": "loadKeuangan",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Mengambil data Keuangan, Master_Siswa, dan Profil_Wali_Kelas secara paralel lewat fetchGAS lalu mengurutkan transaksi, menyaring siswa aktif, dan membaca nominal iuran.",
+      "tags": ["pengambilan-data", "fetchGAS", "kas"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:handleCatatKas",
+      "type": "function",
+      "name": "handleCatatKas",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Menambahkan transaksi yang valid ke antrean lokal dengan ID sementara, lalu mengosongkan form dan menampilkan toast bahwa data belum masuk database.",
+      "tags": ["handler", "antrean", "transaksi"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:persistKeuangan",
+      "type": "function",
+      "name": "persistKeuangan",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Menyimpan seluruh antrean lewat BULK_CREATE atau menyimpan hasil edit lewat UPDATE, mengirim notifikasi terkait, lalu membersihkan antrean dan draf serta menyegarkan data.",
+      "tags": ["handler", "fetchGAS", "notifikasi", "transaksi"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/pages/Keuangan.jsx:handleDelete",
+      "type": "function",
+      "name": "handleDelete",
+      "filePath": "src/pages/Keuangan.jsx",
+      "summary": "Membatalkan transaksi setelah konfirmasi pengguna, menghapusnya lewat fetchGAS, mengirim notifikasi pembatalan, lalu memuat ulang data kas.",
+      "tags": ["handler", "penghapusan", "notifikasi"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:src/pages/Login.jsx:Login",
+      "type": "function",
+      "name": "Login",
+      "filePath": "src/pages/Login.jsx",
+      "summary": "Menangani alur masuk Google, pencocokan email dengan Master_Siswa dan LOGIN_WALI, pengecekan status aktif, lalu menyimpan sesi melalui login dari AuthContext. Pengguna yang sudah masuk dialihkan ke dashboard.",
+      "tags": ["komponen", "autentikasi", "google-oauth"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:src/pages/Panggilan.jsx:Panggilan",
+      "type": "function",
+      "name": "Panggilan",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Komponen utama halaman log panggilan yang merangkai form pembuatan surat, tabel riwayat, modal tindak lanjut, konfirmasi penghapusan, dan lightbox bukti.",
+      "tags": ["komponen", "halaman", "panggilan"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/pages/Panggilan.jsx:load",
+      "type": "function",
+      "name": "load",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Memuat daftar siswa dan log panggilan secara paralel, lalu mengambil data file Drive dalam satu kumpulan permintaan GET_FILE untuk dijadikan data URL.",
+      "tags": ["pengambilan-data", "fetchGAS", "google-drive"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/pages/Panggilan.jsx:handleSubmit",
+      "type": "function",
+      "name": "handleSubmit",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Membuat catatan panggilan baru di sheet Log_Panggilan dan mengirim notifikasi kepada siswa serta pengurus kelas sebelum memperbarui daftar lokal.",
+      "tags": ["handler", "fetchGAS", "notifikasi"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/pages/Panggilan.jsx:handleSaveTindakLanjut",
+      "type": "function",
+      "name": "handleSaveTindakLanjut",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Mengunggah hingga dua bukti foto sebagai base64 lewat UPLOAD_FILE lalu menyimpan catatan hasil pertemuan dan menandai panggilan sebagai selesai.",
+      "tags": ["handler", "unggahan", "fetchGAS"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/pages/Panggilan.jsx:handleUpdateStatus",
+      "type": "function",
+      "name": "handleUpdateStatus",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Mengubah status panggilan menjadi Selesai, Pending, atau Ditolak baik di state lokal maupun di sheet Log_Panggilan.",
+      "tags": ["handler", "status", "fetchGAS"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Panggilan.jsx:handleDeleteLog",
+      "type": "function",
+      "name": "handleDeleteLog",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Menyiapkan log yang akan dihapus dan membuka modal konfirmasi dengan kolom ketik HAPUS.",
+      "tags": ["handler", "konfirmasi", "penghapusan"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Panggilan.jsx:confirmDeleteLog",
+      "type": "function",
+      "name": "confirmDeleteLog",
+      "filePath": "src/pages/Panggilan.jsx",
+      "summary": "Menghapus satu log panggilan dari sheet setelah konfirmasi kata HAPUS benar, lalu memperbarui daftar dan menutup modal.",
+      "tags": ["handler", "penghapusan", "fetchGAS"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:src/pages/Register.jsx:Register",
+      "type": "function",
+      "name": "Register",
+      "filePath": "src/pages/Register.jsx",
+      "summary": "Merender formulir pendaftaran siswa baru beserta versi aplikasi dan tautan ke halaman syarat serta privasi. Komponen ini juga memuat kontak wali kelas saat pertama kali dipasang.",
+      "tags": ["komponen", "registrasi", "form"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Register.jsx:loadContact",
+      "type": "function",
+      "name": "loadContact",
+      "filePath": "src/pages/Register.jsx",
+      "summary": "Mengambil kontak wali kelas dari sheet Profil_Wali_Kelas dan membersihkannya menjadi deretan angka untuk nomor WhatsApp.",
+      "tags": ["pengambilan-data", "fetchGAS", "kontak"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/pages/Register.jsx:handleRegister",
+      "type": "function",
+      "name": "handleRegister",
+      "filePath": "src/pages/Register.jsx",
+      "summary": "Menyusun pesan permohonan pendaftaran dari nama dan email lalu membuka tautan WhatsApp dengan nomor wali kelas di tab baru.",
+      "tags": ["handler", "whatsapp", "form"],
+      "complexity": "simple"
+    },
+
+    {
+      "id": "function:src/utils/gasClient.js:stableValue",
+      "type": "function",
+      "name": "stableValue",
+      "filePath": "src/utils/gasClient.js",
+      "summary": "Mengubah nilai menjadi bentuk kanonik dengan mengurutkan kunci objek secara rekursif agar payload yang sama selalu menghasilkan kunci query yang sama.",
+      "tags": ["normalisasi", "cache", "query-key"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/gasClient.js:gasQueryKey",
+      "type": "function",
+      "name": "gasQueryKey",
+      "filePath": "src/utils/gasClient.js",
+      "summary": "Membentuk kunci query React Query berupa array berisi gas, nama aksi, dan payload yang sudah distabilisasi.",
+      "tags": ["query-key", "cache", "react-query"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/gasClient.js:staleTimeFor",
+      "type": "function",
+      "name": "staleTimeFor",
+      "filePath": "src/utils/gasClient.js",
+      "summary": "Menentukan waktu kedaluwarsa cache per aksi dan sheet, misalnya 30 detik untuk notifikasi dan 15 menit untuk arsip.",
+      "tags": ["cache", "konfigurasi", "stale-time"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/gasClient.js:postToGAS",
+      "type": "function",
+      "name": "postToGAS",
+      "filePath": "src/utils/gasClient.js",
+      "summary": "Mengirim permintaan POST ke URL Web Apps Script, menerjemahkan respons error menjadi pesan yang mudah dipahami, dan melempar pengecualian bila gagal.",
+      "tags": ["fetch", "api", "error-handling"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/gasClient.js:fetchGAS",
+      "type": "function",
+      "name": "fetchGAS",
+      "filePath": "src/utils/gasClient.js",
+      "summary": "Titik masuk semua panggilan GAS: aksi baca diambil dari cache dengan strategi stale-while-revalidate, sedangkan aksi tulis langsung dijalankan lalu menghapus seluruh cache gas.",
+      "tags": ["api", "cache", "mutation", "fetchGAS"],
+      "complexity": "complex"
+    },
+
+    {
+      "id": "function:src/utils/notifications.js:sendNotification",
+      "type": "function",
+      "name": "sendNotification",
+      "filePath": "src/utils/notifications.js",
+      "summary": "Mengumpulkan penerima unik dari daftar peran, siswa yang menjadi subjek, dan email wali kelas lalu mengirim notifikasi ke sheet Notifikasi secara paralel.",
+      "tags": ["notifikasi", "penerima", "fetchGAS"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:src/utils/version.js:getCurrentVersion",
+      "type": "function",
+      "name": "getCurrentVersion",
+      "filePath": "src/utils/version.js",
+      "summary": "Mengurai package.json hasil impor ?raw dan menyimpan nomor versi dalam variabel modul agar tidak diurai ulang.",
+      "tags": ["versi", "package.json", "cache"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/version.js:compareVersions",
+      "type": "function",
+      "name": "compareVersions",
+      "filePath": "src/utils/version.js",
+      "summary": "Membandingkan dua string versi per bagian angka dan mengembalikan -1, 0, atau 1 untuk menentukan apakah rilis baru tersedia.",
+      "tags": ["versi", "perbandingan"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/version.js:readCachedCheck",
+      "type": "function",
+      "name": "readCachedCheck",
+      "filePath": "src/utils/version.js",
+      "summary": "Membaca hasil pengecekan update dari localStorage seraya memastikan versi aplikasi masih sama dan TTL belum terlampaui.",
+      "tags": ["cache", "localStorage", "update"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/version.js:writeCachedCheck",
+      "type": "function",
+      "name": "writeCachedCheck",
+      "filePath": "src/utils/version.js",
+      "summary": "Menulis hasil pengecekan update beserta cap waktu ke localStorage dan mengabaikan kegagalan penyimpanan.",
+      "tags": ["cache", "localStorage", "update"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/version.js:emptyResult",
+      "type": "function",
+      "name": "emptyResult",
+      "filePath": "src/utils/version.js",
+      "summary": "Membuat objek hasil pengecekan kosong dengan versi saat ini dan pesan error saat rilis tidak dapat diambil.",
+      "tags": ["update", "fallback"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/version.js:fetchLatestRelease",
+      "type": "function",
+      "name": "fetchLatestRelease",
+      "filePath": "src/utils/version.js",
+      "summary": "Memanggil endpoint rilis terbaru GitHub, membandingkan tag dengan versi lokal, dan mengembalikan informasi catatan rilis serta tautannya.",
+      "tags": ["github", "update", "fetch"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/version.js:checkForUpdate",
+      "type": "function",
+      "name": "checkForUpdate",
+      "filePath": "src/utils/version.js",
+      "summary": "Menjalankan pengecekan update dengan memanfaatkan hasil cache, mencegah permintaan ganda yang sedang berjalan, dan mencatat hasil akhir ke localStorage.",
+      "tags": ["update", "cache", "github"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    { "source": "file:src/components/ImageLightbox.jsx", "target": "function:src/components/ImageLightbox.jsx:ImageLightbox", "type": "contains", "weight": 1.0, "description": "ImageLightbox.jsx mendefinisikan komponen lightbox utama." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:Keuangan", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx mengekspor komponen halaman kas sebagai default." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:normalizeQueueItem", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi fungsi validasi item antrean transaksi." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:readQueue", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi fungsi pembaca antrean dari localStorage." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:writeQueue", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi fungsi penulis antrean ke localStorage." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:readDraft", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi fungsi pemulih draf form." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:writeDraft", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi fungsi penyimpan draf form." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:loadKeuangan", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi fungsi pemuat data kas dan siswa." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:handleCatatKas", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi handler pencatatan transaksi ke antrean." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:persistKeuangan", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi handler penyimpanan akhir transaksi." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "function:src/pages/Keuangan.jsx:handleDelete", "type": "contains", "weight": 1.0, "description": "Keuangan.jsx berisi handler pembatalan transaksi." },
+    { "source": "file:src/pages/Login.jsx", "target": "function:src/pages/Login.jsx:Login", "type": "contains", "weight": 1.0, "description": "Login.jsx mengekspor komponen halaman masuk sebagai default." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:Panggilan", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx mengekspor komponen halaman log panggilan sebagai default." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:load", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx berisi fungsi pemuat data dalam efek awal." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:handleSubmit", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx berisi handler pembuatan surat panggilan." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:handleSaveTindakLanjut", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx berisi handler penyimpanan tindak lanjut dan bukti." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:handleUpdateStatus", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx berisi handler perubahan status panggilan." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:handleDeleteLog", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx berisi handler pembukaan konfirmasi hapus log." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "function:src/pages/Panggilan.jsx:confirmDeleteLog", "type": "contains", "weight": 1.0, "description": "Panggilan.jsx berisi handler penghapusan log setelah konfirmasi." },
+    { "source": "file:src/pages/Register.jsx", "target": "function:src/pages/Register.jsx:Register", "type": "contains", "weight": 1.0, "description": "Register.jsx mengekspor komponen halaman registrasi sebagai default." },
+    { "source": "file:src/pages/Register.jsx", "target": "function:src/pages/Register.jsx:loadContact", "type": "contains", "weight": 1.0, "description": "Register.jsx berisi fungsi pemuat kontak wali kelas." },
+    { "source": "file:src/pages/Register.jsx", "target": "function:src/pages/Register.jsx:handleRegister", "type": "contains", "weight": 1.0, "description": "Register.jsx berisi handler pengiriman permohonan lewat WhatsApp." },
+    { "source": "file:src/utils/gasClient.js", "target": "function:src/utils/gasClient.js:stableValue", "type": "contains", "weight": 1.0, "description": "gasClient.js berisi fungsi normalisasi nilai untuk kunci query." },
+    { "source": "file:src/utils/gasClient.js", "target": "function:src/utils/gasClient.js:gasQueryKey", "type": "contains", "weight": 1.0, "description": "gasClient.js mengekspor pembentuk kunci query." },
+    { "source": "file:src/utils/gasClient.js", "target": "function:src/utils/gasClient.js:staleTimeFor", "type": "contains", "weight": 1.0, "description": "gasClient.js berisi penentu waktu kedaluwarsa cache." },
+    { "source": "file:src/utils/gasClient.js", "target": "function:src/utils/gasClient.js:postToGAS", "type": "contains", "weight": 1.0, "description": "gasClient.js berisi pengirim permintaan POST ke Web App." },
+    { "source": "file:src/utils/gasClient.js", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "contains", "weight": 1.0, "description": "gasClient.js mengekspor fungsi utama pemanggil GAS." },
+    { "source": "file:src/utils/notifications.js", "target": "function:src/utils/notifications.js:sendNotification", "type": "contains", "weight": 1.0, "description": "notifications.js mengekspor fungsi pengirim notifikasi." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:getCurrentVersion", "type": "contains", "weight": 1.0, "description": "version.js mengekspor pembaca versi aplikasi." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:compareVersions", "type": "contains", "weight": 1.0, "description": "version.js berisi fungsi perbandingan versi." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:readCachedCheck", "type": "contains", "weight": 1.0, "description": "version.js berisi pembaca cache pengecekan update." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:writeCachedCheck", "type": "contains", "weight": 1.0, "description": "version.js berisi penulis cache pengecekan update." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:emptyResult", "type": "contains", "weight": 1.0, "description": "version.js berisi pembuat hasil pengecekan kosong." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:fetchLatestRelease", "type": "contains", "weight": 1.0, "description": "version.js berisi pengambil rilis terbaru dari GitHub." },
+    { "source": "file:src/utils/version.js", "target": "function:src/utils/version.js:checkForUpdate", "type": "contains", "weight": 1.0, "description": "version.js mengekspor fungsi pengecekan pembaruan aplikasi." },
+
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/components/EmptyState.jsx", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor EmptyState untuk tampilan tanpa transaksi; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/components/Loading.jsx", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor Loading sebagai tampilan saat data dimuat; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/components/PageGuide.jsx", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor PageGuide untuk panduan halaman kas; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/components/Skeleton.jsx", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor komponen skeleton; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/context/AuthContext.jsx", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor useAuth untuk peran dan kelas pengguna; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/context/ToastContext.jsx", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor useToast untuk notifikasi antarmuka; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/utils/gasClient.js", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor fetchGAS dari utilitas klien GAS dalam batch yang sama." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/utils/logic.js", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor formatIDR untuk menampilkan nominal rupiah; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Keuangan.jsx", "target": "file:src/utils/notifications.js", "type": "imports", "weight": 0.7, "description": "Keuangan mengimpor sendNotification dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Login.jsx", "target": "file:src/context/AuthContext.jsx", "type": "imports", "weight": 0.7, "description": "Login mengimpor useAuth untuk menyimpan sesi; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Login.jsx", "target": "file:src/utils/gasClient.js", "type": "imports", "weight": 0.7, "description": "Login mengimpor fetchGAS dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Login.jsx", "target": "file:src/utils/version.js", "type": "imports", "weight": 0.7, "description": "Login mengimpor getCurrentVersion dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/components/ImageLightbox.jsx", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor ImageLightbox dari komponen dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/components/Loading.jsx", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor Loading saat data log dimuat; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/context/AuthContext.jsx", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor useAuth untuk email wali kelas; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/context/ToastContext.jsx", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor useToast untuk pesan antarmuka; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/utils/gasClient.js", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor fetchGAS dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/utils/logic.js", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor formatDateIndo; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/pages/Panggilan.jsx", "target": "file:src/utils/notifications.js", "type": "imports", "weight": 0.7, "description": "Panggilan mengimpor sendNotification dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Register.jsx", "target": "file:src/utils/gasClient.js", "type": "imports", "weight": 0.7, "description": "Register mengimpor fetchGAS dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/pages/Register.jsx", "target": "file:src/utils/version.js", "type": "imports", "weight": 0.7, "description": "Register mengimpor getCurrentVersion dalam batch yang sama sesuai batchImportData." },
+    { "source": "file:src/utils/gasClient.js", "target": "file:src/lib/queryClient.js", "type": "imports", "weight": 0.7, "description": "gasClient mengimpor instance queryClient; sesuai batchImportData dan dikonfirmasi neighborMap." },
+    { "source": "file:src/utils/notifications.js", "target": "file:src/utils/gasClient.js", "type": "imports", "weight": 0.7, "description": "notifications mengimpor fetchGAS dari klien GAS dalam batch yang sama sesuai batchImportData." },
+
+    { "source": "function:src/pages/Keuangan.jsx:loadKeuangan", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Mengambil tiga sheet melalui fetchGAS saat memuat halaman kas." },
+    { "source": "function:src/pages/Keuangan.jsx:persistKeuangan", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Menyimpan antrean atau hasil edit lewat fetchGAS." },
+    { "source": "function:src/pages/Keuangan.jsx:persistKeuangan", "target": "function:src/utils/notifications.js:sendNotification", "type": "calls", "weight": 0.8, "description": "Mengirim notifikasi perubahan transaksi setelah penyimpanan berhasil." },
+    { "source": "function:src/pages/Keuangan.jsx:handleDelete", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Menghapus transaksi dari sheet Keuangan lewat fetchGAS." },
+    { "source": "function:src/pages/Keuangan.jsx:handleDelete", "target": "function:src/utils/notifications.js:sendNotification", "type": "calls", "weight": 0.8, "description": "Mengirim notifikasi pembatalan transaksi kepada pihak terkait." },
+    { "source": "function:src/pages/Keuangan.jsx:handleCatatKas", "target": "function:src/pages/Keuangan.jsx:normalizeQueueItem", "type": "calls", "weight": 0.8, "description": "Memvalidasi transaksi baru sebelum dimasukkan ke antrean." },
+    { "source": "function:src/pages/Keuangan.jsx:readQueue", "target": "function:src/pages/Keuangan.jsx:normalizeQueueItem", "type": "calls", "weight": 0.8, "description": "Menyaring tiap item antrean hasil pembacaan localStorage." },
+    { "source": "function:src/pages/Login.jsx:Login", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Memverifikasi email siswa dan wali kelas terhadap sheet melalui fetchGAS." },
+    { "source": "function:src/pages/Login.jsx:Login", "target": "function:src/utils/version.js:getCurrentVersion", "type": "calls", "weight": 0.8, "description": "Menampilkan nomor versi aplikasi di footer halaman masuk." },
+    { "source": "function:src/pages/Panggilan.jsx:load", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Memuat daftar siswa, log panggilan, dan file Drive proxy melalui fetchGAS." },
+    { "source": "function:src/pages/Panggilan.jsx:handleSubmit", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Mencatat surat panggilan baru ke sheet Log_Panggilan." },
+    { "source": "function:src/pages/Panggilan.jsx:handleSubmit", "target": "function:src/utils/notifications.js:sendNotification", "type": "calls", "weight": 0.8, "description": "Memberi tahu siswa dan pengurus kelas setelah panggilan dibuat." },
+    { "source": "function:src/pages/Panggilan.jsx:handleSaveTindakLanjut", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Mengunggah bukti dan memperbarui hasil pertemuan lewat fetchGAS." },
+    { "source": "function:src/pages/Panggilan.jsx:handleUpdateStatus", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Memperbarui Status_Selesai pada sheet Log_Panggilan." },
+    { "source": "function:src/pages/Panggilan.jsx:confirmDeleteLog", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Menghapus log terpilih dari sheet Log_Panggilan." },
+    { "source": "function:src/pages/Register.jsx:loadContact", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Mengambil kontak wali kelas dari sheet Profil_Wali_Kelas." },
+    { "source": "function:src/pages/Register.jsx:Register", "target": "function:src/utils/version.js:getCurrentVersion", "type": "calls", "weight": 0.8, "description": "Menampilkan versi aplikasi pada footer halaman registrasi." },
+    { "source": "function:src/utils/gasClient.js:fetchGAS", "target": "function:src/utils/gasClient.js:postToGAS", "type": "calls", "weight": 0.8, "description": "Meneruskan aksi dan payload ke pengirim POST saat cache tidak tersedia atau saat mutation." },
+    { "source": "function:src/utils/gasClient.js:fetchGAS", "target": "function:src/utils/gasClient.js:gasQueryKey", "type": "calls", "weight": 0.8, "description": "Menyusun kunci query stabil untuk aksi baca." },
+    { "source": "function:src/utils/gasClient.js:fetchGAS", "target": "function:src/utils/gasClient.js:staleTimeFor", "type": "calls", "weight": 0.8, "description": "Menentukan masa berlaku cache berdasarkan aksi dan sheet." },
+    { "source": "function:src/utils/gasClient.js:gasQueryKey", "target": "function:src/utils/gasClient.js:stableValue", "type": "calls", "weight": 0.8, "description": "Menstabilisasi payload sebelum dijadikan bagian kunci query." },
+    { "source": "function:src/utils/notifications.js:sendNotification", "target": "function:src/utils/gasClient.js:fetchGAS", "type": "calls", "weight": 0.8, "description": "Menulis setiap notifikasi ke sheet Notifikasi melalui fetchGAS." },
+    { "source": "function:src/utils/version.js:checkForUpdate", "target": "function:src/utils/version.js:fetchLatestRelease", "type": "calls", "weight": 0.8, "description": "Meminta data rilis terbaru dari GitHub bila cache tidak berguna." },
+    { "source": "function:src/utils/version.js:checkForUpdate", "target": "function:src/utils/version.js:readCachedCheck", "type": "calls", "weight": 0.8, "description": "Mencoba memakai hasil pengecekan tersimpan terlebih dahulu." },
+    { "source": "function:src/utils/version.js:checkForUpdate", "target": "function:src/utils/version.js:writeCachedCheck", "type": "calls", "weight": 0.8, "description": "Menyimpan hasil pengecekan terbaru ke localStorage." },
+    { "source": "function:src/utils/version.js:fetchLatestRelease", "target": "function:src/utils/version.js:getCurrentVersion", "type": "calls", "weight": 0.8, "description": "Membandingkan versi lokal dengan tag rilis GitHub." },
+    { "source": "function:src/utils/version.js:readCachedCheck", "target": "function:src/utils/version.js:getCurrentVersion", "type": "calls", "weight": 0.8, "description": "Memastikan cache masih sesuai dengan versi aplikasi berjalan." },
+    { "source": "function:src/utils/version.js:emptyResult", "target": "function:src/utils/version.js:getCurrentVersion", "type": "calls", "weight": 0.8, "description": "Mengisi versi saat ini pada hasil pengecekan yang gagal." },
+    { "source": "function:src/utils/gasClient.js:fetchGAS", "target": "file:src/lib/queryClient.js", "type": "triggers", "weight": 0.6, "description": "Memicu penghapusan seluruh cache gas pada queryClient setelah mutation berhasil." }
+  ]
+}

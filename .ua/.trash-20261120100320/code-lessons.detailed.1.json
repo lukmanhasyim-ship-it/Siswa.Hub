@@ -1,0 +1,520 @@
+{
+  "files": {
+    "README.md": {
+      "overview": "README.md adalah dokumentasi utama Siswa.Hub: penjelasan platform manajemen kelas serverless, daftar fitur, skema sheet, langkah instalasi backend Apps Script dan OAuth, serta panduan deployment dan alur kerja harian. File ini bukan kode yang dieksekusi aplikasi, melainkan referensi yang menjelaskan arsitektur frontend React dan backend Google Sheets.",
+      "sections": [
+        {
+          "title": "Identitas dan ringkasan proyek",
+          "lineRange": [1, 10],
+          "explanation": "Judul, badge versi 5.0.1, dan paragraf pembuka merangkum Siswa.Hub sebagai platform manajemen kelas serverless untuk Wali Kelas yang memakai ekosistem Google Workspace.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Sorotan rilis 5.0.1",
+          "lineRange": [12, 21],
+          "explanation": "Catatan rilis menjelaskan antrean keterlambatan per tanggal, simpan massal, proteksi duplikat, lazy loading rute, pengecekan versi, dan pembaruan dependensi yang menjadi konteks perubahan kode di tour.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Daftar fitur unggulan",
+          "lineRange": [43, 54],
+          "explanation": "Bagian ini memberi peta fungsi aplikasi: dashboard analitik, presensi dua sesi, kas kelas, catatan terlambat, log panggilan, leger, laporan, piket, dan arsip otomatis.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Skema sheet aktif dan arsip",
+          "lineRange": [63, 88],
+          "explanation": "Tabel mendefinisikan nama sheet beserta headernya. README memperingatkan bahwa nama sheet dan huruf besar/kecil harus persis agar backend GAS dapat membaca dan menulis data dengan benar.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Setup backend dan manifest Apps Script",
+          "lineRange": [92, 130],
+          "explanation": "Bagian ini memuat manifest appsscript.json dengan daftar scope OAuth, langkah deploy Web App, dan pengingat bahwa setiap perubahan Code.gs wajib di-deploy ulang meskipun URL /exec tetap sama.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Setup awal spreadsheet dan trigger arsip",
+          "lineRange": [132, 153],
+          "explanation": "Dijelaskan bahwa setupSpreadsheet() dijalankan sekali dari editor Apps Script, sedangkan action SETUP_TRIGGERS dikirim lewat POST JSON untuk membuat jadwal pengarsipan setiap tanggal 1 pukul 01:00.",
+          "tourOrder": 1
+        },
+        {
+          "title": "OAuth Google dan konfigurasi frontend",
+          "lineRange": [157, 216],
+          "explanation": "Panduan Google Cloud Console menjelaskan origin yang diizinkan dan client ID, lalu dilanjutkan pembuatan file .env berisi VITE_GOOGLE_CLIENT_ID dan VITE_GAS_API_URL yang masing-masing dibaca App.jsx dan gasClient.js.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Deployment Firebase dan data awal",
+          "lineRange": [220, 258],
+          "explanation": "Langkah build, login Firebase CLI, dan deploy folder dist sebagai hosting statis, diikuti pengisian data awal seperti profil Wali Kelas, nominal iuran, dan jadwal piket.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Alur kerja utama dan peran akses",
+          "lineRange": [260, 306],
+          "explanation": "Alur harian merangkum presensi, kas, panggilan orang tua, dan catatan terlambat. Tabel peran kemudian menegaskan bahwa delapan peran mengatur menu dan route, dengan sesi login disimpan di localStorage.",
+          "tourOrder": 1
+        },
+        {
+          "title": "Struktur proyek, tech stack, dan catatan penting",
+          "lineRange": [310, 402],
+          "explanation": "Struktur direktori memetakan komponen, context, pages, dan utils. Penutupnya berisi tech stack serta catatan tentang biaya, CORS, kewajiban deploy ulang, dan sinkronisasi nomor versi.",
+          "tourOrder": 1
+        }
+      ]
+    },
+    "index.html": {
+      "overview": "index.html adalah dokumen HTML pertama yang disajikan Vite. File ini menyiapkan metadata halaman, font, elemen #root, dan memuat /src/main.jsx sebagai modul tempat React dipasang.",
+      "sections": [
+        {
+          "title": "Dokumen dasar dan metadata head",
+          "lineRange": [1, 8],
+          "explanation": "Doctype dan elemen html dengan atribut lang=\"id\" menandakan bahasa dokumen. Head berisi charset UTF-8, favicon, viewport responsif, dan judul Siswa.Hub.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Deskripsi halaman",
+          "lineRange": [9, 10],
+          "explanation": "Meta description merangkum tujuan aplikasi sebagai dashboard manajemen kelas untuk Wali Kelas dan pengurus kelas.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Pemuatan font Google",
+          "lineRange": [12, 17],
+          "explanation": "Tautan preconnect dan stylesheet memuat font Inter serta Outfit dari Google Fonts agar tampilan teks konsisten di seluruh aplikasi.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Elemen root dan entry script",
+          "lineRange": [20, 23],
+          "explanation": "Body memuat div #root sebagai titik mount React dan script bertipe module yang menunjuk ke src/main.jsx; Vite memprosesnya sebagai entry point aplikasi.",
+          "tourOrder": 2
+        }
+      ]
+    },
+    "src/components/ErrorBoundary.jsx": {
+      "overview": "ErrorBoundary menangkap error saat render komponen turunan dan menampilkan halaman fallback daripada layar kosong. Komponen ini memakai class component karena lifecycle penanganan error render hanya tersedia lewat API kelas React.",
+      "sections": [
+        {
+          "title": "Impor dependensi",
+          "lineRange": [1, 2],
+          "explanation": "Impor React dan ikon AlertTriangle dari lucide-react dipakai untuk membangun tampilan peringatan saat error terjadi.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Deklarasi kelas dan state awal",
+          "lineRange": [4, 8],
+          "explanation": "ErrorBoundary extends React.Component dan constructor menginisialisasi state hasError serta error yang menjadi penanda kondisi gagal render.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Lifecycle penangkap error",
+          "lineRange": [10, 16],
+          "explanation": "getDerivedStateFromError menandai bahwa error terjadi sehingga render berikutnya menampilkan fallback, sedangkan componentDidCatch mencatat detail dan stack error ke console.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Tampilan fallback saat error",
+          "lineRange": [18, 42],
+          "explanation": "Saat hasError bernilai true, render mengganti seluruh tampilan dengan kartu merah berisi detail error dan tombol Refresh Halaman yang memuat ulang browser.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Render children normal",
+          "lineRange": [44, 46],
+          "explanation": "Bila tidak ada error, komponen mengembalikan props.children apa adanya sehingga pohon aplikasi yang valid tetap tampil seperti biasa.",
+          "tourOrder": 2
+        }
+      ]
+    },
+    "src/main.jsx": {
+      "overview": "main.jsx adalah entry point React yang mengambil elemen #root dan merender App di dalam StrictMode, QueryClientProvider, dan ErrorBoundary. Urutan pembungkus ini memastikan cache query dan jaring pengaman error tersedia bagi seluruh aplikasi.",
+      "sections": [
+        {
+          "title": "Impor entry point",
+          "lineRange": [1, 7],
+          "explanation": "Impor mencakup React, ReactDOM client, QueryClientProvider, komponen App, ErrorBoundary, singleton queryClient, dan stylesheet global index.css.",
+          "tourOrder": 2
+        },
+        {
+          "title": "Pemasangan root React",
+          "lineRange": [9, 17],
+          "explanation": "ReactDOM.createRoot memasang aplikasi ke #root. StrictMode ditambahkan untuk pemeriksaan saat development, lalu QueryClientProvider, ErrorBoundary, dan App disusun sebagai provider bertingkat.",
+          "tourOrder": 2
+        }
+      ]
+    },
+    "src/App.jsx": {
+      "overview": "App.jsx merangkai provider global OAuth, Toast, dan Auth sebelum memasang router. File ini memuat seluruh deklarasi rute, pembungkus proteksi login dan peran, serta lazy loading untuk halaman yang berat.",
+      "sections": [
+        {
+          "title": "Impor utama",
+          "lineRange": [1, 6],
+          "explanation": "Impor mencakup lazy dan Suspense dari React, komponen React Router, GoogleOAuthProvider, context Auth dan Toast, serta konfigurasi ROUTE_ROLES.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Lazy loading halaman berat",
+          "lineRange": [26, 32],
+          "explanation": "Dashboard, MasterSiswa, Laporan, DKN, Tanggungan, dan BukuKlaper dimuat malas dengan lazy() agar bundle awal lebih kecil dan perpindahan halaman terasa ringan.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Client ID Google OAuth",
+          "lineRange": [34, 39],
+          "explanation": "GOOGLE_CLIENT_ID dibaca dari environment variable VITE_GOOGLE_CLIENT_ID, dan aplikasi mencatat error ke console jika variabel tersebut tidak ditemukan.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Proteksi login dengan ProtectedRoute",
+          "lineRange": [41, 47],
+          "explanation": "ProtectedRoute mengambil status user dari useAuth; bila belum login, komponen Navigate mengarahkan ke /login dengan opsi replace agar halaman login tidak masuk riwayat.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Proteksi peran dengan RoleProtectedRoute",
+          "lineRange": [49, 58],
+          "explanation": "RoleProtectedRoute menambahkan pemeriksaan allowedRoles. Pengguna yang perannya tidak termasuk daftar akan dialihkan ke /dashboard, sehingga aturan akses terpusat di wrapper ini.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Rute publik dan rute akar",
+          "lineRange": [63, 81],
+          "explanation": "AppRoutes mendefinisikan rute publik (/login, /register, /terms, /privacy), rute root yang memakai Layout di dalam ProtectedRoute, redirect index ke dashboard, serta rute master-siswa dengan pembatasan peran.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Rute operasional dan administrasi",
+          "lineRange": [82, 170],
+          "explanation": "Halaman seperti tanggungan, presensi pagi dan siang, laporan, buku klaper, dkn, catatan terlambat, keuangan, dan panggilan dibungkus RoleProtectedRoute dengan daftar peran dari ROUTE_ROLES.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Rute umum dan fallback",
+          "lineRange": [171, 179],
+          "explanation": "Rute piket, notifications, dan feedback dapat diakses pengguna yang sudah login, sedangkan pola rute '*' mengarahkan alamat yang tidak dikenal ke dashboard.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Susunan provider di App",
+          "lineRange": [181, 197],
+          "explanation": "App membungkus seluruh aplikasi dengan GoogleOAuthProvider, ToastProvider, AuthProvider, BrowserRouter, dan Suspense berisi fallback Loading sebelum merender AppRoutes.",
+          "tourOrder": 3
+        }
+      ]
+    },
+    "src/config/navigation.js": {
+      "overview": "navigation.js menjadi sumber kebenaran tunggal untuk navigasi dan pembatasan akses. File ini mendefinisikan daftar peran, aturan peran per rute, grup menu sidebar, fungsi pemeriksa akses, dan prioritasi menu untuk navigasi bawah di layar kecil.",
+      "sections": [
+        {
+          "title": "Impor ikon menu",
+          "lineRange": [1, 5],
+          "explanation": "Ikon lucide-react diimpor sekali di sini agar setiap item menu dapat mereferensikan komponen ikon yang sama di sidebar maupun navigasi bawah.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Komentar sumber kebenaran",
+          "lineRange": [7, 12],
+          "explanation": "Komentar menjelaskan bahwa konfigurasi ini dipakai bersama oleh sidebar dan router, sehingga grup atau item kosong tidak akan muncul untuk peran tertentu.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Daftar peran dan ringkasan grup",
+          "lineRange": [13, 27],
+          "explanation": "ALL_ROLES memuat delapan peran aplikasi. Konstanta WALI, PENGURUS_PRESENSI, PENGURUS_KAS, dan BENDAHARA merangkum peran yang diizinkan untuk tiap kelompok fitur.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Peta peran per rute",
+          "lineRange": [29, 47],
+          "explanation": "ROUTE_ROLES memetakan setiap path ke daftar peran yang boleh mengaksesnya, misalnya master-siswa hanya untuk Wali Kelas dan keuangan untuk pengurus kas; update-presensi sengaja dikosongkan.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Grup menu sidebar",
+          "lineRange": [49, 108],
+          "explanation": "NAV_GROUPS menyusun item menu menjadi grup seperti Manajemen Data, Keuangan, Presensi, Pelaporan, Komunikasi, dan Akun. Tiap item memuat label, shortLabel, ikon, dan roles yang diambil dari ROUTE_ROLES.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Fungsi canAccess",
+          "lineRange": [110, 112],
+          "explanation": "canAccess memastikan roles berupa array tidak kosong dan mengandung peran aktif; fungsi kecil ini dipakai ulang oleh sidebar dan navigasi bawah.",
+          "tourOrder": 3
+        },
+        {
+          "title": "Prioritas menu mobile",
+          "lineRange": [114, 135],
+          "explanation": "MOBILE_PRIORITY menentukan urutan menu yang paling sering dipakai, lalu getMobilePrimaryItems menyaringnya dengan canAccess dan membatasi hasil sesuai limit sebelum dikirim ke BottomNav.",
+          "tourOrder": 3
+        }
+      ]
+    },
+    "src/components/Breadcrumbs.jsx": {
+      "overview": "Breadcrumbs menampilkan jejak navigasi berbasis URL aktif. Komponen ini menerjemahkan segmen path menjadi label ramah pengguna dan menyembunyikan dirinya ketika pengguna berada di halaman Dashboard.",
+      "sections": [
+        {
+          "title": "Impor komponen",
+          "lineRange": [1, 3],
+          "explanation": "Impor React, useLocation dan Link dari React Router, serta ikon ChevronRight dan Home dari lucide-react sebagai dasar tampilan jejak navigasi.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Peta label rute",
+          "lineRange": [5, 23],
+          "explanation": "routeMap menerjemahkan segmen URL seperti 'master-siswa' menjadi 'Data Siswa' dan 'catatan-terlambat' menjadi 'Catatan Terlambat' agar breadcrumb mudah dibaca.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Parsing lokasi dan kondisi sembunyi",
+          "lineRange": [25, 29],
+          "explanation": "useLocation menyediakan pathname, lalu split('/') dan filter menghasilkan segmen path. Breadcrumbs kembali null jika tidak ada segmen atau segmen pertama adalah dashboard.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Tautan Home",
+          "lineRange": [31, 37],
+          "explanation": "Elemen nav diawali tautan ke /dashboard dengan ikon Home sebagai titik awal jejak navigasi.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Render jejak per segmen",
+          "lineRange": [38, 55],
+          "explanation": "Setiap segmen diubah menjadi path kumulatif; yang terakhir ditampilkan sebagai teks tebal, sementara segmen sebelumnya menjadi Link yang bisa diklik dengan pemisah ChevronRight.",
+          "tourOrder": 4
+        }
+      ]
+    },
+    "src/components/Layout.jsx": {
+      "overview": "Layout adalah kerangka visual yang dipakai hampir semua halaman: sidebar responsif, header, breadcrumb, drawer notifikasi, modal pencarian, navigation bawah, dan toast global. Komponen ini juga mengelola shortcut keyboard, state antarmuka, serta pengambilan data notifikasi dan daftar siswa.",
+      "sections": [
+        {
+          "title": "Impor dan dependensi",
+          "lineRange": [1, 16],
+          "explanation": "Layout mengimpor hook React, NavLink, Outlet dan useNavigate, ikon, komponen turunan, context Auth, konfigurasi navigasi, fetchGAS, serta getCurrentVersion untuk footer.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Komponen NavItem",
+          "lineRange": [18, 56],
+          "explanation": "NavItem merender satu tautan sidebar dengan gaya aktif dan mode ringkas; className dihitung dari isActive dan collapsed, termasuk ring focus untuk aksesibilitas.",
+          "tourOrder": 4
+        },
+        {
+          "title": "State UI, ref, dan turunan role",
+          "lineRange": [58, 102],
+          "explanation": "Layout menyimpan state drawer, modal, sidebar, dan desktop, beberapa useRef untuk fokus serta notifikasi, lalu menghitung isCompact dan visibleItems dari peran pengguna dengan bantuan canAccess.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Izin notifikasi browser",
+          "lineRange": [104, 122],
+          "explanation": "requestNotificationPermission meminta izin Notification API, showBrowserNotification menampilkan notifikasi desktop, dan satu efek menyimpan preferensi sidebarCollapsed ke localStorage.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Muat notifikasi dan daftar siswa",
+          "lineRange": [124, 183],
+          "explanation": "Efek ini memanggil GET_NOTIFICATIONS dan GET_ALL lewat fetchGAS, memetakan data sheet, mendeteksi notifikasi baru dengan prevNotifIds, lalu melakukan polling dua menit yang hanya berjalan saat tab terlihat.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Shortcut keyboard dan fokus",
+          "lineRange": [185, 212],
+          "explanation": "Efek pertama menangani Ctrl/Cmd+K untuk membuka modal pencarian dan ESC untuk menutup semua panel; efek kedua mengembalikan fokus ke tombol yang tepat saat drawer mobile dibuka atau ditutup.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Tandai notifikasi dibaca",
+          "lineRange": [214, 230],
+          "explanation": "handleMarkAsRead dan handleMarkAllAsRead memperbarui state secara optimis terlebih dahulu, lalu mengirim action MARK_NOTIF_READ atau MARK_ALL_NOTIFS_READ ke backend.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Sidebar dan profil pengguna",
+          "lineRange": [232, 372],
+          "explanation": "Blok JSX ini merender backdrop mobile, sidebar dengan logo, tombol tutup dan perkecil, daftar visibleItems melalui NavItem, kartu profil, serta tombol Keluar Sesi yang memanggil handleLogout.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Header dan area konten",
+          "lineRange": [374, 461],
+          "explanation": "Header menampung Breadcrumbs, tombol pencarian, lonceng notifikasi dengan indikator belum dibaca, informasi nama, peran dan kelas, serta tombol profil. Area konten menyiapkan Outlet untuk halaman aktif.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Slot rute dan panel global",
+          "lineRange": [463, 499],
+          "explanation": "Bagian akhir merender main dengan Outlet dan footer versi, lalu memasang BottomNav, SearchModal yang menerima daftar students, serta komponen Toast global.",
+          "tourOrder": 4
+        }
+      ]
+    },
+    "src/components/navigation/BottomNav.jsx": {
+      "overview": "BottomNav menyediakan navigasi bawah untuk layar kecil. Komponen ini mengambil menu utama yang sudah difilter sesuai peran, merendernya sebagai NavLink, dan menyediakan tombol 'Lainnya' untuk membuka sidebar lengkap.",
+      "sections": [
+        {
+          "title": "Impor dan gaya",
+          "lineRange": [1, 5],
+          "explanation": "Impor React, NavLink, ikon MoreHorizontal, fungsi getMobilePrimaryItems, serta objek bottomNavStyles dari file style terpisah.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Props dan daftar menu",
+          "lineRange": [7, 10],
+          "explanation": "Komponen menerima role, ref tombol, status drawer, callback onMore, dan hidden; ia langsung kembali null saat hidden, lalu memanggil getMobilePrimaryItems(role) untuk menyaring menu.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Render tautan menu",
+          "lineRange": [12, 33],
+          "explanation": "Setiap item dirender sebagai NavLink dengan gaya aktif atau nonaktif, indikator visual, ikon, dan label pendek; atribut end memastikan pencocokan rute yang tepat.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Tombol menu lengkap",
+          "lineRange": [35, 47],
+          "explanation": "Tombol 'Lainnya' memanggil onMore dan memuat atribut aria-controls serta aria-expanded agar status sidebar dapat dibaca assistive technology; ref-nya dipakai Layout untuk mengembalikan fokus.",
+          "tourOrder": 4
+        }
+      ]
+    },
+    "src/components/SearchModal.jsx": {
+      "overview": "SearchModal adalah modal pencarian cepat yang dibuka dengan Ctrl+K. Modal ini mencari siswa berdasarkan nama atau NISN, menyediakan navigasi cepat ketika kolom kosong, dan mengirim siswa yang dipilih ke halaman MasterSiswa dengan state highlight.",
+      "sections": [
+        {
+          "title": "Impor dan props",
+          "lineRange": [1, 5],
+          "explanation": "Komponen mengimpor hook React, ikon, dan useNavigate; props yang diterima adalah isOpen, onClose, serta daftar students dari Layout.",
+          "tourOrder": 4
+        },
+        {
+          "title": "State query dan handleClose",
+          "lineRange": [6, 13],
+          "explanation": "useState menyimpan kata kunci, sedangkan handleClose yang dibungkus useCallback mengosongkan query sebelum memanggil onClose agar setiap modal dibuka dalam kondisi bersih.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Shortcut Ctrl+K dan ESC",
+          "lineRange": [15, 33],
+          "explanation": "Efek memasang listener keyboard hanya saat modal terbuka; Ctrl/Cmd+K menutup modal sebagai toggle dan ESC juga memanggil handleClose, dengan cleanup listener di akhir efek.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Filter siswa dan render awal",
+          "lineRange": [35, 42],
+          "explanation": "filteredStudents mencocokkan Nama_Siswa atau NISN secara case-insensitive lalu dibatasi lima hasil; komponen langsung kembali null jika isOpen bernilai false.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Overlay dan kolom pencarian",
+          "lineRange": [44, 61],
+          "explanation": "JSX menampilkan overlay berlatar gelap, panel modal, ikon Search, input dengan autoFocus yang terikat pada state query, dan tombol tutup.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Hasil pencarian dan navigasi",
+          "lineRange": [63, 95],
+          "explanation": "Bagian ini menampilkan pesan ketika tidak ada hasil dan daftar siswa yang cocok. Mengklik siswa melakukan navigate ke /master-siswa dengan state highlight berupa NISN atau ID_Siswa, lalu menutup modal.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Navigasi cepat saat query kosong",
+          "lineRange": [97, 115],
+          "explanation": "Jika kolom belum diisi, modal menampilkan empat tautan cepat menuju Presensi Pagi, KAS Kelas, Laporan Akhir, dan Profil Saya.",
+          "tourOrder": 4
+        },
+        {
+          "title": "Petunjuk keyboard di footer",
+          "lineRange": [118, 131],
+          "explanation": "Footer menampilkan kbd ESC untuk Tutup dan kbd Enter untuk Pilih sebagai petunjuk singkat bagi pengguna.",
+          "tourOrder": 4
+        }
+      ]
+    },
+    "src/context/AuthContext.jsx": {
+      "overview": "AuthContext menyimpan sesi pengguna aplikasi. Provider memuat data login dari localStorage saat awal, menyediakan fungsi login dan logout, serta mengekspos hook useAuth agar komponen dapat membaca status user, peran, dan kelas kelolaan tanpa prop drilling.",
+      "sections": [
+        {
+          "title": "Impor dan pembuatan context",
+          "lineRange": [1, 4],
+          "explanation": "React, useContext, useState, dan googleLogout diimpor, kemudian AuthContext dibuat sebagai wadah nilai yang dibagikan ke seluruh aplikasi.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Pemulihan sesi dari localStorage",
+          "lineRange": [6, 13],
+          "explanation": "readStoredUser membaca kunci wali_kelas_user dan mengurai JSON; blok try/catch mengembalikan null bila data rusak atau tidak ada.",
+          "tourOrder": 5
+        },
+        {
+          "title": "State awal AuthProvider",
+          "lineRange": [15, 16],
+          "explanation": "AuthProvider menginisialisasi state user dengan hasil readStoredUser sehingga sesi tetap bertahan setelah halaman di-refresh.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Fungsi login",
+          "lineRange": [18, 30],
+          "explanation": "login menyusun objek user berisi token, nama, email, foto, managedClass, dan peran, lalu menyimpannya ke state serta localStorage dengan kunci wali_kelas_user.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Fungsi logout",
+          "lineRange": [32, 36],
+          "explanation": "logout memanggil googleLogout dari paket OAuth, mengosongkan state user, dan menghapus data sesi dari localStorage.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Pengiriman nilai context",
+          "lineRange": [38, 43],
+          "explanation": "Provider membungkus children dan membagikan objek { user, login, logout } kepada semua konsumen di bawahnya.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Hook useAuth",
+          "lineRange": [45, 48],
+          "explanation": "useAuth mengambil nilai AuthContext lewat useContext; komentar eslint menonaktifkan aturan fast refresh karena file mengekspor hook di samping komponen.",
+          "tourOrder": 5
+        }
+      ]
+    },
+    "src/context/ToastContext.jsx": {
+      "overview": "ToastContext mengelola notifikasi ringkas global. Provider menyimpan daftar toast, menyediakan fungsi untuk menambah dan menghapus toast dengan timer otomatis, dan hook useToast memberi akses ke fungsi-fungsi tersebut bagi halaman atau komponen lain.",
+      "sections": [
+        {
+          "title": "Impor dan context",
+          "lineRange": [1, 3],
+          "explanation": "File mengimpor createContext, useContext, useState, dan useCallback dari React, lalu membuat ToastContext sebagai wadah daftar toast dan fungsi pengelolanya.",
+          "tourOrder": 5
+        },
+        {
+          "title": "State daftar toast",
+          "lineRange": [5, 6],
+          "explanation": "ToastProvider menyimpan array toasts dalam useState; setiap elemen nantinya berisi id, pesan, dan tipe notifikasi.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Menambah toast dengan timer",
+          "lineRange": [8, 19],
+          "explanation": "showToast membuat id dari Date.now(), menambah toast ke state, lalu menjadwalkan penghapusan setelah duration milidetik bila duration lebih dari nol; fungsi ini dibungkus useCallback.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Menghapus toast dan nilai context",
+          "lineRange": [21, 25],
+          "explanation": "removeToast menyaring toast berdasarkan id, lalu objek value menggabungkan toasts, showToast, dan removeToast untuk dibagikan ke konsumen.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Provider dan hook useToast",
+          "lineRange": [27, 41],
+          "explanation": "ToastContext.Provider membungkus children dengan value tersebut. useToast mengambil context dan melempar error bila dipakai di luar ToastProvider, sehingga salah penggunaan cepat terdeteksi.",
+          "tourOrder": 5
+        }
+      ]
+    }
+  }
+}

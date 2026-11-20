@@ -1,0 +1,248 @@
+{
+  "files": {
+    "firebase.json": {
+      "overview": "Konfigurasi Firebase Hosting yang menentukan folder hasil build sebagai sumber statis dan mengarahkan semua rute SPA ke index.html. Dengan rewrite ini, React Router tetap bekerja ketika pengguna membuka atau me-refresh halaman secara langsung.",
+      "sections": [
+        {
+          "title": "Blok hosting dan berkas yang diabaikan",
+          "lineRange": [2, 8],
+          "explanation": "Objek hosting menetapkan dist sebagai direktori yang disajikan. Daftar ignore mencegah firebase.json, berkas tersembunyi, dan node_modules ikut ter-upload, sehingga konfigurasi serta dependensi lokal tidak terekspos.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Rewrite semua rute ke index.html",
+          "lineRange": [9, 14],
+          "explanation": "Pola source ** mencocokkan seluruh URL dan menulis ulangnya ke /index.html. Tanpa aturan ini, alamat seperti /presensi akan menghasilkan 404 karena tidak ada berkas fisiknya; dengan rewrite, React Router yang menentukan halaman tampil.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    "package.json": {
+      "overview": "Manifes npm yang menyimpan identitas proyek wali-kelas versi 5.0.1, skrip pengembangan/build/lint, serta daftar dependensi runtime dan pengembangan. Nomor versi di sini juga dipakai aplikasi untuk menampilkan versi aktif dan mengecek pembaruan.",
+      "sections": [
+        {
+          "title": "Identitas paket dan tipe modul",
+          "lineRange": [2, 5],
+          "explanation": "Field name, private, version, dan type mendefinisikan paket lokal yang tidak diterbitkan ke npm. Nilai \"module\" membuat berkas .js di proyek diperlakukan sebagai ES module, sesuai dengan penggunaan import/export di seluruh sumber.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Skrip npm",
+          "lineRange": [6, 11],
+          "explanation": "Empat skrip menjadi pintu masuk pengembangan: dev menjalankan server Vite, build menghasilkan folder dist, lint memeriksa kode dengan ESLint, dan preview menyajikan hasil build secara lokal.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Dependensi runtime",
+          "lineRange": [12, 28],
+          "explanation": "Blok dependencies memuat React 19, React Router, TanStack Query, OAuth Google, Firebase, pustaka grafik dan PDF, serta xlsx 0.20.3 yang diambil langsung dari CDN resmi SheetJS. Versi caret mengizinkan pembaruan patch dan minor selama masih kompatibel.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Dependensi pengembangan",
+          "lineRange": [29, 43],
+          "explanation": "Blok devDependencies berisi Vite beserta plugin React dan PWA, rantai Tailwind/PostCSS/autoprefixer, serta ESLint dan plugin aturannya. Paket-paket ini dipakai saat build dan lint, bukan saat aplikasi berjalan di browser.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    "postcss.config.js": {
+      "overview": "Konfigurasi PostCSS yang menjalankan Tailwind CSS lalu autoprefixer saat stylesheet diproses. Vite memakai berkas ini untuk mengubah direktif Tailwind menjadi CSS biasa sekaligus menambahkan prefiks vendor yang dibutuhkan.",
+      "sections": [
+        {
+          "title": "Ekspor konfigurasi plugin",
+          "lineRange": [1, 6],
+          "explanation": "Berkas memakai export default karena package.json bertipe module. Objek plugins memuat tailwindcss dan autoprefixer tanpa opsi tambahan; urutannya penting karena Tailwind menghasilkan utilitas lebih dulu, lalu autoprefixer menyesuaikan CSS tersebut.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    "tailwind.config.js": {
+      "overview": "Konfigurasi Tailwind yang menentukan berkas mana dipindai untuk nama kelas utilitas dan memperluas tema dengan warna brand, shadow lembut, serta animasi. Berkat konfigurasi ini, komponen bisa memakai kelas seperti bg-brand-500 dan animate-slide-up.",
+      "sections": [
+        {
+          "title": "Impor palet dan anotasi tipe",
+          "lineRange": [1, 3],
+          "explanation": "Warna bawaan Tailwind diimpor dari tailwindcss/colors agar bisa disebar kembali ke tema. Komentar JSDoc memberi petunjuk tipe konfigurasi kepada editor tanpa menambah kode saat runtime.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Pola pemindaian kelas",
+          "lineRange": [5, 8],
+          "explanation": "Tailwind hanya membangkitkan CSS untuk kelas yang ditemukan di index.html dan berkas JS/TS/JSX/TSX di dalam src. Jika nama kelas tidak muncul di pola ini, utilitasnya tidak akan masuk bundle akhir.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Skala warna brand dan slate",
+          "lineRange": [11, 27],
+          "explanation": "Skala brand 50 sampai 900 didefinisikan sebagai gradasi teal dengan 500 sebagai warna aksen. Objek slate sengaja disebar dari colors.slate supaya palet bawaan tetap tersedia di samping palet brand.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Shadow soft",
+          "lineRange": [28, 30],
+          "explanation": "Theme extend menambahkan box-shadow bernama soft dengan bayangan halus dan lembut. Komponen kartu memakainya melalui kelas shadow-soft.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Definisi keyframes",
+          "lineRange": [31, 44],
+          "explanation": "Tiga keyframes—fadeIn, slideUp, dan scaleIn—menggambarkan nilai awal serta akhir opacity dan transform. Ini adalah deskripsi animasi CSS, bukan logika React, sehingga bisa dipakai ulang oleh banyak elemen.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Pemetaan nama animasi",
+          "lineRange": [45, 49],
+          "explanation": "Keyframes dipetakan menjadi utilitas fade-in, slide-up, dan scale-in beserta durasinya. Dari sisi komponen, pemakaiannya terlihat sebagai animate-slide-up atau animate-fade-in.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Plugin Tailwind kosong",
+          "lineRange": [52, 52],
+          "explanation": "Tidak ada plugin tambahan yang dipasang; seluruh penyesuaian cukup melalui theme.extend. Hal ini membuat daftar kelas tetap berasal dari inti Tailwind plus warna dan animasi buatan sendiri.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    "vite.config.js": {
+      "overview": "Konfigurasi Vite yang mengatur plugin React dan PWA, strategi cache service worker, manifest aplikasi, serta pemisahan chunk vendor saat build. File ini juga menyimpan keputusan penting untuk tidak menyimpan data GAS secara persisten di cache.",
+      "sections": [
+        {
+          "title": "Impor dan defineConfig",
+          "lineRange": [1, 6],
+          "explanation": "defineConfig membungkus opsi Vite, plugin React menangani JSX dan Fast Refresh, sedangkan VitePWA menambahkan dukungan service worker. Komentar di atasnya mengarah ke dokumentasi resmi Vite.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Plugin PWA dan pembaruan otomatis",
+          "lineRange": [7, 14],
+          "explanation": "RegisterType autoUpdate membuat service worker baru mengambil alih begitu tersedia, sementara includeAssets memastikan ikon ikut disalin. Komentar menegaskan bahwa hanya aset statis yang di-cache; data siswa dari GAS tetap berada di memori tab lewat TanStack Query.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Aturan cache font Google",
+          "lineRange": [15, 30],
+          "explanation": "Hanya permintaan ke fonts.googleapis.com dan fonts.gstatic.com yang memakai strategi CacheFirst dengan nama cache google-fonts. Expiration membatasi 30 entri dan usia satu tahun, sedangkan statuses [0, 200] memperbolehkan respons opaque maupun sukses.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Manifest aplikasi terpasang",
+          "lineRange": [32, 58],
+          "explanation": "Manifest menetapkan nama Wali Kelas Digital, deskripsi, theme_color hijau, background_color terang, dan mode tampilan standalone. Ikon 192 px, 512 px, serta varian maskable dipakai ketika aplikasi dipasang ke layar utama perangkat.",
+          "tourOrder": 11
+        },
+        {
+          "title": "Pemisahan chunk vendor",
+          "lineRange": [60, 74],
+          "explanation": "Fungsi manualChunks memisahkan modul node_modules menjadi kelompok charts, excel, pdf, query, dan react-vendor. Berkas di luar node_modules dikembalikan tanpa nama chunk sehingga mengikuti aturan default Vite; tujuannya menjaga ukuran bundle awal tetap kecil.",
+          "tourOrder": 11
+        }
+      ]
+    },
+    "CHANGELOG.md": {
+      "overview": "Catatan perubahan proyek dengan format Keep a Changelog dan Semantic Versioning. Berkas ini merangkum isi rilis 5.0.1 dan 5.0.0 sekaligus memuat tautan ke halaman rilis GitHub.",
+      "sections": [
+        {
+          "title": "Judul dan konvensi penulisan",
+          "lineRange": [1, 3],
+          "explanation": "Baris pertama adalah judul, lalu paragraf pembuka menyatakan bahwa format mengikuti Keep a Changelog dan penomoran versi memakai Semantic Versioning. Sebagai Markdown, seluruh isi berkas adalah dokumentasi, bukan kode yang dijalankan aplikasi.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Header rilis 5.0.1",
+          "lineRange": [5, 6],
+          "explanation": "Versi 5.0.1 diberi tanggal 2026-11-20, sehingga pembaca dapat mengetahui urutan rilis relatif terhadap 5.0.0 di bawahnya.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Penambahan pada 5.0.1",
+          "lineRange": [7, 12],
+          "explanation": "Daftar ini menjelaskan antrean terlambat per tanggal, tombol Simpan Catatan melalui action BULK_CREATE_TERLAMBAT, draft di localStorage, serta penambahan berkas CHANGELOG dan catatan rilis. Ini menjelaskan perilaku yang diimplementasikan di halaman CatatanTerlambat.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Perubahan pada 5.0.1",
+          "lineRange": [14, 20],
+          "explanation": "Bagian Diubah mencatat refresh data kas tanpa reload, lazy loading halaman berat, validasi cache versi terhadap nomor aplikasi aktif, pembaruan xlsx dan react-router-dom, serta penyelarasan dokumentasi.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Perbaikan pada 5.0.1",
+          "lineRange": [22, 25],
+          "explanation": "Dua perbaikan utama adalah proteksi duplikat satu siswa per hari dengan penolakan seluruh antrean, serta penggantian dialog hasil simpan menjadi toast ringkas agar alur kerja tidak terputus.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Rilis 5.0.0",
+          "lineRange": [27, 41],
+          "explanation": "Versi sebelumnya memperkenalkan antrean kas, operasi BULK_CREATE, cache memori TanStack Query, CacheService di Apps Script, serta perbaikan navigasi dan polling. Membaca bagian ini membantu memahami mengapa lapisan cache sudah ada sebelum fitur terlambat ditambahkan.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Tautan rilis GitHub",
+          "lineRange": [43, 44],
+          "explanation": "Referensi Markdown berbentuk [5.0.1]: URL dipakai ulang oleh penulisan [5.0.1] di atas, sehingga pembaca dapat langsung membuka halaman rilis yang sesuai di GitHub.",
+          "tourOrder": 12
+        }
+      ]
+    },
+    "RELEASE_NOTES_v5.0.1.md": {
+      "overview": "Catatan rilis v5.0.1 yang menjelaskan fitur antrean catatan terlambat, perbaikan terkait, dan langkah deployment yang wajib dilakukan. Jika CHANGELOG merangkum apa yang berubah, berkas ini berfungsi sebagai panduan praktis saat merilis versi tersebut.",
+      "sections": [
+        {
+          "title": "Judul dan ringkasan rilis",
+          "lineRange": [1, 3],
+          "explanation": "Judul menegaskan fokus rilis pada antrean catatan terlambat. Paragraf pembuka menempatkannya sebagai pembaruan kecil di atas v5.0.0 yang menyentuh alur keterlambatan, penyimpanan kas, dan ringananya navigasi.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Daftar fitur baru",
+          "lineRange": [5, 10],
+          "explanation": "Bagian Yang baru menjabarkan antrean per tanggal, pengiriman massal lewat BULK_CREATE_TERLAMBAT, draft yang bertahan setelah refresh, dan penyegaran transaksi kas tanpa berpindah halaman. Rincian ini bisa dibandingkan langsung dengan implementasi pada halaman CatatanTerlambat dan Keuangan.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Daftar perbaikan",
+          "lineRange": [12, 18],
+          "explanation": "Perbaikan mencakup batas satu catatan per siswa per hari, notifikasi toast, lazy loading halaman berat, cache pengecekan versi yang mengikuti versi aktif, serta pembaruan dependensi xlsx dan react-router-dom.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Catatan deployment",
+          "lineRange": [20, 25],
+          "explanation": "Empat langkah operasional dijelaskan: deploy ulang backend agar action BULK_CREATE_TERLAMBAT dikenal, jalankan npm ci dan build lalu unggah dist, lakukan hard refresh bila PWA masih menampilkan versi lama, dan pastikan header Sheet Catatan_Terlambat sesuai README. Ini menjembatani perubahan kode dengan kondisi produksi.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Tautan perbandingan perubahan",
+          "lineRange": [27, 27],
+          "explanation": "Tautan Full Changelog mengarah ke perbandingan v5.0.0...v5.0.1 di GitHub, tempat daftar commit lengkap dapat diperiksa bila ringkasan di atas dianggap kurang rinci.",
+          "tourOrder": 12
+        }
+      ]
+    },
+    "SECURITY.md": {
+      "overview": "Kebijakan keamanan proyek yang mencantumkan versi yang masih mendapat pembaruan serta tempat untuk melaporkan kerentanan. Isinya masih berupa templat bawaan, sehingga bagian pelaporan belum memuat kontak atau waktu respons yang konkret.",
+      "sections": [
+        {
+          "title": "Judul kebijakan",
+          "lineRange": [1, 1],
+          "explanation": "Heading menandakan dokumen kebijakan keamanan yang biasanya diletakkan di akar repositori agar mudah ditemukan oleh kontributor maupun peneliti keamanan.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Tabel versi yang didukung",
+          "lineRange": [3, 12],
+          "explanation": "Tabel menandai 5.0.x sebagai versi yang masih didukung, sementara 4.9.x dan versi di bawahnya tidak. Ini selaras dengan nomor 5.0.1 yang tercantum di package.json dan CHANGELOG.",
+          "tourOrder": 12
+        },
+        {
+          "title": "Bagian pelaporan kerentanan",
+          "lineRange": [14, 20],
+          "explanation": "Teks di sini masih berupa instruksi umum dari templat: jelaskan ke mana laporan dikirim, seberapa sering pembaruan diberikan, dan apa yang terjadi bila laporan diterima atau ditolak. Karena belum diisi, calon pelapor belum memiliki kanal kontak yang jelas.",
+          "tourOrder": 12
+        }
+      ]
+    }
+  }
+}

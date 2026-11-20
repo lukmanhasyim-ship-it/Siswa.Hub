@@ -1,0 +1,261 @@
+{
+  "scriptCompleted": true,
+  "stats": {
+    "filesScanned": 67,
+    "filesWithImports": 28,
+    "totalEdges": 155
+  },
+  "failures": [],
+  "importMap": {
+    ".clasp.json": [],
+    ".firebaserc": [],
+    ".github/workflows/node.js.yml": [],
+    "CHANGELOG.md": [],
+    "README.md": [],
+    "RELEASE_NOTES_v5.0.1.md": [],
+    "SECURITY.md": [],
+    "eslint.config.js": [],
+    "firebase.json": [],
+    "gas/Code.gs": [],
+    "gas/appsscript.json": [],
+    "index.html": [],
+    "package.json": [],
+    "postcss.config.js": [],
+    "skills-lock.json": [],
+    "src/App.css": [],
+    "src/App.jsx": [
+      "src/components/Layout.jsx",
+      "src/components/Loading.jsx",
+      "src/config/navigation.js",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/pages/CatatanTerlambat.jsx",
+      "src/pages/Feedback.jsx",
+      "src/pages/Keuangan.jsx",
+      "src/pages/LaporanHarian.jsx",
+      "src/pages/Login.jsx",
+      "src/pages/Notifications.jsx",
+      "src/pages/Panggilan.jsx",
+      "src/pages/Piket.jsx",
+      "src/pages/Presensi.jsx",
+      "src/pages/PresensiPagi.jsx",
+      "src/pages/PresensiSiang.jsx",
+      "src/pages/Privacy.jsx",
+      "src/pages/Profile.jsx",
+      "src/pages/Register.jsx",
+      "src/pages/Terms.jsx"
+    ],
+    "src/components/Breadcrumbs.jsx": [],
+    "src/components/EmptyState.jsx": [],
+    "src/components/ErrorBoundary.jsx": [],
+    "src/components/ImageLightbox.jsx": [],
+    "src/components/Layout.jsx": [
+      "src/components/Breadcrumbs.jsx",
+      "src/components/NotificationDrawer.jsx",
+      "src/components/SearchModal.jsx",
+      "src/components/Toast.jsx",
+      "src/components/navigation/BottomNav.jsx",
+      "src/config/navigation.js",
+      "src/context/AuthContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/version.js"
+    ],
+    "src/components/Loading.jsx": [],
+    "src/components/NotificationDrawer.jsx": [],
+    "src/components/PageGuide.jsx": [],
+    "src/components/SearchModal.jsx": [],
+    "src/components/Skeleton.jsx": [],
+    "src/components/StudentCard.jsx": [
+      "src/utils/logic.js"
+    ],
+    "src/components/Toast.jsx": [
+      "src/context/ToastContext.jsx"
+    ],
+    "src/components/UpdateCheck.jsx": [
+      "src/utils/version.js"
+    ],
+    "src/components/navigation/BottomNav.jsx": [
+      "src/components/navigation/bottom-nav.styles.js",
+      "src/config/navigation.js"
+    ],
+    "src/components/navigation/bottom-nav.styles.js": [],
+    "src/config/navigation.js": [],
+    "src/context/AuthContext.jsx": [],
+    "src/context/ToastContext.jsx": [],
+    "src/index.css": [],
+    "src/lib/queryClient.js": [],
+    "src/main.jsx": [
+      "src/App.jsx",
+      "src/components/ErrorBoundary.jsx",
+      "src/index.css",
+      "src/lib/queryClient.js"
+    ],
+    "src/pages/BukuKlaper.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/CatatanTerlambat.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/DKN.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/xlsxLoader.js"
+    ],
+    "src/pages/Dashboard.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/Skeleton.jsx",
+      "src/components/StudentCard.jsx",
+      "src/context/AuthContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js"
+    ],
+    "src/pages/Feedback.jsx": [
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx"
+    ],
+    "src/pages/Keuangan.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/components/Skeleton.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js",
+      "src/utils/notifications.js"
+    ],
+    "src/pages/Laporan.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/ImageLightbox.jsx",
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/components/Skeleton.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js"
+    ],
+    "src/pages/LaporanHarian.jsx": [
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/Login.jsx": [
+      "src/context/AuthContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/version.js"
+    ],
+    "src/pages/MasterSiswa.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/components/Skeleton.jsx",
+      "src/components/StudentCard.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/coordinates.js",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js",
+      "src/utils/xlsxLoader.js"
+    ],
+    "src/pages/Notifications.jsx": [
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/Panggilan.jsx": [
+      "src/components/ImageLightbox.jsx",
+      "src/components/Loading.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js",
+      "src/utils/notifications.js"
+    ],
+    "src/pages/Piket.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/Skeleton.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/Presensi.jsx": [
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/PresensiPagi.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/Skeleton.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/PresensiSiang.jsx": [
+      "src/components/EmptyState.jsx",
+      "src/components/Loading.jsx",
+      "src/components/Skeleton.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js"
+    ],
+    "src/pages/Privacy.jsx": [],
+    "src/pages/Profile.jsx": [
+      "src/components/Loading.jsx",
+      "src/components/PageGuide.jsx",
+      "src/components/Skeleton.jsx",
+      "src/components/UpdateCheck.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/coordinates.js",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js"
+    ],
+    "src/pages/Register.jsx": [
+      "src/utils/gasClient.js",
+      "src/utils/version.js"
+    ],
+    "src/pages/Tanggungan.jsx": [
+      "src/components/Loading.jsx",
+      "src/context/AuthContext.jsx",
+      "src/context/ToastContext.jsx",
+      "src/utils/gasClient.js",
+      "src/utils/logic.js"
+    ],
+    "src/pages/Terms.jsx": [],
+    "src/utils/coordinates.js": [],
+    "src/utils/gasClient.js": [
+      "src/lib/queryClient.js"
+    ],
+    "src/utils/logic.js": [],
+    "src/utils/notifications.js": [
+      "src/utils/gasClient.js"
+    ],
+    "src/utils/version.js": [],
+    "src/utils/xlsxLoader.js": [],
+    "tailwind.config.js": [],
+    "vite.config.js": []
+  }
+}

@@ -1,0 +1,421 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/components/Breadcrumbs.jsx",
+      "type": "file",
+      "name": "Breadcrumbs.jsx",
+      "filePath": "src/components/Breadcrumbs.jsx",
+      "summary": "Komponen breadcrumb yang menyusun jalur navigasi dari lokasi URL dan menerjemahkan segmen rute menjadi label Bahasa Indonesia. Komponen ini disembunyikan pada halaman utama dan dashboard.",
+      "tags": ["komponen", "navigasi", "breadcrumb", "react-router", "ui"],
+      "complexity": "simple",
+      "languageNotes": "Memakai hook useLocation dan komponen Link dari react-router-dom serta ikon dari lucide-react."
+    },
+    {
+      "id": "file:src/components/Layout.jsx",
+      "type": "file",
+      "name": "Layout.jsx",
+      "filePath": "src/components/Layout.jsx",
+      "summary": "Layout utama aplikasi yang merender sidebar, header, breadcrumb, drawer notifikasi, modal pencarian, navigasi bawah, dan toast. File ini juga mengelola state antarmuka, shortcut keyboard, serta pengambilan data notifikasi dan daftar siswa.",
+      "tags": ["komponen", "layout", "navigasi", "notifikasi", "responsif", "shortcut"],
+      "complexity": "complex",
+      "languageNotes": "Menggabungkan banyak hook bawaan React (useState, useEffect, useMemo, useRef) dan mempertahankan fokus keyboard saat drawer mobile dibuka atau ditutup."
+    },
+    {
+      "id": "file:src/components/NotificationDrawer.jsx",
+      "type": "file",
+      "name": "NotificationDrawer.jsx",
+      "filePath": "src/components/NotificationDrawer.jsx",
+      "summary": "Panel notifikasi yang menampilkan daftar pesan dengan format waktu lokal Indonesia, penanda pesan belum dibaca, dan aksi tandai dibaca. Panel ini juga menyediakan tautan ke halaman daftar notifikasi lengkap.",
+      "tags": ["komponen", "notifikasi", "drawer", "date-fns", "ui"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/SearchModal.jsx",
+      "type": "file",
+      "name": "SearchModal.jsx",
+      "filePath": "src/components/SearchModal.jsx",
+      "summary": "Modal pencarian siswa berdasarkan nama atau NISN dengan batas lima hasil. Tersedia shortcut Ctrl+K dan ESC, tautan navigasi cepat, serta penandaan siswa yang dipilih saat membuka halaman Data Siswa.",
+      "tags": ["komponen", "pencarian", "modal", "shortcut", "siswa", "ui"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/Toast.jsx",
+      "type": "file",
+      "name": "Toast.jsx",
+      "filePath": "src/components/Toast.jsx",
+      "summary": "Komponen tampilan toast global yang mengambil daftar pesan dari hook useToast dan menyesuaikan warna serta ikon berdasarkan jenis pesan. Setiap toast dapat ditutup secara manual.",
+      "tags": ["komponen", "toast", "notifikasi", "ui"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/navigation/BottomNav.jsx",
+      "type": "file",
+      "name": "BottomNav.jsx",
+      "filePath": "src/components/navigation/BottomNav.jsx",
+      "summary": "Bilah navigasi bawah untuk layar kecil yang menampilkan menu utama sesuai peran pengguna dan sebuah tombol untuk membuka menu lengkap. Komponen ini memakai kelas gaya terpusat dan mengatur atribut aksesibilitas pada tombol.",
+      "tags": ["komponen", "navigasi", "mobile", "responsif", "aksesibilitas"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/navigation/bottom-nav.styles.js",
+      "type": "file",
+      "name": "bottom-nav.styles.js",
+      "filePath": "src/components/navigation/bottom-nav.styles.js",
+      "summary": "Berisi objek kelas Tailwind terpusat untuk bilah navigasi bawah, meliputi gaya wadah, item, keadaan aktif dan nonaktif, ikon, label, serta indikator.",
+      "tags": ["gaya", "tailwind", "navigasi", "konstanta"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/config/navigation.js",
+      "type": "file",
+      "name": "navigation.js",
+      "filePath": "src/config/navigation.js",
+      "summary": "Sumber konfigurasi tunggal untuk navigasi dan pembatasan akses, berisi daftar peran, peta peran per rute, grup menu sidebar, dan pembantu pemfilteran menu mobile. Modul ini dipakai bersama oleh komponen navigasi dan pengatur rute aplikasi.",
+      "tags": ["konfigurasi", "navigasi", "rute", "role", "akses"],
+      "complexity": "moderate",
+      "languageNotes": "Mendefinisikan konstanta ALL_ROLES, ROUTE_ROLES, dan NAV_GROUPS serta fungsi canAccess dan getMobilePrimaryItems."
+    },
+    {
+      "id": "function:src/components/Breadcrumbs.jsx:Breadcrumbs",
+      "type": "function",
+      "name": "Breadcrumbs",
+      "filePath": "src/components/Breadcrumbs.jsx",
+      "summary": "Membaca pathname aktif, memetakan tiap segmen ke label yang ramah pengguna, lalu merender tautan bertingkat dengan panah pemisah. Mengembalikan null untuk rute root dan dashboard.",
+      "tags": ["komponen", "breadcrumb", "navigasi", "label"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/Layout.jsx:Layout",
+      "type": "function",
+      "name": "Layout",
+      "filePath": "src/components/Layout.jsx",
+      "summary": "Komponen kerangka aplikasi yang menggabungkan sidebar adaptif, header, isi halaman lewat Outlet, dan seluruh overlay global. Ia juga memuat notifikasi dan data siswa, mengatur izin notifikasi browser, serta menangani shortcut Ctrl+K dan ESC.",
+      "tags": ["komponen", "layout", "state", "shortcut", "integrasi"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/Layout.jsx:NavItem",
+      "type": "function",
+      "name": "NavItem",
+      "filePath": "src/components/Layout.jsx",
+      "summary": "Merender satu tautan menu sidebar dengan gaya berbeda saat aktif maupun saat sidebar diperkecil, termasuk label tersembunyi untuk pembaca layar.",
+      "tags": ["komponen", "menu", "navigasi", "aksesibilitas"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/NotificationDrawer.jsx:NotificationDrawer",
+      "type": "function",
+      "name": "NotificationDrawer",
+      "filePath": "src/components/NotificationDrawer.jsx",
+      "summary": "Menampilkan daftar notifikasi beserta jumlah pesan belum dibaca, ikon sesuai jenis pesan, dan waktu dalam format lokal. Klik pada pesan memanggil handler penandaan dibaca, sedangkan tombol bawah mengarah ke halaman notifikasi.",
+      "tags": ["komponen", "notifikasi", "drawer", "handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/SearchModal.jsx:SearchModal",
+      "type": "function",
+      "name": "SearchModal",
+      "filePath": "src/components/SearchModal.jsx",
+      "summary": "Mengelola kata kunci pencarian, memfilter siswa dari props berdasarkan nama atau NISN, dan menangani penutupan modal melalui tombol, klik latar, atau shortcut keyboard.",
+      "tags": ["komponen", "pencarian", "filter", "shortcut"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/Toast.jsx:Toast",
+      "type": "function",
+      "name": "Toast",
+      "filePath": "src/components/Toast.jsx",
+      "summary": "Mengambil toasts dan removeToast dari context lalu merender setiap pesan dengan skema warna dan ikon yang sesuai, lengkap dengan tombol penutup.",
+      "tags": ["komponen", "toast", "context", "ui"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/navigation/BottomNav.jsx:BottomNav",
+      "type": "function",
+      "name": "BottomNav",
+      "filePath": "src/components/navigation/BottomNav.jsx",
+      "summary": "Mendapatkan item navigasi utama sesuai peran lalu merendernya sebagai tautan dengan indikator aktif, ditambah tombol Lainnya yang membuka menu penuh.",
+      "tags": ["komponen", "navigasi", "mobile", "role"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/config/navigation.js:canAccess",
+      "type": "function",
+      "name": "canAccess",
+      "filePath": "src/config/navigation.js",
+      "summary": "Memeriksa apakah daftar peran yang diizinkan tidak kosong dan memuat peran aktif, sehingga menentukan layaknya sebuah menu atau rute ditampilkan.",
+      "tags": ["pembantu", "otorisasi", "role", "validasi"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/config/navigation.js:getMobilePrimaryItems",
+      "type": "function",
+      "name": "getMobilePrimaryItems",
+      "filePath": "src/config/navigation.js",
+      "summary": "Memetakan daftar prioritas menu mobile ke item NAV_GROUPS, menyaringnya dengan canAccess sesuai peran, lalu membatasi hasil sesuai batas yang diminta.",
+      "tags": ["pembantu", "navigasi", "mobile", "role"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/components/Breadcrumbs.jsx",
+      "target": "function:src/components/Breadcrumbs.jsx:Breadcrumbs",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini mendefinisikan dan mengekspor komponen Breadcrumbs."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "function:src/components/Layout.jsx:Layout",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini berisi komponen utama Layout sebagai ekspor bawaan."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "function:src/components/Layout.jsx:NavItem",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini mendefinisikan komponen bantu NavItem untuk setiap tautan sidebar."
+    },
+    {
+      "source": "file:src/components/NotificationDrawer.jsx",
+      "target": "function:src/components/NotificationDrawer.jsx:NotificationDrawer",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini mendefinisikan dan mengekspor komponen NotificationDrawer."
+    },
+    {
+      "source": "file:src/components/SearchModal.jsx",
+      "target": "function:src/components/SearchModal.jsx:SearchModal",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini mendefinisikan dan mengekspor komponen SearchModal."
+    },
+    {
+      "source": "file:src/components/Toast.jsx",
+      "target": "function:src/components/Toast.jsx:Toast",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini mendefinisikan dan mengekspor komponen Toast."
+    },
+    {
+      "source": "file:src/components/navigation/BottomNav.jsx",
+      "target": "function:src/components/navigation/BottomNav.jsx:BottomNav",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ini mendefinisikan dan mengekspor komponen BottomNav."
+    },
+    {
+      "source": "file:src/config/navigation.js",
+      "target": "function:src/config/navigation.js:canAccess",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "Modul konfigurasi ini mengekspor fungsi pembantu canAccess."
+    },
+    {
+      "source": "file:src/config/navigation.js",
+      "target": "function:src/config/navigation.js:getMobilePrimaryItems",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "Modul konfigurasi ini mengekspor fungsi pembantu getMobilePrimaryItems."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/components/Breadcrumbs.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor komponen Breadcrumbs untuk ditampilkan di header."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/components/NotificationDrawer.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor komponen NotificationDrawer untuk panel notifikasi."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/components/SearchModal.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor komponen SearchModal untuk pencarian siswa."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/components/Toast.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor komponen Toast sebagai area notifikasi global."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/components/navigation/BottomNav.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor komponen BottomNav untuk navigasi layar kecil."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/config/navigation.js",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor NAV_GROUPS dan canAccess dari konfigurasi navigasi."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/context/AuthContext.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor hook useAuth untuk data pengguna dan proses keluar."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/utils/gasClient.js",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor fetchGAS untuk berkomunikasi dengan backend Google Apps Script."
+    },
+    {
+      "source": "file:src/components/Layout.jsx",
+      "target": "file:src/utils/version.js",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Layout mengimpor getCurrentVersion untuk menampilkan versi aplikasi di footer."
+    },
+    {
+      "source": "file:src/components/Toast.jsx",
+      "target": "file:src/context/ToastContext.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "Toast mengimpor hook useToast untuk mengakses daftar dan penghapus pesan."
+    },
+    {
+      "source": "file:src/components/navigation/BottomNav.jsx",
+      "target": "file:src/components/navigation/bottom-nav.styles.js",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "BottomNav mengimpor objek bottomNavStyles sebagai kelas gaya terpusat."
+    },
+    {
+      "source": "file:src/components/navigation/BottomNav.jsx",
+      "target": "file:src/config/navigation.js",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "BottomNav mengimpor getMobilePrimaryItems dari konfigurasi navigasi."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/config/navigation.js:canAccess",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout memanggil canAccess untuk menyaring menu sidebar sesuai peran pengguna."
+    },
+    {
+      "source": "function:src/components/navigation/BottomNav.jsx:BottomNav",
+      "target": "function:src/config/navigation.js:getMobilePrimaryItems",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "BottomNav memanggil getMobilePrimaryItems untuk memperoleh menu utama sesuai peran."
+    },
+    {
+      "source": "function:src/config/navigation.js:getMobilePrimaryItems",
+      "target": "function:src/config/navigation.js:canAccess",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "getMobilePrimaryItems memanggil canAccess saat menyaring item navigasi mobile."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/components/Layout.jsx:NavItem",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout merender NavItem untuk setiap menu yang diizinkan di sidebar."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/components/Breadcrumbs.jsx:Breadcrumbs",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout merender Breadcrumbs di bagian header."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/components/NotificationDrawer.jsx:NotificationDrawer",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout merender NotificationDrawer dan meneruskan data serta handler notifikasi."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/components/SearchModal.jsx:SearchModal",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout merender SearchModal dan meneruskan daftar siswa hasil pengambilan data."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/components/Toast.jsx:Toast",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout merender komponen Toast di dalam kerangka halaman."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "function:src/components/navigation/BottomNav.jsx:BottomNav",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout merender BottomNav untuk navigasi pada layar kecil."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "file:src/utils/gasClient.js",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout memanggil fetchGAS untuk memuat notifikasi dan data siswa serta menandai notifikasi terbaca."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "file:src/utils/version.js",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout memanggil getCurrentVersion saat merender label versi di footer."
+    },
+    {
+      "source": "function:src/components/Layout.jsx:Layout",
+      "target": "file:src/context/AuthContext.jsx",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Layout memanggil useAuth untuk memperoleh data pengguna dan fungsi logout."
+    },
+    {
+      "source": "function:src/components/Toast.jsx:Toast",
+      "target": "file:src/context/ToastContext.jsx",
+      "type": "calls",
+      "weight": 0.8,
+      "description": "Toast memanggil useToast untuk membaca daftar pesan dan menghapusnya."
+    },
+    {
+      "source": "file:src/config/navigation.js",
+      "target": "function:src/components/Layout.jsx:Layout",
+      "type": "configures",
+      "weight": 0.6,
+      "description": "NAV_GROUPS dan ROUTE_ROLES menentukan menu serta batas akses yang dipakai Layout."
+    },
+    {
+      "source": "file:src/config/navigation.js",
+      "target": "function:src/components/navigation/BottomNav.jsx:BottomNav",
+      "type": "configures",
+      "weight": 0.6,
+      "description": "Prioritas menu mobile di modul konfigurasi menentukan item yang ditampilkan BottomNav."
+    },
+    {
+      "source": "file:src/config/navigation.js",
+      "target": "file:src/App.jsx",
+      "type": "configures",
+      "weight": 0.6,
+      "description": "Daftar peran dan peta akses rute dari modul ini dipakai App saat mengatur rute."
+    }
+  ]
+}

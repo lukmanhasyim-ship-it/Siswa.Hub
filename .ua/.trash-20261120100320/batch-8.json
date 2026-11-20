@@ -1,0 +1,141 @@
+{
+  "nodes": [
+    {
+      "id": "config:.clasp.json",
+      "type": "config",
+      "name": ".clasp.json",
+      "filePath": ".clasp.json",
+      "summary": "Konfigurasi clasp yang menghubungkan proyek lokal dengan proyek Google Apps Script melalui scriptId dan menetapkan folder `gas` sebagai rootDir.",
+      "tags": ["clasp", "apps-script", "konfigurasi", "deployment"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:CHANGELOG.md",
+      "type": "document",
+      "name": "CHANGELOG.md",
+      "filePath": "CHANGELOG.md",
+      "summary": "Catatan perubahan resmi Siswa.Hub yang mendokumentasikan rilis 5.0.1 dan 5.0.0 dengan format Keep a Changelog dan Semantic Versioning, mencakup antrean catatan terlambat serta antrean kas massal.",
+      "tags": ["dokumentasi", "changelog", "rilis", "semver"],
+      "complexity": "moderate",
+      "languageNotes": "Mengikuti format Keep a Changelog edisi bahasa Indonesia dan memuat tautan rilis GitHub untuk tiap versi."
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Dokumentasi utama proyek yang menjelaskan fitur, arsitektur, panduan instalasi backend Apps Script dan frontend, konfigurasi OAuth, serta proses deployment ke Firebase Hosting.",
+      "tags": ["dokumentasi", "panduan", "instalasi", "arsitektur", "deployment"],
+      "complexity": "complex",
+      "languageNotes": "Ditulis dalam Bahasa Indonesia dan memuat daftar struktur proyek serta variabel lingkungan yang dibaca aplikasi."
+    },
+    {
+      "id": "document:RELEASE_NOTES_v5.0.1.md",
+      "type": "document",
+      "name": "RELEASE_NOTES_v5.0.1.md",
+      "filePath": "RELEASE_NOTES_v5.0.1.md",
+      "summary": "Catatan rilis versi 5.0.1 yang merangkum antrean catatan terlambat per tanggal, penyimpanan kas tanpa pindah halaman, perbaikan duplikat, dan langkah deployment backend serta frontend.",
+      "tags": ["dokumentasi", "rilis", "release-notes", "deployment"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:SECURITY.md",
+      "type": "document",
+      "name": "SECURITY.md",
+      "filePath": "SECURITY.md",
+      "summary": "Kebijakan keamanan proyek yang mencantumkan versi yang masih didukung (5.0.x) dan masih berisi placeholder templat untuk bagian pelaporan kerentanan.",
+      "tags": ["dokumentasi", "keamanan", "kebijakan", "template"],
+      "complexity": "simple",
+      "languageNotes": "Sebagian besar teks pada bagian pelaporan kerentanan masih berupa placeholder berbahasa Inggris dari templat GitHub."
+    },
+    {
+      "id": "config:firebase.json",
+      "type": "config",
+      "name": "firebase.json",
+      "filePath": "firebase.json",
+      "summary": "Konfigurasi Firebase Hosting yang mempublikasikan folder `dist` dan menerapkan aturan rewrite SPA sehingga seluruh rute diarahkan ke `/index.html`.",
+      "tags": ["firebase", "hosting", "spa", "konfigurasi", "deployment"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "index.html",
+      "summary": "Dokumen HTML sebagai entry point aplikasi yang memuat font Google, elemen `#root`, dan skrip modul `/src/main.jsx` sebagai titik awal React.",
+      "tags": ["html", "entry-point", "vite", "frontend"],
+      "complexity": "simple",
+      "languageNotes": "Elemen `<html>` memakai atribut lang=\"id\" dan favicon diambil dari `/src/assets/logo.png`."
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Manifest npm yang mendefinisikan versi 5.0.1, skrip Vite (dev, build, lint, preview), serta dependensi runtime dan pengembangan untuk aplikasi React 19.",
+      "tags": ["npm", "manifest", "dependensi", "versi", "konfigurasi"],
+      "complexity": "moderate",
+      "languageNotes": "Nomor versi di sini menjadi sumber versi aplikasi yang ditampilkan di UI; paket `xlsx` diambil dari tarball CDN SheetJS 0.20.3."
+    },
+    {
+      "id": "config:skills-lock.json",
+      "type": "config",
+      "name": "skills-lock.json",
+      "filePath": "skills-lock.json",
+      "summary": "Berkas kunci yang merekam daftar agent skill Firebase dan Genkit beserta sumber GitHub serta hash komputasinya untuk menjaga konsistensi instalasi skill.",
+      "tags": ["skills", "lockfile", "konfigurasi", "hash"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:README.md",
+      "target": "config:package.json",
+      "type": "documents",
+      "weight": 0.5,
+      "description": "README menjelaskan nomor versi, skrip npm, dan dependensi yang didefinisikan di package.json."
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:firebase.json",
+      "type": "documents",
+      "weight": 0.5,
+      "description": "README memandu konfigurasi Firebase Hosting serta menjelaskan folder `dist` dan aturan rewrite SPA di firebase.json."
+    },
+    {
+      "source": "document:CHANGELOG.md",
+      "target": "document:RELEASE_NOTES_v5.0.1.md",
+      "type": "documents",
+      "weight": 0.5,
+      "description": "CHANGELOG menyebut catatan rilis RELEASE_NOTES_v5.0.1.md sebagai dokumentasi publik baru pada rilis 5.0.1."
+    },
+    {
+      "source": "document:CHANGELOG.md",
+      "target": "document:SECURITY.md",
+      "type": "documents",
+      "weight": 0.5,
+      "description": "CHANGELOG mencatat penyelarasan SECURITY.md dengan versi yang didukung saat ini."
+    },
+    {
+      "source": "document:CHANGELOG.md",
+      "target": "document:README.md",
+      "type": "documents",
+      "weight": 0.5,
+      "description": "CHANGELOG mencatat pembaruan README dengan rincian v5.0.1 dan URL klon repo kanonik."
+    },
+    {
+      "source": "document:RELEASE_NOTES_v5.0.1.md",
+      "target": "document:README.md",
+      "type": "documents",
+      "weight": 0.5,
+      "description": "Catatan rilis mengarahkan pembaca ke README untuk struktur header sheet `Catatan_Terlambat` yang dibutuhkan."
+    },
+    {
+      "source": "config:firebase.json",
+      "target": "file:index.html",
+      "type": "routes",
+      "weight": 0.5,
+      "description": "Aturan rewrite Firebase mengalihkan seluruh rute (`**`) ke `/index.html` sehingga aplikasi berperilaku sebagai single-page app."
+    }
+  ]
+}

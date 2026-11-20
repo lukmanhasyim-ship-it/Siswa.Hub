@@ -1,0 +1,160 @@
+[
+  {
+    "id": "layer:entry-bootstrap",
+    "name": "Entry & Bootstrap",
+    "description": "Titik awal aplikasi: shell HTML, pemasangan root React, provider global, dan komponen akar yang merangkai router. main.jsx membungkus App dengan QueryClientProvider serta ErrorBoundary, sementara App menyiapkan OAuth Google, Toast, Auth, dan peta rute aplikasi.",
+    "nodeIds": [
+      "file:index.html",
+      "file:src/main.jsx",
+      "file:src/App.jsx",
+      "file:src/components/ErrorBoundary.jsx"
+    ]
+  },
+  {
+    "id": "layer:routing-layout",
+    "name": "Routing & Layout",
+    "description": "Kerangka navigasi dan tampilan halaman: konfigurasi peran serta rute, layout utama, breadcrumb, dan navigasi bawah responsif. Config navigation.js mengonfigurasi App, Layout, dan BottomNav, sedangkan edge routes dari App menentukan halaman yang dirender.",
+    "nodeIds": [
+      "file:src/config/navigation.js",
+      "file:src/components/Layout.jsx",
+      "file:src/components/Breadcrumbs.jsx",
+      "file:src/components/navigation/BottomNav.jsx",
+      "file:src/components/navigation/bottom-nav.styles.js"
+    ]
+  },
+  {
+    "id": "layer:ui-components",
+    "name": "Komponen UI",
+    "description": "Komponen presentasi yang dipakai ulang lintas halaman: placeholder, indikator pemuatan, panduan halaman, kartu siswa, lightbox, toast, drawer notifikasi, modal pencarian, dan pengecek versi. Semuanya berada di src/components serta diimpor oleh halaman dan Layout.",
+    "nodeIds": [
+      "file:src/components/EmptyState.jsx",
+      "file:src/components/Loading.jsx",
+      "file:src/components/Skeleton.jsx",
+      "file:src/components/PageGuide.jsx",
+      "file:src/components/NotificationDrawer.jsx",
+      "file:src/components/SearchModal.jsx",
+      "file:src/components/Toast.jsx",
+      "file:src/components/ImageLightbox.jsx",
+      "file:src/components/StudentCard.jsx",
+      "file:src/components/UpdateCheck.jsx"
+    ]
+  },
+  {
+    "id": "layer:academic-pages",
+    "name": "Halaman Akademik & Presensi",
+    "description": "Halaman pengelolaan kehadiran, piket, keterlambatan, leger nilai, buku induk, dan laporan. Seluruhnya berada di src/pages, menjadi target rute App, serta memakai gasClient, context, dan komponen UI untuk membaca atau menulis sheet.",
+    "nodeIds": [
+      "file:src/pages/CatatanTerlambat.jsx",
+      "file:src/pages/DKN.jsx",
+      "file:src/pages/Dashboard.jsx",
+      "file:src/pages/Laporan.jsx",
+      "file:src/pages/Piket.jsx",
+      "file:src/pages/Presensi.jsx",
+      "file:src/pages/PresensiPagi.jsx",
+      "file:src/pages/PresensiSiang.jsx",
+      "file:src/pages/BukuKlaper.jsx",
+      "file:src/pages/LaporanHarian.jsx"
+    ]
+  },
+  {
+    "id": "layer:admin-pages",
+    "name": "Halaman Administrasi & Komunikasi",
+    "description": "Halaman data induk siswa, kas dan tagihan, panggilan orang tua, notifikasi, profil, serta formulir saran. Halaman-halaman ini juga menjadi target rute App dan memakai lapisan data yang sama, tetapi berfokus pada administrasi serta komunikasi kelas.",
+    "nodeIds": [
+      "file:src/pages/Keuangan.jsx",
+      "file:src/pages/MasterSiswa.jsx",
+      "file:src/pages/Tanggungan.jsx",
+      "file:src/pages/Panggilan.jsx",
+      "file:src/pages/Notifications.jsx",
+      "file:src/pages/Profile.jsx",
+      "file:src/pages/Feedback.jsx"
+    ]
+  },
+  {
+    "id": "layer:auth-static-pages",
+    "name": "Halaman Autentikasi & Informasi Statis",
+    "description": "Halaman masuk dan registrasi yang memverifikasi akun melalui OAuth Google dan data GAS, ditambah halaman tetap untuk syarat penggunaan serta kebijakan privasi. Login dan Register adalah rute publik, sedangkan Privacy dan Terms menyajikan konten kebijakan tanpa dependensi data.",
+    "nodeIds": [
+      "file:src/pages/Login.jsx",
+      "file:src/pages/Register.jsx",
+      "file:src/pages/Privacy.jsx",
+      "file:src/pages/Terms.jsx"
+    ]
+  },
+  {
+    "id": "layer:state-data",
+    "name": "State & Data Access",
+    "description": "Lapisan state global dan akses data: context autentikasi serta toast, singleton QueryClient, dan klien GAS terpusat. Halaman mengonsumsi useAuth, useToast, dan fetchGAS; fetchGAS memakai queryClient lalu memicu penghapusan cache setelah mutation berhasil.",
+    "nodeIds": [
+      "file:src/context/AuthContext.jsx",
+      "file:src/context/ToastContext.jsx",
+      "file:src/lib/queryClient.js",
+      "file:src/utils/gasClient.js"
+    ]
+  },
+  {
+    "id": "layer:utilities-domain",
+    "name": "Utilitas & Logika Domain",
+    "description": "Fungsi murni dan pembantu lintas halaman: normalisasi koordinat, aturan disiplin serta format lokal, pengecekan versi rilis, pemuatan XLSX secara malas, dan pengiriman notifikasi berbasis peran lewat gasClient.",
+    "nodeIds": [
+      "file:src/utils/coordinates.js",
+      "file:src/utils/logic.js",
+      "file:src/utils/version.js",
+      "file:src/utils/xlsxLoader.js",
+      "file:src/utils/notifications.js"
+    ]
+  },
+  {
+    "id": "layer:styling",
+    "name": "Styling & Tema",
+    "description": "Stylesheet global dan berkas stylesheet aplikasi yang menentukan tampilan: direktif Tailwind, token warna, animasi, dan kelas komponen. Konfigurasi Tailwind serta PostCSS di lapisan konfigurasi memproses stylesheet ini saat build.",
+    "nodeIds": [
+      "file:src/index.css",
+      "file:src/App.css"
+    ]
+  },
+  {
+    "id": "layer:backend-gas",
+    "name": "Backend Apps Script",
+    "description": "API serverless Google Apps Script sebagai backend: Web App doGet/doPost, router aksi, operasi Google Sheets, notifikasi, pengarsipan bulanan, Drive, dan trigger. Manifest appsscript.json serta konfigurasi clasp mengikat kode ini ke proyek Apps Script.",
+    "nodeIds": [
+      "file:gas/Code.gs",
+      "config:gas/appsscript.json",
+      "config:.clasp.json"
+    ]
+  },
+  {
+    "id": "layer:config-build",
+    "name": "Konfigurasi & Build",
+    "description": "Manifest npm, konfigurasi Vite, ESLint, Tailwind, dan PostCSS, pengaturan Firebase Hosting, alias proyek, serta lockfile skill. Bersama-sama mereka menentukan dependensi, build PWA, aturan lint, tema, rewrite SPA, dan alat pengembangan.",
+    "nodeIds": [
+      "config:package.json",
+      "config:vite.config.js",
+      "config:eslint.config.js",
+      "config:tailwind.config.js",
+      "config:postcss.config.js",
+      "config:firebase.json",
+      "config:.firebaserc",
+      "config:skills-lock.json"
+    ]
+  },
+  {
+    "id": "layer:ci-cd",
+    "name": "CI/CD",
+    "description": "Workflow GitHub Actions yang menjalankan instalasi bersih dependensi, build, dan pengujian pada matriks Node.js untuk setiap push serta pull request. Pipeline ini memvalidasi perubahan frontend sebelum tahap deployment.",
+    "nodeIds": [
+      "pipeline:.github/workflows/node.js.yml"
+    ]
+  },
+  {
+    "id": "layer:documentation",
+    "name": "Dokumentasi",
+    "description": "README, catatan perubahan, catatan rilis, dan kebijakan keamanan proyek. Edge documents menghubungkan README ke package.json serta firebase.json, dan CHANGELOG ke catatan rilis serta SECURITY.md.",
+    "nodeIds": [
+      "document:README.md",
+      "document:CHANGELOG.md",
+      "document:RELEASE_NOTES_v5.0.1.md",
+      "document:SECURITY.md"
+    ]
+  }
+]

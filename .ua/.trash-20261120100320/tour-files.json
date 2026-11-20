@@ -1,0 +1,178 @@
+[
+  {
+    "filePath": "README.md",
+    "tourOrder": 1
+  },
+  {
+    "filePath": "index.html",
+    "tourOrder": 2
+  },
+  {
+    "filePath": "src/components/ErrorBoundary.jsx",
+    "tourOrder": 2
+  },
+  {
+    "filePath": "src/main.jsx",
+    "tourOrder": 2
+  },
+  {
+    "filePath": "src/App.jsx",
+    "tourOrder": 3
+  },
+  {
+    "filePath": "src/config/navigation.js",
+    "tourOrder": 3
+  },
+  {
+    "filePath": "src/components/Breadcrumbs.jsx",
+    "tourOrder": 4
+  },
+  {
+    "filePath": "src/components/Layout.jsx",
+    "tourOrder": 4
+  },
+  {
+    "filePath": "src/components/navigation/BottomNav.jsx",
+    "tourOrder": 4
+  },
+  {
+    "filePath": "src/components/SearchModal.jsx",
+    "tourOrder": 4
+  },
+  {
+    "filePath": "src/context/AuthContext.jsx",
+    "tourOrder": 5
+  },
+  {
+    "filePath": "src/context/ToastContext.jsx",
+    "tourOrder": 5
+  },
+  {
+    "filePath": "src/lib/queryClient.js",
+    "tourOrder": 5
+  },
+  {
+    "filePath": "src/utils/gasClient.js",
+    "tourOrder": 5
+  },
+  {
+    "filePath": "src/components/StudentCard.jsx",
+    "tourOrder": 6
+  },
+  {
+    "filePath": "src/pages/Dashboard.jsx",
+    "tourOrder": 6
+  },
+  {
+    "filePath": "src/utils/logic.js",
+    "tourOrder": 6
+  },
+  {
+    "filePath": "src/pages/CatatanTerlambat.jsx",
+    "tourOrder": 7
+  },
+  {
+    "filePath": "src/pages/Keuangan.jsx",
+    "tourOrder": 7
+  },
+  {
+    "filePath": "src/pages/Presensi.jsx",
+    "tourOrder": 7
+  },
+  {
+    "filePath": "src/pages/PresensiPagi.jsx",
+    "tourOrder": 7
+  },
+  {
+    "filePath": "src/pages/PresensiSiang.jsx",
+    "tourOrder": 7
+  },
+  {
+    "filePath": "src/pages/Laporan.jsx",
+    "tourOrder": 8
+  },
+  {
+    "filePath": "src/pages/MasterSiswa.jsx",
+    "tourOrder": 8
+  },
+  {
+    "filePath": "src/pages/Notifications.jsx",
+    "tourOrder": 8
+  },
+  {
+    "filePath": "src/pages/Panggilan.jsx",
+    "tourOrder": 8
+  },
+  {
+    "filePath": "src/utils/coordinates.js",
+    "tourOrder": 9
+  },
+  {
+    "filePath": "src/utils/notifications.js",
+    "tourOrder": 9
+  },
+  {
+    "filePath": "src/utils/version.js",
+    "tourOrder": 9
+  },
+  {
+    "filePath": "src/utils/xlsxLoader.js",
+    "tourOrder": 9
+  },
+  {
+    "filePath": ".clasp.json",
+    "tourOrder": 10
+  },
+  {
+    "filePath": "gas/appsscript.json",
+    "tourOrder": 10
+  },
+  {
+    "filePath": "gas/Code.gs",
+    "tourOrder": 10
+  },
+  {
+    "filePath": ".firebaserc",
+    "tourOrder": 11
+  },
+  {
+    "filePath": ".github/workflows/node.js.yml",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "eslint.config.js",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "firebase.json",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "package.json",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "postcss.config.js",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "tailwind.config.js",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "vite.config.js",
+    "tourOrder": 11
+  },
+  {
+    "filePath": "CHANGELOG.md",
+    "tourOrder": 12
+  },
+  {
+    "filePath": "RELEASE_NOTES_v5.0.1.md",
+    "tourOrder": 12
+  },
+  {
+    "filePath": "SECURITY.md",
+    "tourOrder": 12
+  }
+]

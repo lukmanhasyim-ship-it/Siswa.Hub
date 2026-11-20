@@ -1,0 +1,2165 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 67,
+  "totalBatches": 9,
+  "exportsByPath": {
+    ".firebaserc": [],
+    "eslint.config.js": [],
+    "gas/Code.gs": [],
+    "postcss.config.js": [],
+    "src/App.jsx": [],
+    "src/components/Breadcrumbs.jsx": [
+      "Breadcrumbs"
+    ],
+    "src/components/EmptyState.jsx": [],
+    "src/components/ErrorBoundary.jsx": [
+      "default"
+    ],
+    "src/components/ImageLightbox.jsx": [
+      "ImageLightbox"
+    ],
+    "src/components/Layout.jsx": [
+      "Layout"
+    ],
+    "src/components/Loading.jsx": [],
+    "src/components/NotificationDrawer.jsx": [
+      "NotificationDrawer"
+    ],
+    "src/components/PageGuide.jsx": [
+      "PageGuide"
+    ],
+    "src/components/SearchModal.jsx": [
+      "SearchModal"
+    ],
+    "src/components/Skeleton.jsx": [
+      "SkeletonCard",
+      "SkeletonTable",
+      "SkeletonStats",
+      "SkeletonDashboard"
+    ],
+    "src/components/StudentCard.jsx": [],
+    "src/components/Toast.jsx": [
+      "Toast"
+    ],
+    "src/components/UpdateCheck.jsx": [
+      "UpdateCheck"
+    ],
+    "src/components/navigation/BottomNav.jsx": [
+      "BottomNav"
+    ],
+    "src/components/navigation/bottom-nav.styles.js": [
+      "bottomNavStyles"
+    ],
+    "src/config/navigation.js": [
+      "ALL_ROLES",
+      "ROUTE_ROLES",
+      "NAV_GROUPS",
+      "canAccess",
+      "getMobilePrimaryItems"
+    ],
+    "src/context/AuthContext.jsx": [
+      "AuthProvider",
+      "useAuth"
+    ],
+    "src/context/ToastContext.jsx": [
+      "ToastProvider",
+      "useToast"
+    ],
+    "src/lib/queryClient.js": [
+      "queryClient"
+    ],
+    "src/main.jsx": [],
+    "src/pages/BukuKlaper.jsx": [
+      "BukuKlaper"
+    ],
+    "src/pages/CatatanTerlambat.jsx": [
+      "CatatanTerlambat"
+    ],
+    "src/pages/DKN.jsx": [
+      "DKN"
+    ],
+    "src/pages/Dashboard.jsx": [
+      "Dashboard"
+    ],
+    "src/pages/Feedback.jsx": [
+      "Feedback"
+    ],
+    "src/pages/Keuangan.jsx": [
+      "Keuangan"
+    ],
+    "src/pages/Laporan.jsx": [
+      "Laporan"
+    ],
+    "src/pages/LaporanHarian.jsx": [
+      "LaporanHarian"
+    ],
+    "src/pages/Login.jsx": [
+      "Login"
+    ],
+    "src/pages/MasterSiswa.jsx": [
+      "MasterSiswa"
+    ],
+    "src/pages/Notifications.jsx": [
+      "Notifications"
+    ],
+    "src/pages/Panggilan.jsx": [
+      "Panggilan"
+    ],
+    "src/pages/Piket.jsx": [
+      "Piket"
+    ],
+    "src/pages/Presensi.jsx": [
+      "Presensi"
+    ],
+    "src/pages/PresensiPagi.jsx": [
+      "PresensiPagi"
+    ],
+    "src/pages/PresensiSiang.jsx": [
+      "PresensiSiang"
+    ],
+    "src/pages/Privacy.jsx": [
+      "Privacy"
+    ],
+    "src/pages/Profile.jsx": [
+      "Profile"
+    ],
+    "src/pages/Register.jsx": [
+      "Register"
+    ],
+    "src/pages/Tanggungan.jsx": [
+      "Tanggungan"
+    ],
+    "src/pages/Terms.jsx": [
+      "Terms"
+    ],
+    "src/utils/coordinates.js": [
+      "normalizeDecimalString",
+      "decimalToDMS",
+      "dmsToDecimal",
+      "isDMSValue",
+      "formatCoordinateInput",
+      "createMapsLink"
+    ],
+    "src/utils/gasClient.js": [
+      "gasQueryKey",
+      "fetchGAS"
+    ],
+    "src/utils/logic.js": [
+      "calculateNominal",
+      "formatIDR",
+      "calculateDisciplineStatus",
+      "formatPhoneNumber",
+      "formatDateIndo"
+    ],
+    "src/utils/notifications.js": [
+      "sendNotification"
+    ],
+    "src/utils/version.js": [
+      "getCurrentVersion",
+      "checkForUpdate"
+    ],
+    "src/utils/xlsxLoader.js": [
+      "loadXLSX"
+    ],
+    "tailwind.config.js": [],
+    "vite.config.js": []
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": "src/components/EmptyState.jsx",
+          "language": "javascript",
+          "sizeLines": 23,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/Loading.jsx",
+          "language": "javascript",
+          "sizeLines": 77,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/Skeleton.jsx",
+          "language": "javascript",
+          "sizeLines": 78,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/context/AuthContext.jsx",
+          "language": "javascript",
+          "sizeLines": 48,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/CatatanTerlambat.jsx",
+          "language": "javascript",
+          "sizeLines": 634,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/DKN.jsx",
+          "language": "javascript",
+          "sizeLines": 764,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Dashboard.jsx",
+          "language": "javascript",
+          "sizeLines": 532,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Laporan.jsx",
+          "language": "javascript",
+          "sizeLines": 1314,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Piket.jsx",
+          "language": "javascript",
+          "sizeLines": 299,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/PresensiPagi.jsx",
+          "language": "javascript",
+          "sizeLines": 352,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/PresensiSiang.jsx",
+          "language": "javascript",
+          "sizeLines": 374,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/utils/xlsxLoader.js",
+          "language": "javascript",
+          "sizeLines": 9,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "src/components/EmptyState.jsx": [],
+        "src/components/Loading.jsx": [],
+        "src/components/Skeleton.jsx": [],
+        "src/context/AuthContext.jsx": [],
+        "src/pages/CatatanTerlambat.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/DKN.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/xlsxLoader.js"
+        ],
+        "src/pages/Dashboard.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/Skeleton.jsx",
+          "src/components/StudentCard.jsx",
+          "src/context/AuthContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js"
+        ],
+        "src/pages/Laporan.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/ImageLightbox.jsx",
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/components/Skeleton.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js"
+        ],
+        "src/pages/Piket.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/Skeleton.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/PresensiPagi.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/Skeleton.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/PresensiSiang.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/Skeleton.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/utils/xlsxLoader.js": []
+      },
+      "neighborMap": {
+        "src/components/EmptyState.jsx": [
+          {
+            "path": "src/pages/BukuKlaper.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "BukuKlaper"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          }
+        ],
+        "src/components/Loading.jsx": [
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          },
+          {
+            "path": "src/pages/BukuKlaper.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "BukuKlaper"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/LaporanHarian.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "LaporanHarian"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          },
+          {
+            "path": "src/pages/Notifications.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Notifications"
+            ]
+          },
+          {
+            "path": "src/pages/Panggilan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Panggilan"
+            ]
+          },
+          {
+            "path": "src/pages/Presensi.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Presensi"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          },
+          {
+            "path": "src/pages/Tanggungan.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Tanggungan"
+            ]
+          }
+        ],
+        "src/components/Skeleton.jsx": [
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          }
+        ],
+        "src/context/AuthContext.jsx": [
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          },
+          {
+            "path": "src/components/Layout.jsx",
+            "batchIndex": 3,
+            "symbols": [
+              "Layout"
+            ]
+          },
+          {
+            "path": "src/pages/BukuKlaper.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "BukuKlaper"
+            ]
+          },
+          {
+            "path": "src/pages/Feedback.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Feedback"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/LaporanHarian.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "LaporanHarian"
+            ]
+          },
+          {
+            "path": "src/pages/Login.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Login"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          },
+          {
+            "path": "src/pages/Notifications.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Notifications"
+            ]
+          },
+          {
+            "path": "src/pages/Panggilan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Panggilan"
+            ]
+          },
+          {
+            "path": "src/pages/Presensi.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Presensi"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          },
+          {
+            "path": "src/pages/Tanggungan.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Tanggungan"
+            ]
+          }
+        ],
+        "src/pages/CatatanTerlambat.jsx": [
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/DKN.jsx": [
+          {
+            "path": "src/components/PageGuide.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "PageGuide"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ],
+        "src/pages/Dashboard.jsx": [
+          {
+            "path": "src/components/StudentCard.jsx",
+            "batchIndex": 5,
+            "symbols": []
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/utils/logic.js",
+            "batchIndex": 5,
+            "symbols": [
+              "calculateNominal",
+              "formatIDR",
+              "calculateDisciplineStatus",
+              "formatPhoneNumber",
+              "formatDateIndo"
+            ]
+          }
+        ],
+        "src/pages/Laporan.jsx": [
+          {
+            "path": "src/components/ImageLightbox.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "ImageLightbox"
+            ]
+          },
+          {
+            "path": "src/components/PageGuide.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "PageGuide"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/utils/logic.js",
+            "batchIndex": 5,
+            "symbols": [
+              "calculateNominal",
+              "formatIDR",
+              "calculateDisciplineStatus",
+              "formatPhoneNumber",
+              "formatDateIndo"
+            ]
+          }
+        ],
+        "src/pages/Piket.jsx": [
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/PresensiPagi.jsx": [
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/PresensiSiang.jsx": [
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/utils/xlsxLoader.js": [
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": "src/App.jsx",
+          "language": "javascript",
+          "sizeLines": 197,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/PageGuide.jsx",
+          "language": "javascript",
+          "sizeLines": 22,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/context/ToastContext.jsx",
+          "language": "javascript",
+          "sizeLines": 41,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/BukuKlaper.jsx",
+          "language": "javascript",
+          "sizeLines": 243,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Feedback.jsx",
+          "language": "javascript",
+          "sizeLines": 163,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/LaporanHarian.jsx",
+          "language": "javascript",
+          "sizeLines": 319,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Notifications.jsx",
+          "language": "javascript",
+          "sizeLines": 210,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Presensi.jsx",
+          "language": "javascript",
+          "sizeLines": 357,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Privacy.jsx",
+          "language": "javascript",
+          "sizeLines": 93,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Terms.jsx",
+          "language": "javascript",
+          "sizeLines": 90,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "src/App.jsx": [
+          "src/components/Layout.jsx",
+          "src/components/Loading.jsx",
+          "src/config/navigation.js",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/pages/CatatanTerlambat.jsx",
+          "src/pages/Feedback.jsx",
+          "src/pages/Keuangan.jsx",
+          "src/pages/LaporanHarian.jsx",
+          "src/pages/Login.jsx",
+          "src/pages/Notifications.jsx",
+          "src/pages/Panggilan.jsx",
+          "src/pages/Piket.jsx",
+          "src/pages/Presensi.jsx",
+          "src/pages/PresensiPagi.jsx",
+          "src/pages/PresensiSiang.jsx",
+          "src/pages/Privacy.jsx",
+          "src/pages/Profile.jsx",
+          "src/pages/Register.jsx",
+          "src/pages/Terms.jsx"
+        ],
+        "src/components/PageGuide.jsx": [],
+        "src/context/ToastContext.jsx": [],
+        "src/pages/BukuKlaper.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/Feedback.jsx": [
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx"
+        ],
+        "src/pages/LaporanHarian.jsx": [
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/Notifications.jsx": [
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/Presensi.jsx": [
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js"
+        ],
+        "src/pages/Privacy.jsx": [],
+        "src/pages/Terms.jsx": []
+      },
+      "neighborMap": {
+        "src/App.jsx": [
+          {
+            "path": "src/components/Layout.jsx",
+            "batchIndex": 3,
+            "symbols": [
+              "Layout"
+            ]
+          },
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/config/navigation.js",
+            "batchIndex": 3,
+            "symbols": [
+              "ALL_ROLES",
+              "ROUTE_ROLES",
+              "NAV_GROUPS",
+              "canAccess",
+              "getMobilePrimaryItems"
+            ]
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/pages/CatatanTerlambat.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "CatatanTerlambat"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/Login.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Login"
+            ]
+          },
+          {
+            "path": "src/pages/Panggilan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Panggilan"
+            ]
+          },
+          {
+            "path": "src/pages/Piket.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Piket"
+            ]
+          },
+          {
+            "path": "src/pages/PresensiPagi.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "PresensiPagi"
+            ]
+          },
+          {
+            "path": "src/pages/PresensiSiang.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "PresensiSiang"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          },
+          {
+            "path": "src/pages/Register.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Register"
+            ]
+          },
+          {
+            "path": "src/main.jsx",
+            "batchIndex": 6,
+            "symbols": []
+          }
+        ],
+        "src/components/PageGuide.jsx": [
+          {
+            "path": "src/pages/DKN.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "DKN"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/Laporan.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Laporan"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          }
+        ],
+        "src/context/ToastContext.jsx": [
+          {
+            "path": "src/components/Toast.jsx",
+            "batchIndex": 3,
+            "symbols": [
+              "Toast"
+            ]
+          },
+          {
+            "path": "src/pages/CatatanTerlambat.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "CatatanTerlambat"
+            ]
+          },
+          {
+            "path": "src/pages/DKN.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "DKN"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/Laporan.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Laporan"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          },
+          {
+            "path": "src/pages/Panggilan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Panggilan"
+            ]
+          },
+          {
+            "path": "src/pages/Piket.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Piket"
+            ]
+          },
+          {
+            "path": "src/pages/PresensiPagi.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "PresensiPagi"
+            ]
+          },
+          {
+            "path": "src/pages/PresensiSiang.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "PresensiSiang"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          },
+          {
+            "path": "src/pages/Tanggungan.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Tanggungan"
+            ]
+          }
+        ],
+        "src/pages/BukuKlaper.jsx": [
+          {
+            "path": "src/components/EmptyState.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ],
+        "src/pages/Feedback.jsx": [
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          }
+        ],
+        "src/pages/LaporanHarian.jsx": [
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ],
+        "src/pages/Notifications.jsx": [
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ],
+        "src/pages/Presensi.jsx": [
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": "src/components/Breadcrumbs.jsx",
+          "language": "javascript",
+          "sizeLines": 58,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/Layout.jsx",
+          "language": "javascript",
+          "sizeLines": 499,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/NotificationDrawer.jsx",
+          "language": "javascript",
+          "sizeLines": 123,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/SearchModal.jsx",
+          "language": "javascript",
+          "sizeLines": 131,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/Toast.jsx",
+          "language": "javascript",
+          "sizeLines": 53,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/navigation/BottomNav.jsx",
+          "language": "javascript",
+          "sizeLines": 49,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/navigation/bottom-nav.styles.js",
+          "language": "javascript",
+          "sizeLines": 17,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/config/navigation.js",
+          "language": "javascript",
+          "sizeLines": 135,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "src/components/Breadcrumbs.jsx": [],
+        "src/components/Layout.jsx": [
+          "src/components/Breadcrumbs.jsx",
+          "src/components/NotificationDrawer.jsx",
+          "src/components/SearchModal.jsx",
+          "src/components/Toast.jsx",
+          "src/components/navigation/BottomNav.jsx",
+          "src/config/navigation.js",
+          "src/context/AuthContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/version.js"
+        ],
+        "src/components/NotificationDrawer.jsx": [],
+        "src/components/SearchModal.jsx": [],
+        "src/components/Toast.jsx": [
+          "src/context/ToastContext.jsx"
+        ],
+        "src/components/navigation/BottomNav.jsx": [
+          "src/components/navigation/bottom-nav.styles.js",
+          "src/config/navigation.js"
+        ],
+        "src/components/navigation/bottom-nav.styles.js": [],
+        "src/config/navigation.js": []
+      },
+      "neighborMap": {
+        "src/components/Layout.jsx": [
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/utils/version.js",
+            "batchIndex": 4,
+            "symbols": [
+              "getCurrentVersion",
+              "checkForUpdate"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/components/Toast.jsx": [
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          }
+        ],
+        "src/config/navigation.js": [
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": "src/components/ImageLightbox.jsx",
+          "language": "javascript",
+          "sizeLines": 99,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Keuangan.jsx",
+          "language": "javascript",
+          "sizeLines": 862,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Login.jsx",
+          "language": "javascript",
+          "sizeLines": 188,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Panggilan.jsx",
+          "language": "javascript",
+          "sizeLines": 930,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Register.jsx",
+          "language": "javascript",
+          "sizeLines": 139,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/utils/gasClient.js",
+          "language": "javascript",
+          "sizeLines": 122,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/utils/notifications.js",
+          "language": "javascript",
+          "sizeLines": 79,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/utils/version.js",
+          "language": "javascript",
+          "sizeLines": 124,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "src/components/ImageLightbox.jsx": [],
+        "src/pages/Keuangan.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/components/Skeleton.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js",
+          "src/utils/notifications.js"
+        ],
+        "src/pages/Login.jsx": [
+          "src/context/AuthContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/version.js"
+        ],
+        "src/pages/Panggilan.jsx": [
+          "src/components/ImageLightbox.jsx",
+          "src/components/Loading.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js",
+          "src/utils/notifications.js"
+        ],
+        "src/pages/Register.jsx": [
+          "src/utils/gasClient.js",
+          "src/utils/version.js"
+        ],
+        "src/utils/gasClient.js": [
+          "src/lib/queryClient.js"
+        ],
+        "src/utils/notifications.js": [
+          "src/utils/gasClient.js"
+        ],
+        "src/utils/version.js": []
+      },
+      "neighborMap": {
+        "src/components/ImageLightbox.jsx": [
+          {
+            "path": "src/pages/Laporan.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Laporan"
+            ]
+          }
+        ],
+        "src/pages/Keuangan.jsx": [
+          {
+            "path": "src/components/EmptyState.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/components/PageGuide.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "PageGuide"
+            ]
+          },
+          {
+            "path": "src/components/Skeleton.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "SkeletonCard",
+              "SkeletonTable",
+              "SkeletonStats",
+              "SkeletonDashboard"
+            ]
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/logic.js",
+            "batchIndex": 5,
+            "symbols": [
+              "calculateNominal",
+              "formatIDR",
+              "calculateDisciplineStatus",
+              "formatPhoneNumber",
+              "formatDateIndo"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/Login.jsx": [
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/Panggilan.jsx": [
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/logic.js",
+            "batchIndex": 5,
+            "symbols": [
+              "calculateNominal",
+              "formatIDR",
+              "calculateDisciplineStatus",
+              "formatPhoneNumber",
+              "formatDateIndo"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/Register.jsx": [
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/utils/gasClient.js": [
+          {
+            "path": "src/lib/queryClient.js",
+            "batchIndex": 6,
+            "symbols": [
+              "queryClient"
+            ]
+          },
+          {
+            "path": "src/components/Layout.jsx",
+            "batchIndex": 3,
+            "symbols": [
+              "Layout"
+            ]
+          },
+          {
+            "path": "src/pages/BukuKlaper.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "BukuKlaper"
+            ]
+          },
+          {
+            "path": "src/pages/CatatanTerlambat.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "CatatanTerlambat"
+            ]
+          },
+          {
+            "path": "src/pages/DKN.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "DKN"
+            ]
+          },
+          {
+            "path": "src/pages/Dashboard.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Dashboard"
+            ]
+          },
+          {
+            "path": "src/pages/Laporan.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Laporan"
+            ]
+          },
+          {
+            "path": "src/pages/LaporanHarian.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "LaporanHarian"
+            ]
+          },
+          {
+            "path": "src/pages/MasterSiswa.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "MasterSiswa"
+            ]
+          },
+          {
+            "path": "src/pages/Notifications.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Notifications"
+            ]
+          },
+          {
+            "path": "src/pages/Piket.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Piket"
+            ]
+          },
+          {
+            "path": "src/pages/Presensi.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "Presensi"
+            ]
+          },
+          {
+            "path": "src/pages/PresensiPagi.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "PresensiPagi"
+            ]
+          },
+          {
+            "path": "src/pages/PresensiSiang.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "PresensiSiang"
+            ]
+          },
+          {
+            "path": "src/pages/Profile.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Profile"
+            ]
+          },
+          {
+            "path": "src/pages/Tanggungan.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "Tanggungan"
+            ]
+          }
+        ],
+        "src/utils/version.js": [
+          {
+            "path": "src/components/Layout.jsx",
+            "batchIndex": 3,
+            "symbols": [
+              "Layout"
+            ]
+          },
+          {
+            "path": "src/components/UpdateCheck.jsx",
+            "batchIndex": 5,
+            "symbols": [
+              "UpdateCheck"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": "src/components/StudentCard.jsx",
+          "language": "javascript",
+          "sizeLines": 194,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/components/UpdateCheck.jsx",
+          "language": "javascript",
+          "sizeLines": 127,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/MasterSiswa.jsx",
+          "language": "javascript",
+          "sizeLines": 785,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Profile.jsx",
+          "language": "javascript",
+          "sizeLines": 752,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/pages/Tanggungan.jsx",
+          "language": "javascript",
+          "sizeLines": 413,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/utils/coordinates.js",
+          "language": "javascript",
+          "sizeLines": 64,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/utils/logic.js",
+          "language": "javascript",
+          "sizeLines": 81,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "src/components/StudentCard.jsx": [
+          "src/utils/logic.js"
+        ],
+        "src/components/UpdateCheck.jsx": [
+          "src/utils/version.js"
+        ],
+        "src/pages/MasterSiswa.jsx": [
+          "src/components/EmptyState.jsx",
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/components/Skeleton.jsx",
+          "src/components/StudentCard.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/coordinates.js",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js",
+          "src/utils/xlsxLoader.js"
+        ],
+        "src/pages/Profile.jsx": [
+          "src/components/Loading.jsx",
+          "src/components/PageGuide.jsx",
+          "src/components/Skeleton.jsx",
+          "src/components/UpdateCheck.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/coordinates.js",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js"
+        ],
+        "src/pages/Tanggungan.jsx": [
+          "src/components/Loading.jsx",
+          "src/context/AuthContext.jsx",
+          "src/context/ToastContext.jsx",
+          "src/utils/gasClient.js",
+          "src/utils/logic.js"
+        ],
+        "src/utils/coordinates.js": [],
+        "src/utils/logic.js": []
+      },
+      "neighborMap": {
+        "src/components/StudentCard.jsx": [
+          {
+            "path": "src/pages/Dashboard.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Dashboard"
+            ]
+          }
+        ],
+        "src/components/UpdateCheck.jsx": [
+          {
+            "path": "src/utils/version.js",
+            "batchIndex": 4,
+            "symbols": [
+              "getCurrentVersion",
+              "checkForUpdate"
+            ]
+          }
+        ],
+        "src/pages/MasterSiswa.jsx": [
+          {
+            "path": "src/components/EmptyState.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/components/PageGuide.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "PageGuide"
+            ]
+          },
+          {
+            "path": "src/components/Skeleton.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "SkeletonCard",
+              "SkeletonTable",
+              "SkeletonStats",
+              "SkeletonDashboard"
+            ]
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/utils/xlsxLoader.js",
+            "batchIndex": 1,
+            "symbols": [
+              "loadXLSX"
+            ]
+          }
+        ],
+        "src/pages/Profile.jsx": [
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/components/PageGuide.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "PageGuide"
+            ]
+          },
+          {
+            "path": "src/components/Skeleton.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "SkeletonCard",
+              "SkeletonTable",
+              "SkeletonStats",
+              "SkeletonDashboard"
+            ]
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          },
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          }
+        ],
+        "src/pages/Tanggungan.jsx": [
+          {
+            "path": "src/components/Loading.jsx",
+            "batchIndex": 1,
+            "symbols": []
+          },
+          {
+            "path": "src/context/AuthContext.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "AuthProvider",
+              "useAuth"
+            ]
+          },
+          {
+            "path": "src/context/ToastContext.jsx",
+            "batchIndex": 2,
+            "symbols": [
+              "ToastProvider",
+              "useToast"
+            ]
+          },
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ],
+        "src/utils/logic.js": [
+          {
+            "path": "src/pages/Dashboard.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Dashboard"
+            ]
+          },
+          {
+            "path": "src/pages/Keuangan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Keuangan"
+            ]
+          },
+          {
+            "path": "src/pages/Laporan.jsx",
+            "batchIndex": 1,
+            "symbols": [
+              "Laporan"
+            ]
+          },
+          {
+            "path": "src/pages/Panggilan.jsx",
+            "batchIndex": 4,
+            "symbols": [
+              "Panggilan"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 6,
+      "files": [
+        {
+          "path": "src/components/ErrorBoundary.jsx",
+          "language": "javascript",
+          "sizeLines": 46,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/lib/queryClient.js",
+          "language": "javascript",
+          "sizeLines": 15,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/main.jsx",
+          "language": "javascript",
+          "sizeLines": 17,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "src/components/ErrorBoundary.jsx": [],
+        "src/lib/queryClient.js": [],
+        "src/main.jsx": [
+          "src/App.jsx",
+          "src/components/ErrorBoundary.jsx",
+          "src/index.css",
+          "src/lib/queryClient.js"
+        ]
+      },
+      "neighborMap": {
+        "src/lib/queryClient.js": [
+          {
+            "path": "src/utils/gasClient.js",
+            "batchIndex": 4,
+            "symbols": [
+              "gasQueryKey",
+              "fetchGAS"
+            ]
+          }
+        ],
+        "src/main.jsx": [
+          {
+            "path": "src/App.jsx",
+            "batchIndex": 2,
+            "symbols": []
+          },
+          {
+            "path": "src/index.css",
+            "batchIndex": 9,
+            "symbols": []
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 7,
+      "files": [
+        {
+          "path": ".github/workflows/node.js.yml",
+          "language": "yaml",
+          "sizeLines": 31,
+          "fileCategory": "infra"
+        }
+      ],
+      "batchImportData": {
+        ".github/workflows/node.js.yml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 8,
+      "files": [
+        {
+          "path": ".clasp.json",
+          "language": "json",
+          "sizeLines": 4,
+          "fileCategory": "config"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "language": "markdown",
+          "sizeLines": 44,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "README.md",
+          "language": "markdown",
+          "sizeLines": 409,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "RELEASE_NOTES_v5.0.1.md",
+          "language": "markdown",
+          "sizeLines": 27,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "SECURITY.md",
+          "language": "markdown",
+          "sizeLines": 20,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "firebase.json",
+          "language": "json",
+          "sizeLines": 16,
+          "fileCategory": "config"
+        },
+        {
+          "path": "index.html",
+          "language": "html",
+          "sizeLines": 24,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "package.json",
+          "language": "json",
+          "sizeLines": 44,
+          "fileCategory": "config"
+        },
+        {
+          "path": "skills-lock.json",
+          "language": "json",
+          "sizeLines": 65,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".clasp.json": [],
+        "CHANGELOG.md": [],
+        "README.md": [],
+        "RELEASE_NOTES_v5.0.1.md": [],
+        "SECURITY.md": [],
+        "firebase.json": [],
+        "index.html": [],
+        "package.json": [],
+        "skills-lock.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 9,
+      "files": [
+        {
+          "path": ".firebaserc",
+          "language": "unknown",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "eslint.config.js",
+          "language": "javascript",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "gas/Code.gs",
+          "language": "gs",
+          "sizeLines": 1680,
+          "fileCategory": "code"
+        },
+        {
+          "path": "gas/appsscript.json",
+          "language": "json",
+          "sizeLines": 18,
+          "fileCategory": "config"
+        },
+        {
+          "path": "postcss.config.js",
+          "language": "javascript",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "src/App.css",
+          "language": "css",
+          "sizeLines": 0,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "src/index.css",
+          "language": "css",
+          "sizeLines": 157,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "tailwind.config.js",
+          "language": "javascript",
+          "sizeLines": 53,
+          "fileCategory": "code"
+        },
+        {
+          "path": "vite.config.js",
+          "language": "javascript",
+          "sizeLines": 75,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        ".firebaserc": [],
+        "eslint.config.js": [],
+        "gas/Code.gs": [],
+        "gas/appsscript.json": [],
+        "postcss.config.js": [],
+        "src/App.css": [],
+        "src/index.css": [],
+        "tailwind.config.js": [],
+        "vite.config.js": []
+      },
+      "neighborMap": {
+        "src/index.css": [
+          {
+            "path": "src/main.jsx",
+            "batchIndex": 6,
+            "symbols": []
+          }
+        ]
+      }
+    }
+  ]
+}

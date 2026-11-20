@@ -1,0 +1,3575 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "d6b911242c52c1dc26287fe56d4036b6f68c923b",
+  "generatedAt": "2026-11-20T03:03:07.929Z",
+  "files": {
+    ".clasp.json": {
+      "filePath": ".clasp.json",
+      "contentHash": "d75e6206680845932fad08b9ef1d0ecb933144a32e95b8701d21a11e47a4621f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": false
+    },
+    ".firebaserc": {
+      "filePath": ".firebaserc",
+      "contentHash": "678da46ec4dd47d41e9348b3032c3d5cab6a1b110c55b2889e5c173a455a73e8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7,
+      "hasStructuralAnalysis": false
+    },
+    ".github/workflows/node.js.yml": {
+      "filePath": ".github/workflows/node.js.yml",
+      "contentHash": "76d21317349898d3bf0b6c40c55ee1c2e9d63281d6035d9c5dd8fd40068d4a87",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    "CHANGELOG.md": {
+      "filePath": "CHANGELOG.md",
+      "contentHash": "e2945c86fb2b23d261a2aa9761ba4857fe44b98cadb61675ee57babcc67270ce",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": false
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "49d519c104af52f9c08397328f04ffce9689eac76f293b554e6ece22a3c31ce4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 410,
+      "hasStructuralAnalysis": false
+    },
+    "RELEASE_NOTES_v5.0.1.md": {
+      "filePath": "RELEASE_NOTES_v5.0.1.md",
+      "contentHash": "0df52431576339a90141ad3f7d3bc2fcb140f10d5f0a5beecafeaf0c9567b534",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 28,
+      "hasStructuralAnalysis": false
+    },
+    "SECURITY.md": {
+      "filePath": "SECURITY.md",
+      "contentHash": "af5d35158aa17b688ed76843ea760241dd72c6f3970d1fce1e6312a2167fce4c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": false
+    },
+    "eslint.config.js": {
+      "filePath": "eslint.config.js",
+      "contentHash": "da0cbf3213f2994741024e2aa5165d017e0345f389dcd2f8a0db97fee7289d1b",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@eslint/js",
+          "specifiers": [
+            "js"
+          ]
+        },
+        {
+          "source": "globals",
+          "specifiers": [
+            "globals"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-hooks",
+          "specifiers": [
+            "reactHooks"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-refresh",
+          "specifiers": [
+            "reactRefresh"
+          ]
+        },
+        {
+          "source": "eslint/config",
+          "specifiers": [
+            "defineConfig",
+            "globalIgnores"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 30,
+      "hasStructuralAnalysis": true
+    },
+    "firebase.json": {
+      "filePath": "firebase.json",
+      "contentHash": "40cb9845ed670e185bdc382366f0c5cb8f0260361cc4d3ae3ec7d78edc52ce70",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": false
+    },
+    "gas/Code.gs": {
+      "filePath": "gas/Code.gs",
+      "contentHash": "317a028563a313380644d7a92f0cbd6f5c61cf05da7511b14665ad741ae50a7d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1681,
+      "hasStructuralAnalysis": false
+    },
+    "gas/appsscript.json": {
+      "filePath": "gas/appsscript.json",
+      "contentHash": "650d7fbce1e72e28ee9035f61ec450a5351b3504d2047af91a8a865b0b23b0d5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": false
+    },
+    "index.html": {
+      "filePath": "index.html",
+      "contentHash": "14be12d6ab80e0f2c7b262d8777212b81fa43ccbeb6175f85bbbdb7b0dd96b0b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": false
+    },
+    "package.json": {
+      "filePath": "package.json",
+      "contentHash": "7de467a7518bf8cd47f0137d3dbeb9e608e0de5ad334a0ccfff9f09825fb36be",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": false
+    },
+    "postcss.config.js": {
+      "filePath": "postcss.config.js",
+      "contentHash": "190c877db466995bf1482f4a16abd06e04a89ede3119341e2a86ff96e1737b27",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "skills-lock.json": {
+      "filePath": "skills-lock.json",
+      "contentHash": "99b0fff0ce5c82133ef803d8eb79ad4faba5b3e4e168f07d59e2bee1c31ddc39",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 66,
+      "hasStructuralAnalysis": false
+    },
+    "src/App.css": {
+      "filePath": "src/App.css",
+      "contentHash": "c3978b37a1afd88f9df173f8601a5945702c4ab9620beb879058f8bd1794f01b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": false
+    },
+    "src/App.jsx": {
+      "filePath": "src/App.jsx",
+      "contentHash": "38d0aa4e2c60faf60707dd7860331242e0f90383f886ff3c4550528022695b78",
+      "functions": [
+        {
+          "name": "ProtectedRoute",
+          "params": [],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "RoleProtectedRoute",
+          "params": [],
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "AppRoutes",
+          "params": [],
+          "exported": false,
+          "lineCount": 117
+        },
+        {
+          "name": "App",
+          "params": [],
+          "exported": false,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "lazy",
+            "Suspense"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "BrowserRouter",
+            "Routes",
+            "Route",
+            "Navigate"
+          ]
+        },
+        {
+          "source": "@react-oauth/google",
+          "specifiers": [
+            "GoogleOAuthProvider"
+          ]
+        },
+        {
+          "source": "./context/AuthContext",
+          "specifiers": [
+            "AuthProvider",
+            "useAuth"
+          ]
+        },
+        {
+          "source": "./context/ToastContext",
+          "specifiers": [
+            "ToastProvider"
+          ]
+        },
+        {
+          "source": "./config/navigation",
+          "specifiers": [
+            "ROUTE_ROLES"
+          ]
+        },
+        {
+          "source": "./components/Layout",
+          "specifiers": [
+            "Layout"
+          ]
+        },
+        {
+          "source": "./components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "./pages/Login",
+          "specifiers": [
+            "Login"
+          ]
+        },
+        {
+          "source": "./pages/Presensi",
+          "specifiers": [
+            "Presensi"
+          ]
+        },
+        {
+          "source": "./pages/PresensiPagi",
+          "specifiers": [
+            "PresensiPagi"
+          ]
+        },
+        {
+          "source": "./pages/PresensiSiang",
+          "specifiers": [
+            "PresensiSiang"
+          ]
+        },
+        {
+          "source": "./pages/LaporanHarian",
+          "specifiers": [
+            "LaporanHarian"
+          ]
+        },
+        {
+          "source": "./pages/Keuangan",
+          "specifiers": [
+            "Keuangan"
+          ]
+        },
+        {
+          "source": "./pages/Panggilan",
+          "specifiers": [
+            "Panggilan"
+          ]
+        },
+        {
+          "source": "./pages/Profile",
+          "specifiers": [
+            "Profile"
+          ]
+        },
+        {
+          "source": "./pages/Notifications",
+          "specifiers": [
+            "Notifications"
+          ]
+        },
+        {
+          "source": "./pages/Register",
+          "specifiers": [
+            "Register"
+          ]
+        },
+        {
+          "source": "./pages/Terms",
+          "specifiers": [
+            "Terms"
+          ]
+        },
+        {
+          "source": "./pages/Privacy",
+          "specifiers": [
+            "Privacy"
+          ]
+        },
+        {
+          "source": "./pages/Piket",
+          "specifiers": [
+            "Piket"
+          ]
+        },
+        {
+          "source": "./pages/Feedback",
+          "specifiers": [
+            "Feedback"
+          ]
+        },
+        {
+          "source": "./pages/CatatanTerlambat",
+          "specifiers": [
+            "CatatanTerlambat"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 198,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Breadcrumbs.jsx": {
+      "filePath": "src/components/Breadcrumbs.jsx",
+      "contentHash": "b8c59c9b4439a44582e02863a135aa2df56e7666b3ee956f59e18e8819c97e6f",
+      "functions": [
+        {
+          "name": "Breadcrumbs",
+          "params": [],
+          "exported": true,
+          "lineCount": 34
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useLocation",
+            "Link"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ChevronRight",
+            "Home"
+          ]
+        }
+      ],
+      "exports": [
+        "Breadcrumbs"
+      ],
+      "totalLines": 59,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/EmptyState.jsx": {
+      "filePath": "src/components/EmptyState.jsx",
+      "contentHash": "64ee2d0e4178bb46f585fb6cfca310cf4ce6b4b8fb3134f05ca9d36bb79b459c",
+      "functions": [
+        {
+          "name": "EmptyState",
+          "params": [],
+          "exported": false,
+          "lineCount": 18
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Inbox"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ErrorBoundary.jsx": {
+      "filePath": "src/components/ErrorBoundary.jsx",
+      "contentHash": "c58ee4f402259dd64815123b60ef1d1c321b4e7d0795702099c9e62ba35de67b",
+      "functions": [],
+      "classes": [
+        {
+          "name": "ErrorBoundary",
+          "methods": [
+            "constructor",
+            "getDerivedStateFromError",
+            "componentDidCatch",
+            "render"
+          ],
+          "properties": [],
+          "exported": false,
+          "lineCount": 43
+        }
+      ],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "AlertTriangle"
+          ]
+        }
+      ],
+      "exports": [
+        "default"
+      ],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ImageLightbox.jsx": {
+      "filePath": "src/components/ImageLightbox.jsx",
+      "contentHash": "909a5b784bbc34745bc992b79bb8963d23a686601a3fe06900c82379cc0e517e",
+      "functions": [
+        {
+          "name": "ImageLightbox",
+          "params": [],
+          "exported": true,
+          "lineCount": 97
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        }
+      ],
+      "exports": [
+        "ImageLightbox"
+      ],
+      "totalLines": 100,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Layout.jsx": {
+      "filePath": "src/components/Layout.jsx",
+      "contentHash": "e9d65cd9289ad29ff874cd0903b89dc7147a025961d1532e1a338e87761b6643",
+      "functions": [
+        {
+          "name": "NavItem",
+          "params": [],
+          "exported": false,
+          "lineCount": 39
+        },
+        {
+          "name": "Layout",
+          "params": [],
+          "exported": true,
+          "lineCount": 442
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useRef"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "NavLink",
+            "Outlet",
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "LogOut",
+            "Settings",
+            "User",
+            "Bell",
+            "ChevronLeft",
+            "ChevronRight",
+            "Search",
+            "X"
+          ]
+        },
+        {
+          "source": "./Breadcrumbs",
+          "specifiers": [
+            "Breadcrumbs"
+          ]
+        },
+        {
+          "source": "./navigation/BottomNav",
+          "specifiers": [
+            "BottomNav"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../config/navigation",
+          "specifiers": [
+            "NAV_GROUPS",
+            "canAccess"
+          ]
+        },
+        {
+          "source": "./Toast",
+          "specifiers": [
+            "Toast"
+          ]
+        },
+        {
+          "source": "./NotificationDrawer",
+          "specifiers": [
+            "NotificationDrawer"
+          ]
+        },
+        {
+          "source": "./SearchModal",
+          "specifiers": [
+            "SearchModal"
+          ]
+        },
+        {
+          "source": "../assets/logo.png",
+          "specifiers": [
+            "appLogo"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../utils/version",
+          "specifiers": [
+            "getCurrentVersion"
+          ]
+        }
+      ],
+      "exports": [
+        "Layout"
+      ],
+      "totalLines": 500,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Loading.jsx": {
+      "filePath": "src/components/Loading.jsx",
+      "contentHash": "9982a9aace672360d29af4d9f8322cf44b5e3240baa6d662449bd98f4c0c98c8",
+      "functions": [
+        {
+          "name": "Loading",
+          "params": [],
+          "exported": false,
+          "lineCount": 55
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 78,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/NotificationDrawer.jsx": {
+      "filePath": "src/components/NotificationDrawer.jsx",
+      "contentHash": "9ad6ac1d7b78e0221a90cf00ce3279882aee5fd14403e6399d1b55d9e56fbf57",
+      "functions": [
+        {
+          "name": "NotificationDrawer",
+          "params": [],
+          "exported": true,
+          "lineCount": 117
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Bell",
+            "Info",
+            "AlertTriangle",
+            "CheckCircle2",
+            "X"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        }
+      ],
+      "exports": [
+        "NotificationDrawer"
+      ],
+      "totalLines": 124,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/PageGuide.jsx": {
+      "filePath": "src/components/PageGuide.jsx",
+      "contentHash": "a7b1c86ca7a540b4e42ef32e34b7d00df43f4070bbbbae643af84af7a9e79807",
+      "functions": [
+        {
+          "name": "PageGuide",
+          "params": [],
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Info"
+          ]
+        }
+      ],
+      "exports": [
+        "PageGuide"
+      ],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/SearchModal.jsx": {
+      "filePath": "src/components/SearchModal.jsx",
+      "contentHash": "80efae81b8740254e47de0d58e8864593505a79ed0e2acb12eb78618c6000c2b",
+      "functions": [
+        {
+          "name": "SearchModal",
+          "params": [],
+          "exported": true,
+          "lineCount": 127
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Search",
+            "User",
+            "X",
+            "ArrowRight"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        }
+      ],
+      "exports": [
+        "SearchModal"
+      ],
+      "totalLines": 132,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Skeleton.jsx": {
+      "filePath": "src/components/Skeleton.jsx",
+      "contentHash": "b6790a7a49e837a3c5299b6215cdf7b378ecdd7f275b664e0112295ddc985c06",
+      "functions": [
+        {
+          "name": "Skeleton",
+          "params": [],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "SkeletonCard",
+          "params": [],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "SkeletonTable",
+          "params": [],
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "SkeletonStats",
+          "params": [],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "SkeletonDashboard",
+          "params": [],
+          "exported": true,
+          "lineCount": 27
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        }
+      ],
+      "exports": [
+        "SkeletonCard",
+        "SkeletonTable",
+        "SkeletonStats",
+        "SkeletonDashboard"
+      ],
+      "totalLines": 79,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/StudentCard.jsx": {
+      "filePath": "src/components/StudentCard.jsx",
+      "contentHash": "7eeecfad6a10588d75511ad38362d24831d7efca343baba102b36f1775b2fc32",
+      "functions": [
+        {
+          "name": "StudentCard",
+          "params": [],
+          "exported": false,
+          "lineCount": 188
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "memo"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Phone",
+            "FileText",
+            "AlertTriangle",
+            "Edit3",
+            "MapPin",
+            "Trash2",
+            "MessageCircle",
+            "Crown",
+            "XCircle"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatDateIndo"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 195,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Toast.jsx": {
+      "filePath": "src/components/Toast.jsx",
+      "contentHash": "5b4886d6b94ab5e1d777653add80c66aac754679a7ef6eda6e515c3224307a49",
+      "functions": [
+        {
+          "name": "Toast",
+          "params": [],
+          "exported": true,
+          "lineCount": 49
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Check",
+            "AlertCircle",
+            "X"
+          ]
+        }
+      ],
+      "exports": [
+        "Toast"
+      ],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/UpdateCheck.jsx": {
+      "filePath": "src/components/UpdateCheck.jsx",
+      "contentHash": "cd98108a8c227d9f24f8786f36acece35f8f166ec45445a5c3d64c360ed53bd7",
+      "functions": [
+        {
+          "name": "UpdateCheck",
+          "params": [],
+          "exported": true,
+          "lineCount": 125
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useEffect",
+            "useState"
+          ]
+        },
+        {
+          "source": "../utils/version",
+          "specifiers": [
+            "checkForUpdate"
+          ]
+        }
+      ],
+      "exports": [
+        "UpdateCheck"
+      ],
+      "totalLines": 128,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/navigation/BottomNav.jsx": {
+      "filePath": "src/components/navigation/BottomNav.jsx",
+      "contentHash": "060e945d8a3511967f3677138ea4105d082b09a670d16e60bcf8ed52345f106b",
+      "functions": [
+        {
+          "name": "BottomNav",
+          "params": [],
+          "exported": true,
+          "lineCount": 43
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "NavLink"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "MoreHorizontal"
+          ]
+        },
+        {
+          "source": "../../config/navigation",
+          "specifiers": [
+            "getMobilePrimaryItems"
+          ]
+        },
+        {
+          "source": "./bottom-nav.styles",
+          "specifiers": [
+            "styles"
+          ]
+        }
+      ],
+      "exports": [
+        "BottomNav"
+      ],
+      "totalLines": 50,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/navigation/bottom-nav.styles.js": {
+      "filePath": "src/components/navigation/bottom-nav.styles.js",
+      "contentHash": "4e1c1c61325117de83dcadf886dc3ba19dece51b22846cb777ae8c2b5f99f50a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "bottomNavStyles"
+      ],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "src/config/navigation.js": {
+      "filePath": "src/config/navigation.js",
+      "contentHash": "614d833c5ab79fa64e08af5fd937a4cff511b5f79a35a759f07168eea77b1572",
+      "functions": [
+        {
+          "name": "canAccess",
+          "params": [
+            "roles",
+            "role"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "getMobilePrimaryItems",
+          "params": [
+            "role"
+          ],
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "LayoutDashboard",
+            "Users",
+            "BookOpen",
+            "LibraryBig",
+            "ClipboardList",
+            "Wallet",
+            "Sun",
+            "Moon",
+            "Calendar",
+            "Clock",
+            "FileText",
+            "CalendarCheck",
+            "PhoneCall",
+            "MessageCircle",
+            "Bell",
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "ALL_ROLES",
+        "ROUTE_ROLES",
+        "NAV_GROUPS",
+        "canAccess",
+        "getMobilePrimaryItems"
+      ],
+      "totalLines": 136,
+      "hasStructuralAnalysis": true
+    },
+    "src/context/AuthContext.jsx": {
+      "filePath": "src/context/AuthContext.jsx",
+      "contentHash": "821d825b6dd5c509a1cfc0d14b2c18e0f61bd8397647f6a41837c68471b5e86e",
+      "functions": [
+        {
+          "name": "readStoredUser",
+          "params": [],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "AuthProvider",
+          "params": [],
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "useAuth",
+          "params": [],
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "createContext",
+            "useContext",
+            "useState"
+          ]
+        },
+        {
+          "source": "@react-oauth/google",
+          "specifiers": [
+            "googleLogout"
+          ]
+        }
+      ],
+      "exports": [
+        "AuthProvider",
+        "useAuth"
+      ],
+      "totalLines": 49,
+      "hasStructuralAnalysis": true
+    },
+    "src/context/ToastContext.jsx": {
+      "filePath": "src/context/ToastContext.jsx",
+      "contentHash": "43120c47694cd1ee0252f966901ebf62a2c775c694e58ec0dde0dcaf9bccf258",
+      "functions": [
+        {
+          "name": "ToastProvider",
+          "params": [],
+          "exported": true,
+          "lineCount": 28
+        },
+        {
+          "name": "useToast",
+          "params": [],
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "createContext",
+            "useContext",
+            "useState",
+            "useCallback"
+          ]
+        }
+      ],
+      "exports": [
+        "ToastProvider",
+        "useToast"
+      ],
+      "totalLines": 42,
+      "hasStructuralAnalysis": true
+    },
+    "src/index.css": {
+      "filePath": "src/index.css",
+      "contentHash": "947874302a3958f907db70348d515f7e992372f8357c21a5918ea4918f14642a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 158,
+      "hasStructuralAnalysis": false
+    },
+    "src/lib/queryClient.js": {
+      "filePath": "src/lib/queryClient.js",
+      "contentHash": "05c4f0c6e7736ffb47d65153aeff9ff42ee79236b0aef26a0e3d959c656b3592",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "QueryClient"
+          ]
+        }
+      ],
+      "exports": [
+        "queryClient"
+      ],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "src/main.jsx": {
+      "filePath": "src/main.jsx",
+      "contentHash": "ec930dc02d0f03c548e84c9267c60a4aae9a5ab045372502a8e22e19d2a957fa",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "ReactDOM"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "QueryClientProvider"
+          ]
+        },
+        {
+          "source": "./App.jsx",
+          "specifiers": [
+            "App"
+          ]
+        },
+        {
+          "source": "./components/ErrorBoundary",
+          "specifiers": [
+            "ErrorBoundary"
+          ]
+        },
+        {
+          "source": "./lib/queryClient",
+          "specifiers": [
+            "queryClient"
+          ]
+        },
+        {
+          "source": "./index.css",
+          "specifiers": []
+        }
+      ],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/BukuKlaper.jsx": {
+      "filePath": "src/pages/BukuKlaper.jsx",
+      "contentHash": "1e41ca6af3ebd9841412e3314d81a771ebbc1e8522aab055b6287df5bd11e55e",
+      "functions": [
+        {
+          "name": "BukuKlaper",
+          "params": [],
+          "exported": true,
+          "lineCount": 234
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Users",
+            "Printer"
+          ]
+        }
+      ],
+      "exports": [
+        "BukuKlaper"
+      ],
+      "totalLines": 244,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/CatatanTerlambat.jsx": {
+      "filePath": "src/pages/CatatanTerlambat.jsx",
+      "contentHash": "67d7f0a27d014594b79d0bcb36d03bf1a2db0d0b850e5ecd1c17eb69f873a983",
+      "functions": [
+        {
+          "name": "getDraftKey",
+          "params": [
+            "user",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "getQueueKey",
+          "params": [
+            "user",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "makeLocalId",
+          "params": [],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "normalizeQueueItem",
+          "params": [
+            "item",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 15
+        },
+        {
+          "name": "readQueue",
+          "params": [
+            "user",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "writeQueue",
+          "params": [
+            "user",
+            "tanggal",
+            "items"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "clearQueue",
+          "params": [
+            "user",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "readDraft",
+          "params": [
+            "user",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "writeDraft",
+          "params": [
+            "user",
+            "tanggal",
+            "draft"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "clearDraft",
+          "params": [
+            "user",
+            "tanggal"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "CatatanTerlambat",
+          "params": [],
+          "exported": true,
+          "lineCount": 537
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useCallback",
+            "useRef"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Clock",
+            "Search",
+            "X",
+            "Trash2",
+            "UserCheck",
+            "AlertCircle",
+            "Pencil",
+            "Check"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        }
+      ],
+      "exports": [
+        "CatatanTerlambat"
+      ],
+      "totalLines": 635,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/DKN.jsx": {
+      "filePath": "src/pages/DKN.jsx",
+      "contentHash": "0bb916a5971a2eceb12755ee02de73fe4f2c6cbb30d87bc939e7e02218a8bdee",
+      "functions": [
+        {
+          "name": "DKN",
+          "params": [],
+          "exported": true,
+          "lineCount": 739
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "BookOpen",
+            "Plus",
+            "Save",
+            "FileSpreadsheet",
+            "Trash2",
+            "Edit2",
+            "X",
+            "Info",
+            "FileUp",
+            "Download"
+          ]
+        },
+        {
+          "source": "../utils/xlsxLoader",
+          "specifiers": [
+            "loadXLSX"
+          ]
+        }
+      ],
+      "exports": [
+        "DKN"
+      ],
+      "totalLines": 765,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Dashboard.jsx": {
+      "filePath": "src/pages/Dashboard.jsx",
+      "contentHash": "d4013c10258db13d4ddae2a2be558df4ee54d39f35fe7830f3569a86e4a085e2",
+      "functions": [
+        {
+          "name": "Dashboard",
+          "params": [],
+          "exported": true,
+          "lineCount": 515
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format",
+            "startOfWeek",
+            "endOfWeek",
+            "parseISO"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "calculateDisciplineStatus",
+            "formatIDR"
+          ]
+        },
+        {
+          "source": "../components/StudentCard",
+          "specifiers": [
+            "StudentCard"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Users",
+            "Wallet",
+            "AlertTriangle",
+            "CheckCircle2",
+            "Bell",
+            "ChevronRight",
+            "Calendar",
+            "Info",
+            "Clock"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton",
+            "SkeletonStats",
+            "SkeletonDashboard"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "recharts",
+          "specifiers": [
+            "PieChart",
+            "Pie",
+            "Cell",
+            "ResponsiveContainer",
+            "Tooltip",
+            "Legend",
+            "BarChart",
+            "Bar",
+            "XAxis",
+            "YAxis",
+            "CartesianGrid",
+            "AreaChart",
+            "Area"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        }
+      ],
+      "exports": [
+        "Dashboard"
+      ],
+      "totalLines": 533,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Feedback.jsx": {
+      "filePath": "src/pages/Feedback.jsx",
+      "contentHash": "248c9cc93726ecc098ccdc436ee47f601dbc231fd85712d779b09237849086f3",
+      "functions": [
+        {
+          "name": "Feedback",
+          "params": [],
+          "exported": true,
+          "lineCount": 157
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        }
+      ],
+      "exports": [
+        "Feedback"
+      ],
+      "totalLines": 164,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Keuangan.jsx": {
+      "filePath": "src/pages/Keuangan.jsx",
+      "contentHash": "60afa1e8f0adbd55e0a71daf282549ff61fa50f304e1a37cd67f5a7a842ce884",
+      "functions": [
+        {
+          "name": "getDraftKey",
+          "params": [
+            "user"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "getQueueKey",
+          "params": [
+            "user"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "normalizeQueueItem",
+          "params": [
+            "item"
+          ],
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "readQueue",
+          "params": [
+            "user"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "writeQueue",
+          "params": [
+            "user",
+            "items"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "clearQueue",
+          "params": [
+            "user"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "readDraft",
+          "params": [
+            "user"
+          ],
+          "exported": false,
+          "lineCount": 18
+        },
+        {
+          "name": "writeDraft",
+          "params": [
+            "user",
+            "draft"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "clearDraft",
+          "params": [
+            "user"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "Keuangan",
+          "params": [],
+          "exported": true,
+          "lineCount": 755
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback",
+            "useRef"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatIDR"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format",
+            "startOfWeek",
+            "endOfWeek",
+            "isWithinInterval"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton",
+            "SkeletonStats",
+            "SkeletonTable"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "History",
+            "Users",
+            "Trash2",
+            "Edit2",
+            "X"
+          ]
+        },
+        {
+          "source": "../utils/notifications",
+          "specifiers": [
+            "sendNotification"
+          ]
+        }
+      ],
+      "exports": [
+        "Keuangan"
+      ],
+      "totalLines": 863,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Laporan.jsx": {
+      "filePath": "src/pages/Laporan.jsx",
+      "contentHash": "5258da64e98e5454434c573c5fabd8a624de9c1b4e1e99550c0f2fbb7b165395",
+      "functions": [
+        {
+          "name": "Laporan",
+          "params": [],
+          "exported": true,
+          "lineCount": 1264
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useMemo",
+            "useEffect",
+            "useRef"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format",
+            "startOfMonth",
+            "endOfMonth",
+            "endOfWeek",
+            "eachDayOfInterval",
+            "isSameDay",
+            "parseISO",
+            "eachWeekOfInterval"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "recharts",
+          "specifiers": [
+            "BarChart",
+            "Bar",
+            "XAxis",
+            "YAxis",
+            "CartesianGrid",
+            "Tooltip",
+            "Legend",
+            "PieChart",
+            "Pie",
+            "Cell",
+            "ResponsiveContainer",
+            "LineChart",
+            "Line"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Calendar",
+            "FileText",
+            "Download",
+            "TrendingUp",
+            "Users",
+            "AlertCircle",
+            "Wallet",
+            "ChevronRight",
+            "Filter",
+            "CalendarDays",
+            "FileDown",
+            "AlertTriangle",
+            "UserCheck",
+            "DollarSign",
+            "Printer",
+            "ChevronLeft",
+            "Clock",
+            "ExternalLink",
+            "ChevronDown",
+            "Timer"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton",
+            "SkeletonStats",
+            "SkeletonTable"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        },
+        {
+          "source": "../components/ImageLightbox",
+          "specifiers": [
+            "ImageLightbox"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatDateIndo"
+          ]
+        }
+      ],
+      "exports": [
+        "Laporan"
+      ],
+      "totalLines": 1315,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/LaporanHarian.jsx": {
+      "filePath": "src/pages/LaporanHarian.jsx",
+      "contentHash": "69ce8c034aaabd3109de16d7cd65563b65c1384b4d19a785201ad396a906d3ab",
+      "functions": [
+        {
+          "name": "LaporanHarian",
+          "params": [],
+          "exported": true,
+          "lineCount": 298
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useRef"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Calendar",
+            "Printer",
+            "Search",
+            "Filter",
+            "CheckCircle2",
+            "XCircle",
+            "Clock",
+            "UserCheck",
+            "UserX",
+            "FileText"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format",
+            "parseISO"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        }
+      ],
+      "exports": [
+        "LaporanHarian"
+      ],
+      "totalLines": 320,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Login.jsx": {
+      "filePath": "src/pages/Login.jsx",
+      "contentHash": "a19a4f92ed4293d7f2a53993af1978d28bb63889a06106f0e05c44cdc18ee973",
+      "functions": [
+        {
+          "name": "Login",
+          "params": [],
+          "exported": true,
+          "lineCount": 176
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState"
+          ]
+        },
+        {
+          "source": "@react-oauth/google",
+          "specifiers": [
+            "useGoogleLogin"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../utils/version",
+          "specifiers": [
+            "getCurrentVersion"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "Navigate",
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ShieldAlert",
+            "Loader2"
+          ]
+        },
+        {
+          "source": "../assets/login_illustration.png",
+          "specifiers": [
+            "loginIllustration"
+          ]
+        },
+        {
+          "source": "../assets/logo.png",
+          "specifiers": [
+            "appLogo"
+          ]
+        },
+        {
+          "source": "../assets/logo google.png",
+          "specifiers": [
+            "googleLogo"
+          ]
+        }
+      ],
+      "exports": [
+        "Login"
+      ],
+      "totalLines": 189,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/MasterSiswa.jsx": {
+      "filePath": "src/pages/MasterSiswa.jsx",
+      "contentHash": "5bbcbc9288be7745226d3b7efe22dacaf6f9413d21665acc15d0894dc11cc30b",
+      "functions": [
+        {
+          "name": "MasterSiswa",
+          "params": [],
+          "exported": true,
+          "lineCount": 769
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useCallback",
+            "useMemo"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../components/StudentCard",
+          "specifiers": [
+            "StudentCard"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton",
+            "SkeletonStats",
+            "SkeletonTable"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "UserPlus",
+            "FileUp",
+            "Download",
+            "FileDown",
+            "X",
+            "MapPin"
+          ]
+        },
+        {
+          "source": "../utils/xlsxLoader",
+          "specifiers": [
+            "loadXLSX"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatPhoneNumber"
+          ]
+        },
+        {
+          "source": "../utils/coordinates",
+          "specifiers": [
+            "decimalToDMS",
+            "formatCoordinateInput",
+            "createMapsLink"
+          ]
+        }
+      ],
+      "exports": [
+        "MasterSiswa"
+      ],
+      "totalLines": 786,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Notifications.jsx": {
+      "filePath": "src/pages/Notifications.jsx",
+      "contentHash": "73b465562ea9210919d3307de62d04bb98bf4fdb15955aad98534e7a93fb59ae",
+      "functions": [
+        {
+          "name": "Notifications",
+          "params": [],
+          "exported": true,
+          "lineCount": 199
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Bell",
+            "Info",
+            "AlertTriangle",
+            "CheckCircle2",
+            "ArrowLeft",
+            "Trash2",
+            "CheckCheck"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        }
+      ],
+      "exports": [
+        "Notifications"
+      ],
+      "totalLines": 211,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Panggilan.jsx": {
+      "filePath": "src/pages/Panggilan.jsx",
+      "contentHash": "60b72dc4aa1997ae966439ea82bd61987931d11da423b576d00538c9209f65c8",
+      "functions": [
+        {
+          "name": "Panggilan",
+          "params": [],
+          "exported": true,
+          "lineCount": 900
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useLocation"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "PhoneCall",
+            "MapPin",
+            "AlertCircle",
+            "CheckCircle2",
+            "Clock",
+            "Users",
+            "ChevronRight",
+            "FileText",
+            "PlusCircle",
+            "History",
+            "Info",
+            "X",
+            "XCircle",
+            "Upload",
+            "Trash2",
+            "Link2",
+            "ExternalLink"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../utils/notifications",
+          "specifiers": [
+            "sendNotification"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatDateIndo"
+          ]
+        },
+        {
+          "source": "../components/ImageLightbox",
+          "specifiers": [
+            "ImageLightbox"
+          ]
+        }
+      ],
+      "exports": [
+        "Panggilan"
+      ],
+      "totalLines": 931,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Piket.jsx": {
+      "filePath": "src/pages/Piket.jsx",
+      "contentHash": "99ebf3f55a537bd986a747719239653e516e6c8572ab5756e406562055f8a0d4",
+      "functions": [
+        {
+          "name": "createPiketId",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "Piket",
+          "params": [],
+          "exported": true,
+          "lineCount": 274
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Calendar",
+            "UserPlus",
+            "Trash2",
+            "Save",
+            "Info",
+            "Clock",
+            "CheckCircle2",
+            "AlertCircle"
+          ]
+        }
+      ],
+      "exports": [
+        "Piket"
+      ],
+      "totalLines": 300,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Presensi.jsx": {
+      "filePath": "src/pages/Presensi.jsx",
+      "contentHash": "91f3908578fdb7e5a7a3656c299d74e46c4cb84ffc5af198411bd75a1703ed4b",
+      "functions": [
+        {
+          "name": "Presensi",
+          "params": [],
+          "exported": true,
+          "lineCount": 348
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        }
+      ],
+      "exports": [
+        "Presensi"
+      ],
+      "totalLines": 358,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/PresensiPagi.jsx": {
+      "filePath": "src/pages/PresensiPagi.jsx",
+      "contentHash": "818a141e2eb5c902dcc0afdc66fadf385bcb32ed17350c3ba2a6ab48a9b34788",
+      "functions": [
+        {
+          "name": "PresensiPagi",
+          "params": [],
+          "exported": true,
+          "lineCount": 340
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Sun",
+            "CheckCircle",
+            "Save",
+            "Info"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton",
+            "SkeletonStats",
+            "SkeletonTable"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Users"
+          ]
+        }
+      ],
+      "exports": [
+        "PresensiPagi"
+      ],
+      "totalLines": 353,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/PresensiSiang.jsx": {
+      "filePath": "src/pages/PresensiSiang.jsx",
+      "contentHash": "2d4dd8d59ce8fd998cf21b333b2af09ab244d2b6fed7f4884d04ce40e61fa5bf",
+      "functions": [
+        {
+          "name": "PresensiSiang",
+          "params": [],
+          "exported": true,
+          "lineCount": 362
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Moon",
+            "CheckCircle",
+            "Save",
+            "Info",
+            "AlertCircle",
+            "Copy"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton",
+            "SkeletonStats",
+            "SkeletonTable"
+          ]
+        },
+        {
+          "source": "../components/EmptyState",
+          "specifiers": [
+            "EmptyState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Users"
+          ]
+        }
+      ],
+      "exports": [
+        "PresensiSiang"
+      ],
+      "totalLines": 375,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Privacy.jsx": {
+      "filePath": "src/pages/Privacy.jsx",
+      "contentHash": "9bc32bdeab166e83525cbc0a599eaaa41f8b41431f4e2e7e7ae093406f054d54",
+      "functions": [
+        {
+          "name": "Privacy",
+          "params": [],
+          "exported": true,
+          "lineCount": 89
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ArrowLeft",
+            "ShieldCheck",
+            "Eye",
+            "Database"
+          ]
+        }
+      ],
+      "exports": [
+        "Privacy"
+      ],
+      "totalLines": 94,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Profile.jsx": {
+      "filePath": "src/pages/Profile.jsx",
+      "contentHash": "5090f3cdc7729013f11729ac75875f6398bba25c9be01276da8f2f5e2598b95f",
+      "functions": [
+        {
+          "name": "Profile",
+          "params": [],
+          "exported": true,
+          "lineCount": 740
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useEffect",
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatPhoneNumber"
+          ]
+        },
+        {
+          "source": "../utils/coordinates",
+          "specifiers": [
+            "decimalToDMS",
+            "formatCoordinateInput",
+            "createMapsLink"
+          ]
+        },
+        {
+          "source": "../components/Skeleton",
+          "specifiers": [
+            "Skeleton"
+          ]
+        },
+        {
+          "source": "../components/PageGuide",
+          "specifiers": [
+            "PageGuide"
+          ]
+        },
+        {
+          "source": "../components/UpdateCheck",
+          "specifiers": [
+            "UpdateCheck"
+          ]
+        }
+      ],
+      "exports": [
+        "Profile"
+      ],
+      "totalLines": 753,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Register.jsx": {
+      "filePath": "src/pages/Register.jsx",
+      "contentHash": "e0a37832b72c408a8f2aa9fe5dca0c00ae608b95fe5999162b5f32b562b3b396",
+      "functions": [
+        {
+          "name": "Register",
+          "params": [],
+          "exported": true,
+          "lineCount": 132
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../utils/version",
+          "specifiers": [
+            "getCurrentVersion"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "UserPlus",
+            "ArrowLeft",
+            "Send",
+            "Mail",
+            "User"
+          ]
+        },
+        {
+          "source": "../assets/logo.png",
+          "specifiers": [
+            "appLogo"
+          ]
+        }
+      ],
+      "exports": [
+        "Register"
+      ],
+      "totalLines": 140,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Tanggungan.jsx": {
+      "filePath": "src/pages/Tanggungan.jsx",
+      "contentHash": "77f0bde2acea5f9dc8a4631d5eabe9cb2c2ee5106086020c919c21b20ebbfce1",
+      "functions": [
+        {
+          "name": "Tanggungan",
+          "params": [],
+          "exported": true,
+          "lineCount": 382
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo"
+          ]
+        },
+        {
+          "source": "../context/AuthContext",
+          "specifiers": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../context/ToastContext",
+          "specifiers": [
+            "useToast"
+          ]
+        },
+        {
+          "source": "../utils/gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        },
+        {
+          "source": "../utils/logic",
+          "specifiers": [
+            "formatIDR"
+          ]
+        },
+        {
+          "source": "date-fns",
+          "specifiers": [
+            "format",
+            "startOfWeek",
+            "endOfWeek",
+            "startOfMonth",
+            "endOfMonth",
+            "isWithinInterval",
+            "differenceInDays"
+          ]
+        },
+        {
+          "source": "date-fns/locale",
+          "specifiers": [
+            "id"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "CreditCard",
+            "Users",
+            "CheckCircle2",
+            "AlertCircle",
+            "Wallet",
+            "ChevronRight",
+            "Filter",
+            "Calendar",
+            "Search",
+            "ArrowUpRight",
+            "TrendingUp",
+            "Clock"
+          ]
+        },
+        {
+          "source": "../components/Loading",
+          "specifiers": [
+            "Loading"
+          ]
+        }
+      ],
+      "exports": [
+        "Tanggungan"
+      ],
+      "totalLines": 414,
+      "hasStructuralAnalysis": true
+    },
+    "src/pages/Terms.jsx": {
+      "filePath": "src/pages/Terms.jsx",
+      "contentHash": "3fa2a6d9de05644ea1ee4d196c010ea723b6663610db60a420123800a4cbcb9a",
+      "functions": [
+        {
+          "name": "Terms",
+          "params": [],
+          "exported": true,
+          "lineCount": 86
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-router-dom",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ArrowLeft",
+            "ScrollText"
+          ]
+        }
+      ],
+      "exports": [
+        "Terms"
+      ],
+      "totalLines": 91,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/coordinates.js": {
+      "filePath": "src/utils/coordinates.js",
+      "contentHash": "174fee26fb1a2e78d98dc9ace3f639ba8dce4ad3f5a4c0e79a5c03caf78db111",
+      "functions": [
+        {
+          "name": "normalizeDecimalString",
+          "params": [
+            "value"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "decimalToDMS",
+          "params": [
+            "value",
+            "isLatitude"
+          ],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "dmsToDecimal",
+          "params": [
+            "value"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "isDMSValue",
+          "params": [
+            "value"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "formatCoordinateInput",
+          "params": [
+            "value",
+            "isLatitude"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "createMapsLink",
+          "params": [
+            "lat",
+            "lng"
+          ],
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "normalizeDecimalString",
+        "decimalToDMS",
+        "dmsToDecimal",
+        "isDMSValue",
+        "formatCoordinateInput",
+        "createMapsLink"
+      ],
+      "totalLines": 65,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/gasClient.js": {
+      "filePath": "src/utils/gasClient.js",
+      "contentHash": "015412b48e15fa95f1a8bbbe613e7141712c7e644649cc042cfbba0b68b4164d",
+      "functions": [
+        {
+          "name": "stableValue",
+          "params": [
+            "value"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "gasQueryKey",
+          "params": [
+            "action"
+          ],
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "staleTimeFor",
+          "params": [
+            "action",
+            "payload"
+          ],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "postToGAS",
+          "params": [
+            "action",
+            "payload"
+          ],
+          "exported": false,
+          "lineCount": 29
+        },
+        {
+          "name": "fetchGAS",
+          "params": [
+            "action"
+          ],
+          "exported": true,
+          "lineCount": 36
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../lib/queryClient",
+          "specifiers": [
+            "queryClient"
+          ]
+        }
+      ],
+      "exports": [
+        "gasQueryKey",
+        "fetchGAS"
+      ],
+      "totalLines": 123,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/logic.js": {
+      "filePath": "src/utils/logic.js",
+      "contentHash": "f9bbdb7d49553bcece4019aeeeb1363fa1af3422f6e020b2ee46e260eb8a2210",
+      "functions": [
+        {
+          "name": "calculateNominal",
+          "params": [
+            "amount"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "formatIDR",
+          "params": [
+            "amount"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "calculateDisciplineStatus",
+          "params": [
+            "attendanceRecords"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "formatPhoneNumber",
+          "params": [
+            "phone"
+          ],
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "formatDateIndo",
+          "params": [
+            "dateStr"
+          ],
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "calculateNominal",
+        "formatIDR",
+        "calculateDisciplineStatus",
+        "formatPhoneNumber",
+        "formatDateIndo"
+      ],
+      "totalLines": 82,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/notifications.js": {
+      "filePath": "src/utils/notifications.js",
+      "contentHash": "7f3e8932d905f048f28bede185d04d28c67d8c1f095b21906034addbf1bd0adc",
+      "functions": [
+        {
+          "name": "sendNotification",
+          "params": [
+            "studentsList",
+            "options"
+          ],
+          "exported": true,
+          "lineCount": 64
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./gasClient",
+          "specifiers": [
+            "fetchGAS"
+          ]
+        }
+      ],
+      "exports": [
+        "sendNotification"
+      ],
+      "totalLines": 80,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/version.js": {
+      "filePath": "src/utils/version.js",
+      "contentHash": "e6c529026a02611d09ae7210240605985db29a45bf353cd5826b831bed535446",
+      "functions": [
+        {
+          "name": "getCurrentVersion",
+          "params": [],
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "compareVersions",
+          "params": [
+            "current",
+            "latest"
+          ],
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "readCachedCheck",
+          "params": [],
+          "exported": false,
+          "lineCount": 18
+        },
+        {
+          "name": "writeCachedCheck",
+          "params": [
+            "result"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "emptyResult",
+          "params": [
+            "error"
+          ],
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "fetchLatestRelease",
+          "params": [],
+          "exported": false,
+          "lineCount": 31
+        },
+        {
+          "name": "checkForUpdate",
+          "params": [],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../../package.json?raw",
+          "specifiers": [
+            "packageJson"
+          ]
+        }
+      ],
+      "exports": [
+        "getCurrentVersion",
+        "checkForUpdate"
+      ],
+      "totalLines": 125,
+      "hasStructuralAnalysis": true
+    },
+    "src/utils/xlsxLoader.js": {
+      "filePath": "src/utils/xlsxLoader.js",
+      "contentHash": "cfaf96dfc848fc182c5ab26ac7a69d7f2805265d51856871f3b9d29d8cb88c4e",
+      "functions": [
+        {
+          "name": "loadXLSX",
+          "params": [],
+          "exported": true,
+          "lineCount": 6
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "loadXLSX"
+      ],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "tailwind.config.js": {
+      "filePath": "tailwind.config.js",
+      "contentHash": "2ee8e378956f20f4cf9bbf794b617e92a25aa66e01509c208cf81a9778c837eb",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "tailwindcss/colors",
+          "specifiers": [
+            "colors"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "vite.config.js": {
+      "filePath": "vite.config.js",
+      "contentHash": "f4081ed58c4952ff44474a4fd8a339f11efae6669aeb54cde15313d269077bf8",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "react"
+          ]
+        },
+        {
+          "source": "vite-plugin-pwa",
+          "specifiers": [
+            "VitePWA"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

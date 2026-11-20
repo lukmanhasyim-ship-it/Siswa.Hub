@@ -1,0 +1,181 @@
+[
+  {
+    "order": 1,
+    "title": "Peta awal: mengenal Siswa.Hub",
+    "description": "Mulailah dari dokumentasi utama untuk memahami tujuan proyek: platform manajemen kelas serverless untuk wali kelas yang mencakup presensi, kas, keterlambatan, panggilan orang tua, piket, leger nilai, dan laporan. Catat dua sisi arsitekturnya: frontend React yang divisualisasikan di browser dan backend Google Apps Script yang menyimpan data di Google Sheets. Anggap README sebagai gambaran umum, lalu gunakan grafik kode untuk memverifikasi detail implementasinya.",
+    "nodeIds": [
+      "document:README.md"
+    ],
+    "languageLesson": "README ditulis dalam Markdown, yaitu format teks ringan untuk dokumentasi. Judul dengan tanda pagar, daftar dengan tanda bintang, dan tabel bukanlah kode yang dijalankan aplikasi."
+  },
+  {
+    "order": 2,
+    "title": "Entry point: dari HTML ke root React",
+    "description": "Telusuri bootstrap aplikasi: index.html menyediakan elemen #root dan memuat /src/main.jsx sebagai modul. Di main.jsx, React memasang root dengan StrictMode, memuat stylesheet global, lalu membungkus App dengan QueryClientProvider dan ErrorBoundary. ErrorBoundary menjadi jaring pengaman saat render komponen gagal, sehingga pengguna melihat halaman fallback alih-alih layar kosong.",
+    "nodeIds": [
+      "file:index.html",
+      "file:src/main.jsx",
+      "file:src/components/ErrorBoundary.jsx",
+      "class:src/components/ErrorBoundary.jsx:ErrorBoundary"
+    ],
+    "languageLesson": "JSX memungkinkan menulis struktur mirip HTML di dalam JavaScript. Berbeda dengan komponen fungsi pada umumnya, ErrorBoundary memakai class component dan lifecycle getDerivedStateFromError serta componentDidCatch, karena penanganan error render memang memerlukan API kelas."
+  },
+  {
+    "order": 3,
+    "title": "Routing: peta halaman dan pembatasan akses",
+    "description": "Buka App.jsx untuk melihat komponen akar yang merangkai provider OAuth Google, Toast, dan Auth sebelum router dipasang. AppRoutes mendefinisikan rute publik, rute terlindungi, dan halaman yang hanya boleh diakses peran tertentu. ProtectedRoute memeriksa status login, sedangkan RoleProtectedRoute memeriksa peran pengguna. Konfigurasi peran dan menu ada terpusat di navigation.js agar sidebar, navigasi bawah, dan router memakai aturan yang sama.",
+    "nodeIds": [
+      "file:src/App.jsx",
+      "function:src/App.jsx:App",
+      "function:src/App.jsx:AppRoutes",
+      "function:src/App.jsx:ProtectedRoute",
+      "function:src/App.jsx:RoleProtectedRoute",
+      "file:src/config/navigation.js",
+      "function:src/config/navigation.js:canAccess"
+    ],
+    "languageLesson": "React Router memakai komponen wrapper sebagai pengaman rute: pembungkus hanya merender children bila syarat terpenuhi, jika tidak ia melakukan navigasi. Pola ini memisahkan aturan otorisasi dari tiap halaman."
+  },
+  {
+    "order": 4,
+    "title": "Layout: kerangka visual yang dipakai setiap halaman",
+    "description": "Setelah rute dipilih, Layout menyediakan kerangka aplikasi: sidebar adaptif, header, breadcrumb, drawer notifikasi, modal pencarian, navigasi bawah untuk layar kecil, dan toast global. Komponen ini juga mengelola state antarmuka, shortcut Ctrl+K dan ESC, serta memuat data notifikasi dan daftar siswa. Breadcrumbs menerjemahkan segmen URL menjadi label yang ramah pengguna, sementara BottomNav menyaring menu utama sesuai peran.",
+    "nodeIds": [
+      "file:src/components/Layout.jsx",
+      "function:src/components/Layout.jsx:Layout",
+      "file:src/components/Breadcrumbs.jsx",
+      "function:src/components/Breadcrumbs.jsx:Breadcrumbs",
+      "file:src/components/navigation/BottomNav.jsx",
+      "function:src/components/navigation/BottomNav.jsx:BottomNav",
+      "file:src/components/SearchModal.jsx"
+    ],
+    "languageLesson": "Layout memakai Outlet dari React Router sebagai slot tempat konten rute dirender. Banyak hook bawaan React dipakai bersama-sama: useState untuk state UI, useEffect untuk sinkronisasi, useMemo untuk turunan data, dan useRef untuk fokus serta listener keyboard."
+  },
+  {
+    "order": 5,
+    "title": "State dan data: context, cache, dan klien GAS",
+    "description": "Lapisan state global terdiri dari AuthContext untuk sesi pengguna dan ToastContext untuk notifikasi ringkas. useAuth dipanggil halaman untuk mengetahui peran dan kelas kelolaan, sedangkan useToast dipakai untuk memberi umpan balik setelah aksi. Untuk data sheet, queryClient menyediakan singleton TanStack Query dengan cache di memori tab, dan fetchGAS menjadi titik masuk semua panggilan backend: aksi baca memakai cache, aksi tulis menghapus cache setelah berhasil.",
+    "nodeIds": [
+      "file:src/context/AuthContext.jsx",
+      "function:src/context/AuthContext.jsx:useAuth",
+      "file:src/context/ToastContext.jsx",
+      "function:src/context/ToastContext.jsx:useToast",
+      "file:src/lib/queryClient.js",
+      "function:src/lib/queryClient.js:queryClient",
+      "file:src/utils/gasClient.js",
+      "function:src/utils/gasClient.js:fetchGAS"
+    ],
+    "languageLesson": "Context menghindari prop drilling: provider menyimpan nilai, hook konsumen mengambilnya. Kunci cache GAS dibuat stabil dengan mengurutkan kunci objek secara rekursif, sehingga payload yang sama tidak menghasilkan entri cache ganda."
+  },
+  {
+    "order": 6,
+    "title": "Dashboard: merangkum kondisi kelas dalam satu layar",
+    "description": "Dashboard adalah contoh baik membaca graf secara menyeluruh. Halaman ini menggabungkan data kehadiran, keterlambatan, saldo kas, jadwal piket, grafik, dan alert kedisiplinan dari beberapa sheet, lalu menampilkannya lewat kartu dan StudentCard. Perhatikan getEffectiveStatus yang mengutamakan status siang dan calculateDisciplineStatus yang menentukan apakah siswa perlu dipanggil. Interaksi lanjutan tersedia lewat handler WhatsApp dan penolakan panggilan.",
+    "nodeIds": [
+      "file:src/pages/Dashboard.jsx",
+      "function:src/pages/Dashboard.jsx:Dashboard",
+      "function:src/pages/Dashboard.jsx:getEffectiveStatus",
+      "function:src/pages/Dashboard.jsx:handleRejectCall",
+      "file:src/components/StudentCard.jsx",
+      "function:src/utils/logic.js:calculateDisciplineStatus"
+    ],
+    "languageLesson": "Dashboard menunjukkan pola turunan data: data mentah dari sheet tidak langsung ditampilkan, melainkan dinormalisasi dengan fungsi pembantu murni agar aturan bisnis tetap konsisten. StudentCard dibungkus React.memo supaya tidak render ulang ketika props tidak berubah."
+  },
+  {
+    "order": 7,
+    "title": "Halaman operasional: presensi, terlambat, dan kas",
+    "description": "Lanjut ke alur pencatatan harian. Presensi dan PresensiPagi membandingkan status saat ini dengan data awal agar hanya perubahan yang dikirim; PresensiSiang menambahkan kemampuan menyalin absensi pagi. CatatanTerlambat menampung siswa ke antrean localStorage per tanggal sebelum dikirim massal, lengkap dengan draf keterangan dan proteksi duplikat. Keuangan memakai pola antrean serupa untuk transaksi kas, lalu menyimpan semuanya dalam satu permintaan massal.",
+    "nodeIds": [
+      "file:src/pages/Presensi.jsx",
+      "function:src/pages/Presensi.jsx:handleSave",
+      "file:src/pages/PresensiPagi.jsx",
+      "function:src/pages/PresensiPagi.jsx:handleSave",
+      "file:src/pages/PresensiSiang.jsx",
+      "function:src/pages/PresensiSiang.jsx:handleCopyMorningAttendance",
+      "file:src/pages/CatatanTerlambat.jsx",
+      "function:src/pages/CatatanTerlambat.jsx:handleSaveQueue",
+      "file:src/pages/Keuangan.jsx",
+      "function:src/pages/Keuangan.jsx:persistKeuangan"
+    ],
+    "languageLesson": "Pola yang berulang adalah draf plus antrean: tulis ke localStorage lebih dulu, normalisasi saat dibaca, lalu kirim sekali gus lewat operasi BULK_CREATE. Kunci localStorage biasanya menggabungkan versi aplikasi, email akun, dan tanggal agar data antar akun tidak tercampur."
+  },
+  {
+    "order": 8,
+    "title": "Halaman administrasi: data induk, komunikasi, dan laporan",
+    "description": "Kumpulan halaman berikutnya memperlihat sisi pengelolaan kelas yang lebih luas. MasterSiswa menangani tambah, edit, hapus, impor dan ekspor Excel,serta membatasi tombol manajemen untuk Wali Kelas. Panggilan mencatat surat, tindak lanjut, bukti foto dari Drive, dan status log. Notifications menyajikan riwayat pesan per peran, sementara Laporan menggabungkan data aktif dan arsip lalu menyiapkan tampilan untuk cetak atau PDF.",
+    "nodeIds": [
+      "file:src/pages/MasterSiswa.jsx",
+      "function:src/pages/MasterSiswa.jsx:MasterSiswa",
+      "file:src/pages/Panggilan.jsx",
+      "function:src/pages/Panggilan.jsx:handleSaveTindakLanjut",
+      "file:src/pages/Notifications.jsx",
+      "function:src/pages/Notifications.jsx:loadNotifs",
+      "file:src/pages/Laporan.jsx",
+      "function:src/pages/Laporan.jsx:Laporan"
+    ],
+    "languageLesson": "Banyak handler memakai async/await dan pembaruan state optimis: antarmuka diperbarui lebih dulu, lalu permintaan GAS dijalankan. Jika operasi gagal, state perlu diselaraskan kembali agar tampilan tidak berbohong."
+  },
+  {
+    "order": 9,
+    "title": "Utilitas: aturan domain yang bisa dipakai ulang",
+    "description": "Sebelum masuk ke backend, pelajari fungsi-fungsi kecil yang dipakai lintas halaman. logic.js berisi format Rupiah, nomor telepon Indonesia, tanggal lokal, dan status disiplin. coordinates.js menangani normalisasi koordinat, konversi desimal dan DMS, serta tautan Google Maps. xlsxLoader memuat pustaka Excel secara malas hanya saat dibutuhkan, version.js mengecek rilis terbaru dengan cache, dan notifications.js mengirim pesan ke penerima unik secara paralel.",
+    "nodeIds": [
+      "file:src/utils/logic.js",
+      "function:src/utils/logic.js:formatIDR",
+      "file:src/utils/coordinates.js",
+      "function:src/utils/coordinates.js:decimalToDMS",
+      "file:src/utils/xlsxLoader.js",
+      "function:src/utils/xlsxLoader.js:loadXLSX",
+      "file:src/utils/version.js",
+      "function:src/utils/version.js:checkForUpdate",
+      "file:src/utils/notifications.js",
+      "function:src/utils/notifications.js:sendNotification"
+    ],
+    "languageLesson": "Dynamic import memisahkan pustaka berat ke chunk terpisah; Promise yang sama dipakai ulang agar modul tidak dimuat dua kali. Fungsi di sini kebanyakan murni, artinya tidak mengubah state global dan lebih mudah diuji."
+  },
+  {
+    "order": 10,
+    "title": "Backend Apps Script: router aksi dan operasi sheet",
+    "description": "Code.gs adalah API web app backend. doGet dan doPost meneruskan request ke handleResponse, yang mengurai action, memanggil handler, menginvalidasi cache setelah tulis, dan mengembalikan JSON. Jalur baca memakai readCachedData agar sheet tidak terus dibaca ulang; jalur tulis memakai helper seperti bulkUpdatePresensi dan bulkCreateTerlambat dengan validasi serta penguncian. setupSpreadsheet menyiapkan sheet awal, sedangkan runMonthlyArchive memindahkan data lama ke arsip lewat trigger. Manifest appsscript.json dan .clasp.json mengikat kode lokal ke proyek Apps Script.",
+    "nodeIds": [
+      "file:gas/Code.gs",
+      "function:gas/Code.gs:doPost",
+      "function:gas/Code.gs:handleResponse",
+      "function:gas/Code.gs:readCachedData",
+      "function:gas/Code.gs:bulkUpdatePresensi",
+      "function:gas/Code.gs:bulkCreateTerlambat",
+      "function:gas/Code.gs:setupSpreadsheet",
+      "function:gas/Code.gs:runMonthlyArchive",
+      "config:gas/appsscript.json",
+      "config:.clasp.json"
+    ],
+    "languageLesson": "Apps Script berjalan di runtime V8 dengan gaya var dan function declaration, bukan modul ES modern. CacheService, LockService, ScriptApp, dan ContentService adalah API khusus lingkungan Google; Handler biasanya menerima objek event dari web app."
+  },
+  {
+    "order": 11,
+    "title": "Konfigurasi, build, dan deployment",
+    "description": "Tahap ini menjelaskan bagaimana kode sampai ke pengguna. package.json mendefinisikan versi 5.0.1, skrip Vite, dan dependensi. vite.config.js mengatur plugin React dan PWA, memisahkan chunk vendor, serta sengaja tidak meng-cache data GAS di service worker. tailwind.config.js dan postcss.config.js memproses gaya, eslint.config.js menjaga kualitas kode, firebase.json dan .firebaserc mengatur hosting SPA dengan rewrite ke index.html. Workflow GitHub Actions menjalankan npm ci, build, dan test pada matriks Node.js sebelum deploy.",
+    "nodeIds": [
+      "config:package.json",
+      "config:vite.config.js",
+      "config:tailwind.config.js",
+      "config:postcss.config.js",
+      "config:eslint.config.js",
+      "config:firebase.json",
+      "config:.firebaserc",
+      "pipeline:.github/workflows/node.js.yml"
+    ],
+    "languageLesson": "File konfigurasi memakai JSON, JavaScript, dan YAML. JSON adalah data murni tanpa komentar; YAML memakai indentasi sebagai struktur dan di sini mendefinisikan job CI, bukan logika aplikasi."
+  },
+  {
+    "order": 12,
+    "title": "Dokumentasi: melacak perubahan dan batas keamanan",
+    "description": "Akhiri tour dengan membaca dokumentasi pendukung. README menjelaskan instalasi backend, konfigurasi OAuth, dan deployment frontend. CHANGELOG merangkum perubahan rilis dengan format Keep a Changelog dan Semantic Versioning. RELEASE_NOTES_v5.0.1.md memberi konteks scoped untuk fitur terbaru serta langkah deploy, sementara SECURITY.md menjelaskan versi yang masih didukung. Bandingkan catatan tersebut dengan node kode yang sudah dikunjungi agar dokumentasi dan implementasi tetap selaras.",
+    "nodeIds": [
+      "document:README.md",
+      "document:CHANGELOG.md",
+      "document:RELEASE_NOTES_v5.0.1.md",
+      "document:SECURITY.md"
+    ],
+    "languageLesson": "Semantic Versioning menulis versi sebagai MAJOR.MINOR.PATCH. Perubahan yang kompatibel biasanya menaikkan patch, sedangkan perubahan besar yang memecah kompatibilitas menaikkan major."
+  }
+]

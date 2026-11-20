@@ -1,0 +1,628 @@
+{
+  "files": {
+    "src/lib/queryClient.js": {
+      "overview": "Berkas ini membuat satu instance QueryClient dari TanStack Query yang menjadi pusat cache data Google Apps Script bagi seluruh aplikasi. Konfigurasinya menjaga data sensitif siswa tetap di memori tab dan tidak disimpan ke localStorage maupun service worker.",
+      "sections": [
+        {
+          "title": "Impor dan keputusan desain cache",
+          "lineRange": [1, 4],
+          "explanation": "Baris 1 mengimpor QueryClient, lalu dua baris komentar menjelaskan alasan cache sengaja tidak dipersistensi: data siswa dianggap sensitif sehingga tidak boleh ditulis ke penyimpanan permanen.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Singleton QueryClient dan opsi default",
+          "lineRange": [5, 15],
+          "explanation": "queryClient diekspor sebagai satu objek bersama. Opsi queries menetapkan staleTime 60 detik, gcTime 15 menit, retry 0, refetchOnWindowFocus false, dan refetchOnReconnect true agar data tidak terus dimuat ulang tanpa keperluan.",
+          "tourOrder": 5
+        }
+      ]
+    },
+    "src/utils/gasClient.js": {
+      "overview": "gasClient adalah satu titik masuk bagi semua komunikasi frontend ke Web App Google Apps Script. Berkas ini membedakan aksi baca yang boleh memakai cache dari aksi tulis yang harus menghapus cache, sekaligus menyeragamkan penanganan error.",
+      "sections": [
+        {
+          "title": "Impor, URL backend, dan daftar aksi baca",
+          "lineRange": [1, 15],
+          "explanation": "GAS_URL diambil dari environment variable VITE_GAS_API_URL. Set READ_ACTIONS berisi aksi-aksi yang diizinkan memakai cache, mulai dari GET_ALL, GET_NOTIFICATIONS, sampai GET_TRIGGER_STATUS.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Masa segar per sheet dan durasi cache",
+          "lineRange": [17, 28],
+          "explanation": "SHEET_STALE_TIME memberi masa segar lima menit untuk sheet master dan lima belas menit untuk sheet arsip, sedangkan CACHE_TIME menentukan lama entri cache disimpan.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Kunci cache yang stabil",
+          "lineRange": [30, 45],
+          "explanation": "stableValue mengurutkan kunci objek secara rekursif dan membuang nilai undefined, sehingga payload dengan susunan kunci berbeda tetap menghasilkan kunci yang sama. gasQueryKey lalu membentuk kunci ['gas', action, payload].",
+          "tourOrder": 5
+        },
+        {
+          "title": "Penentuan staleTime per aksi",
+          "lineRange": [47, 54],
+          "explanation": "staleTimeFor memberi 30 detik untuk notifikasi, sepuluh menit untuk thumbnail dan file, masa segar sesuai nama sheet untuk GET_ALL, dan 60 detik sebagai nilai bawaan.",
+          "tourOrder": 5
+        },
+        {
+          "title": "Permintaan POST ke Web App",
+          "lineRange": [56, 84],
+          "explanation": "postToGAS mengirim JSON dengan header text/plain agar tidak memicu preflight CORS, memeriksa response.ok, menerjemahkan pesan Unknown action menjadi petunjuk deploy ulang, lalu melempar error yang dicatat ke console.",
+          "tourOrder": 5
+        },
+        {
+          "title": "fetchGAS: validasi dan jalur tulis",
+          "lineRange": [86, 96],
+          "explanation": "fetchGAS lebih dulu memastikan GAS_URL tersedia. Aksi di luar READ_ACTIONS dikirim langsung, lalu queryClient.removeQueries menghapus seluruh cache GAS setelah mutation berhasil agar pembacaan berikutnya benar-benar segar.",
+          "tourOrder": 5
+        },
+        {
+          "title": "fetchGAS: strategi stale-while-revalidate",
+          "lineRange": [98, 121],
+          "explanation": "Untuk aksi baca, data lama langsung dikembalikan sambil fetchQuery dijalankan di latar belakang. Bila belum ada cache, hasil ditunggu; bila gagal, entri dihapus supaya percobaan berikutnya tidak kembali memakai data error.",
+          "tourOrder": 5
+        }
+      ]
+    },
+    "src/components/StudentCard.jsx": {
+      "overview": "StudentCard adalah komponen kartu siswa yang dipakai ulang di Dashboard dan MasterSiswa. Kartu ini merangkum identitas, status kedisiplinan, detail panggilan, dan tombol aksi yang muncul sesuai props dari komponen induk.",
+      "sections": [
+        {
+          "title": "Impor dan daftar props",
+          "lineRange": [1, 5],
+          "explanation": "Komponen mengimpor memo dari React, sekumpulan ikon lucide, dan formatDateIndo. Props yang diterima mencakup data student, status disiplin, detail panggilan, serta callback untuk WhatsApp, edit, hapus, dan penolakan panggilan.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Warna avatar berdasarkan jenis kelamin",
+          "lineRange": [6, 8],
+          "explanation": "getAvatarColor memilih kombinasi kelas rose untuk siswa perempuan dan sky untuk siswa laki-laki berdasarkan field L/P.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Header nama dan badge status",
+          "lineRange": [10, 32],
+          "explanation": "Bagian atas kartu menampilkan Nama_Siswa, badge Status_Aktif bila nilainya bukan Aktif, dan badge Jabatan dengan ikon mahkota. Border kartu berubah bernuansa merah saat ada disciplineStatus.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Avatar dan identitas siswa",
+          "lineRange": [34, 56],
+          "explanation": "Inisial nama tampil di avatar, sementara ID_Siswa atau NIS, NISN, dan nama wali dirapatkan di bagian tengah kartu dengan gaya teks yang berbeda-beda.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Bar aksi ikon",
+          "lineRange": [58, 121],
+          "explanation": "Tautan Google Maps hanya muncul bila siswa memiliki Latitude dan Longitude. Tombol lain dirender secara kondisional bergantung pada keberadaan callback onContactClick, onWaStudentClick, onWaClick, onEdit, dan onDelete.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Indikator alert kedisiplinan",
+          "lineRange": [123, 140],
+          "explanation": "Blok ini tampil hanya ketika disciplineStatus tidak kosong. Status Sudah Dipanggil memakai aksen amber dan menampilkan tombol Tolak yang memanggil onReject bila handler tersedia.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Detail pemanggilan orang tua",
+          "lineRange": [142, 178],
+          "explanation": "Untuk status Sudah Dipanggil disertai panggilanDetail, kartu menampilkan tanggal melalui formatDateIndo, kategori, alasan, dan Status_Selesai. Warna badge menyesuaikan kategori serta status tindak lanjut.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Detail alasan dan ekspor memo",
+          "lineRange": [180, 194],
+          "explanation": "Pada status selain Sudah Dipanggil, teks detailReason ditampilkan sebagai catatan singkat. Komponen diekspor dengan memo supaya tidak render ulang ketika props tidak berubah.",
+          "tourOrder": 6
+        }
+      ]
+    },
+    "src/pages/Dashboard.jsx": {
+      "overview": "Dashboard menyajikan ringkasan kondisi kelas dalam satu layar dengan menggabungkan delapan sheet dari Google Sheets. Halaman ini menghitung statistik kehadiran, kas, piket, dan keterlambatan, lalu menampilkan alert kedisiplinan lewat StudentCard beserta akses WhatsApp dan pembatalan panggilan.",
+      "sections": [
+        {
+          "title": "Impor dan dependensi",
+          "lineRange": [1, 16],
+          "explanation": "Dashboard menggabungkan hooks React, date-fns beserta locale Indonesia, fetchGAS, formatIDR, calculateDisciplineStatus, StudentCard, komponen skeleton dan empty state, serta grafik dari recharts.",
+          "tourOrder": 6
+        },
+        {
+          "title": "State data dan efek pemuatan paralel",
+          "lineRange": [18, 78],
+          "explanation": "State data menampung delapan sheet. useEffect memuat semuanya sekaligus dengan Promise.all, memicu notifikasi piket sekali sehari per akun memakai penanda di localStorage, lalu menyimpan hanya siswa berstatus Aktif.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Penentu status absen efektif",
+          "lineRange": [80, 83],
+          "explanation": "getEffectiveStatus mengutamakan Status_Siang bila terisi, lalu jatuh ke Status_Pagi atau field Status lama. Fungsi dibungkus useCallback supaya identitasnya stabil dipakai useMemo lain.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Perhitungan statistik utama",
+          "lineRange": [85, 177],
+          "explanation": "useMemo stats menghitung persentase kehadiran, saldo kas aktif ditambah saldo arsip, mutasi kas minggu ini, data pie chart, tren transaksi tujuh hari, jadwal piket hari ini, dan persentase keterlambatan.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Penyusunan alert kedisiplinan",
+          "lineRange": [179, 250],
+          "explanation": "Alert dibangun dari presensi bulan berjalan ditambah minggu terakhir bulan sebelumnya dari arsip, dipotong setelah tanggal panggilan selesai. calculateDisciplineStatus menentukan statusnya, dan hanya Wali Kelas atau siswa yang bersangkutan yang melihat alert.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Handler direktori, WhatsApp, dan penolakan",
+          "lineRange": [252, 308],
+          "explanation": "handleDirectCall membawa NISN ke halaman /panggilan, sementara handleWA dan handleWaStudent membuka tautan wa.me dengan pesan yang sudah di-URL-encode. handleRejectCall mengirim UPDATE Log_Panggilan menjadi Ditolak lalu memperbarui state secara optimis.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Kartu ringkasan dan grafik",
+          "lineRange": [310, 490],
+          "explanation": "Saat memuat ditampilkan SkeletonDashboard. Setelah itu halaman merender kartu kehadiran, keterlambatan, saldo kas, dan piket, diikuti PieChart komposisi presensi serta AreaChart tren kas tujuh hari.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Daftar alert memakai StudentCard",
+          "lineRange": [492, 532],
+          "explanation": "Bila tidak ada alert, EmptyState ditampilkan. Setiap alert dirender sebagai StudentCard dengan handler WhatsApp dan penolakan yang hanya diberikan kepada Wali Kelas.",
+          "tourOrder": 6
+        }
+      ]
+    },
+    "src/utils/logic.js": {
+      "overview": "logic.js berisi kumpulan fungsi pembantu yang dipakai lintas halaman untuk membulatkan nominal kas, memformat mata uang, menentukan status disiplin, menyeragamkan nomor telepon, dan menampilkan tanggal dalam bahasa Indonesia.",
+      "sections": [
+        {
+          "title": "Pembulatan nominal kas",
+          "lineRange": [1, 6],
+          "explanation": "calculateNominal mengubah input menjadi bilangan bulat lalu membulatkannya ke kelipatan 500 terdekat. Input yang bukan angka menghasilkan 0.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Format mata uang Rupiah",
+          "lineRange": [8, 16],
+          "explanation": "formatIDR memakai Intl.NumberFormat dengan locale id-ID dan currency IDR, tanpa digit desimal, agar tampilan uang konsisten di seluruh aplikasi.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Aturan status kedisiplinan",
+          "lineRange": [18, 42],
+          "explanation": "calculateDisciplineStatus menghitung jumlah Alfa dari catatan kehadiran. Bolos enam kali atau Alfa lima kali menghasilkan Panggilan Orang Tua, Alfa tiga kali atau tiga hari berturut-turut Alfa menghasilkan Siap Panggil, selebihnya null.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Normalisasi nomor telepon Indonesia",
+          "lineRange": [44, 60],
+          "explanation": "formatPhoneNumber membuang semua karakter non-angka, lalu mengganti awalan 0 dengan 62 atau menambahkan 62 pada nomor yang sudah diawali 8 agar siap dipakai tautan WhatsApp.",
+          "tourOrder": 6
+        },
+        {
+          "title": "Format tanggal ala Indonesia",
+          "lineRange": [62, 81],
+          "explanation": "formatDateIndo mengubah string tanggal menjadi pola hari, nama bulan Indonesia, dan tahun. Bila tanggal tidak valid atau terjadi kesalahan, fungsi mengembalikan string aslinya.",
+          "tourOrder": 6
+        }
+      ]
+    },
+    "src/pages/CatatanTerlambat.jsx": {
+      "overview": "Halaman ini mencatat keterlambatan siswa melalui alur draf dan antrean lokal di localStorage sebelum dikirim massal ke Google Sheets. Pencatatan dibatasi satu kali per siswa per tanggal dan hanya dapat dilakukan oleh Wali Kelas.",
+      "sections": [
+        {
+          "title": "Impor, versi skema, dan kunci localStorage",
+          "lineRange": [1, 24],
+          "explanation": "DRAFT_VERSION dan QUEUE_VERSION dipakai dalam kunci penyimpanan. getDraftKey dan getQueueKey menggabungkan versi, email akun, serta tanggal, sedangkan makeLocalId membuat ID sementara untuk tiap item antrean.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Normalisasi item antrean",
+          "lineRange": [26, 40],
+          "explanation": "normalizeQueueItem memastikan item memiliki ID_Siswa dan mengisi field yang hilang dengan nilai bawaan. Item tanpa ID_Siswa dibuang sehingga data rusak dari localStorage tidak masuk ke daftar.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Pembaca dan penulis draf serta antrean",
+          "lineRange": [42, 96],
+          "explanation": "Pasangan readQueue, writeQueue, clearQueue dan readDraft, writeDraft, clearDraft membungkus localStorage dengan try/catch. Bila storage tidak tersedia, antrean tetap hidup di memori selama halaman terbuka.",
+          "tourOrder": 7
+        },
+        {
+          "title": "State komponen dan pembatasan peran",
+          "lineRange": [98, 119],
+          "explanation": "Komponen memakai useAuth dan useToast lalu menyiapkan state daftar siswa, data terlambat, tanggal, pencarian, keterangan dari draft, dan queue dari localStorage. canEdit bernilai true hanya untuk Wali Kelas.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Efek pemuatan dan penyimpanan draf",
+          "lineRange": [121, 148],
+          "explanation": "Efek pertama memuat Master_Siswa dan GET_TERLAMBAT secara paralel. Efek kedua menulis draf keterangan, dengan skipDraftSaveRef untuk melewati satu penulisan ketika tanggal sedang diganti.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Pencarian siswa dan perpindahan tanggal",
+          "lineRange": [150, 189],
+          "explanation": "loadTerlambat mengambil ulang data sesuai tanggal. filteredSiswa membatasi hasil pencarian menjadi sepuluh siswa, sementara handleDateChange mengganti queue dan draf serta membersihkan pilihan sebelum memuat data baru.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Menambah dan menghapus antrean",
+          "lineRange": [191, 225],
+          "explanation": "handleCatatTerlambat menolak siswa yang sudah tercatat atau sudah antre, lalu menyimpan item baru ke localStorage dan mengosongkan form. handleRemoveQueueItem menghapus satu item berdasarkan localId.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Pengiriman massal antrean",
+          "lineRange": [227, 257],
+          "explanation": "handleSaveQueue membuang localId lalu mengirim semua item lewat BULK_CREATE_TERLAMBAT dalam satu permintaan. Setelah sukses, antrean dan draf dibersihkan serta daftar dimuat ulang; saat gagal antrean sengaja dipertahankan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Hapus dan edit catatan tersimpan",
+          "lineRange": [259, 300],
+          "explanation": "DELETE_TERLAMBAT menghapus catatan, sedangkan UPDATE mengubah keterangan. Saat mengedit, Enter menyimpan dan Escape membatalkan perubahan lewat handleEditKeyDown.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Antarmuka form, antrean, dan daftar",
+          "lineRange": [302, 634],
+          "explanation": "Halaman menampilkan form pencarian dengan dropdown siswa, kartu antrean yang belum disimpan beserta tombol Simpan Catatan, dan tabel daftar keterlambatan dengan fitur edit keterangan secara langsung.",
+          "tourOrder": 7
+        }
+      ]
+    },
+    "src/pages/Keuangan.jsx": {
+      "overview": "Keuangan mengelola kas kelas: pencatatan transaksi masuk dan keluar, antrean lokal, laporan tanggungan mingguan, dan notifikasi setelah data tersimpan. Seperti halaman operasional lainnya, transaksi baru dikumpulkan lebih dulu di localStorage lalu dikirim sekali gus lewat BULK_CREATE.",
+      "sections": [
+        {
+          "title": "Impor dan kunci penyimpanan kas",
+          "lineRange": [1, 23],
+          "explanation": "Selain hooks dan fetchGAS, berkas ini mengimpor formatIDR dan sendNotification. DRAFT_VERSION serta QUEUE_VERSION dipakai getDraftKey dan getQueueKey agar data lokal terikat pada akun yang sedang login.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Validasi item antrean transaksi",
+          "lineRange": [25, 43],
+          "explanation": "normalizeQueueItem menolak item tanpa ID_Siswa atau dengan Jumlah bukan angka positif. Item yang valid diberi localId untuk UI dan ID_Transaksi bila belum tersedia.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Helper draf dan antrean localStorage",
+          "lineRange": [45, 106],
+          "explanation": "Fungsi readQueue, writeQueue, clearQueue serta readDraft, writeDraft, clearDraft mengamankan setiap akses localStorage dengan try/catch supaya form tetap bisa dipakai dalam mode private.",
+          "tourOrder": 7
+        },
+        {
+          "title": "State form dan izin editing",
+          "lineRange": [108, 131],
+          "explanation": "Komponen menyimpan state transaksi, hasil pencarian, nominal iuran, dan antrean. canEdit hanya bernilai true untuk Bendahara dan Wakil Bendahara; skipDraftSaveRef mengendalikan penulisan draf.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Pemuatan data dan draf otomatis",
+          "lineRange": [133, 171],
+          "explanation": "loadKeuangan mengambil Keuangan, Master_Siswa, dan Profil_Wali_Kelas secara paralel lalu menetapkan nominal iuran dari profil akun. Efek berikutnya menyimpan draf form kecuali sedang mengedit atau baru saja menyimpan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Turunan data kas dan tanggungan",
+          "lineRange": [173, 249],
+          "explanation": "useMemo menghitung total kas, total antrean, siswa yang sudah membayar minggu ini, siswa yang belum bayar, laporan tanggungan per siswa, pembayaran sebagian, dan daftar siswa hasil pencarian.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Handler form dan antrean",
+          "lineRange": [251, 308],
+          "explanation": "cancelEdit memulihkan form dari draf, handleCatatKas menambah transaksi ke antrean, handleRemoveQueueItem membuangnya, dan handleEdit mengisi form dari baris riwayat sambil menggulir ke atas.",
+          "tourOrder": 7
+        },
+        {
+          "title": "persistKeuangan untuk edit dan antrean",
+          "lineRange": [310, 401],
+          "explanation": "Fungsi ini bercabang antara UPDATE satu transaksi dan BULK_CREATE untuk seluruh antrean. Keduanya diikuti sendNotification, pembersihan antrean dan draf, pemuatan ulang senyap, lalu toast sukses; handleSubmit dan handleSaveQueue memanggilnya.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Pembatalan transaksi",
+          "lineRange": [403, 439],
+          "explanation": "handleDelete meminta konfirmasi, mengirim DELETE ke sheet Keuangan, lalu mengirim notifikasi pembatalan khusus bila transaksi yang dihapus bertipe Masuk sebelum memuat ulang data.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Antarmuka buku kas dan tabel",
+          "lineRange": [441, 862],
+          "explanation": "Tampilan mencakup buku kas mingguan beserta daftar belum bayar dan pembayaran sebagian, form input transaksi, tabel antrean dengan tombol Simpan Transaksi, serta riwayat sepuluh transaksi terbaru yang bisa diedit atau dibatalkan.",
+          "tourOrder": 7
+        }
+      ]
+    },
+    "src/pages/Presensi.jsx": {
+      "overview": "Presensi adalah buku absen harian gabungan sesi pagi dan siang untuk seluruh siswa aktif. Halaman ini membandingkan status saat ini dengan data awal supaya hanya baris yang benar-benar berubah yang dikirim ke backend.",
+      "sections": [
+        {
+          "title": "Impor, state, dan aturan editing",
+          "lineRange": [1, 22],
+          "explanation": "Komponen memakai useAuth dan useToast serta menyimpan siswa, presensi, salinan originalPresensi, keterangan, dan tanggal hari ini. canEdit diberikan kepada Wali Kelas, Sekretaris, dan Wakil Sekretaris.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Muat data siswa dan presensi",
+          "lineRange": [24, 43],
+          "explanation": "useEffect mengambil Master_Siswa dan sheet Presensi secara paralel, menyaring siswa aktif, lalu menyimpan data yang sama ke presensi dan originalPresensi sebagai baseline perbandingan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Helper identitas dan deteksi perubahan",
+          "lineRange": [45, 65],
+          "explanation": "getStatusKey memilih kolom pagi atau siang, buildPresensiId menyusun ID berupa P plus tanggal dan ID siswa, sedangkan isPresensiChanged dan hasChanges mendeteksi perubahan status maupun keterangan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Perubahan status dan keterangan",
+          "lineRange": [67, 100],
+          "explanation": "handleStatusChange menolak pengguna tanpa izin, mengubah status yang sama menjadi kosong sebagai toggle, dan membuat record baru bila belum ada. handleKeteranganChange menyimpan catatan sementara di state.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Tandai seluruh siswa hadir",
+          "lineRange": [102, 129],
+          "explanation": "handleMarkAllPresent mengisi Status_Pagi dan Status_Siang dengan H untuk semua siswa, membuat record baru bila belum ada, lalu menampilkan toast konfirmasi.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Simpan perubahan secara massal",
+          "lineRange": [131, 210],
+          "explanation": "handleSave membandingkan tiap record dengan data awal, membuang yang tidak berubah, mengirim BULK_UPDATE_PRESENSI sekali gus, lalu menyelaraskan originalPresensi dan mengosongkan keterangan setelah sukses.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Pesan kondisi dan panduan halaman",
+          "lineRange": [212, 276],
+          "explanation": "Halaman menampilkan Loading saat memuat, pesan penjelas bagi peran yang hanya bisa melihat, serta PageGuide berisi langkah pengisian absen dan tombol Hadir Semua dan Simpan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Tabel absen interaktif",
+          "lineRange": [278, 357],
+          "explanation": "Setiap baris siswa memiliki tombol status H, S, I, A, dan B untuk pagi dan siang serta kolom keterangan. Tombol dinonaktaskan bagi peran tanpa izin editing.",
+          "tourOrder": 7
+        }
+      ]
+    },
+    "src/pages/PresensiPagi.jsx": {
+      "overview": "PresensiPagi mengkhususkan pencatatan kehadiran sesi pagi dengan pemilih tanggal dan normalisasi format tanggal dari sheet. Perubahan status dan keterangan dibandingkan terhadap salinan data awal sebelum dikirim massal.",
+      "sections": [
+        {
+          "title": "Impor, state, dan peran yang diizinkan",
+          "lineRange": [1, 26],
+          "explanation": "Selain state standar halaman absen, tanggal dibuat bisa diubah. canEdit mencakup Wali Kelas, Ketua Kelas, Wakil Ketua Kelas, Sekretaris, dan Wakil Sekretaris.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Normalisasi tanggal dan efek pemuatan",
+          "lineRange": [28, 57],
+          "explanation": "normalizeDateString mengubah nilai tanggal menjadi yyyy-MM-dd bila valid. Data hasil normalisasi disimpan ke presensi dan disalin ke originalPresensi lewat JSON.parse(JSON.stringify()) agar perbandingan tidak merujuk objek yang sama.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Deteksi perubahan khusus sesi pagi",
+          "lineRange": [59, 77],
+          "explanation": "buildPresensiId dan isPresensiChanged kini hanya memeriksa Status_Pagi. hasChanges menggabungkan perubahan status dengan perubahan keterangan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Handler status dan keterangan",
+          "lineRange": [79, 105],
+          "explanation": "handleStatusChange memperbarui atau membuat record dengan Status_Pagi saja; mengklik status yang aktif akan mengosongkannya. handleKeteranganChange menyimpan catatan per ID siswa.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Tandai hadir semua untuk pagi",
+          "lineRange": [107, 130],
+          "explanation": "handleMarkAllPresent mengisi Status_Pagi dengan H untuk seluruh siswa dan membuat record baru bila belum ada, tanpa menyentuh Status_Siang.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Simpan perubahan ke backend",
+          "lineRange": [132, 198],
+          "explanation": "handleSave menyaring record yang berubah, mengirim BULK_UPDATE_PRESENSI, menyamakan originalPresensi dengan data terbaru, menghapus duplikat per siswa, lalu mengosongkan draf keterangan.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Header, pemilih tanggal, dan statistik",
+          "lineRange": [200, 266],
+          "explanation": "Tampilan menampilkan label Sesi Pagi, nama kelas, tanggal dalam locale Indonesia, input date, tombol Hadir Semua dan Simpan Perubahan, serta kartu total siswa, jumlah hadir pagi, dan status terakhir.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Tabel kehadiran pagi",
+          "lineRange": [268, 352],
+          "explanation": "Tabel menampilkan satu set tombol status H sampai B untuk tiap siswa. Warna aktif dan disabled mengikuti status saat ini dan izin editing pengguna.",
+          "tourOrder": 7
+        }
+      ]
+    },
+    "src/pages/PresensiSiang.jsx": {
+      "overview": "PresensiSiang mencatat kehadiran sesi siang sekaligus menampilkan status pagi sebagai referensi. Keunggulannya ada pada tombol Salin Absen Pagi yang mengisi status siang otomatis, dengan default Hadir bila status pagi kosong.",
+      "sections": [
+        {
+          "title": "Impor, state, dan izin editing",
+          "lineRange": [1, 26],
+          "explanation": "Struktur awal halaman ini mengikuti PresensiPagi: state siswa, presensi, salinan awal, keterangan, dan tanggal yang bisa diubah, dengan daftar peran yang sama untuk canEdit.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Normalisasi tanggal dan pemuatan data",
+          "lineRange": [28, 57],
+          "explanation": "normalizeDateString menyeragamkan Tanggal dari sheet. Data dinormalisasi disimpan lalu disalin ke originalPresensi supaya perubahan siang dapat dibandingkan dengan kondisi awal.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Deteksi perubahan Status_Siang",
+          "lineRange": [59, 77],
+          "explanation": "isPresensiChanged kini hanya membandingkan Status_Siang. Fungsi buildPresensiId dan hasChanges tetap sama polanya dengan halaman pagi.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Handler status siang dan keterangan",
+          "lineRange": [79, 105],
+          "explanation": "handleStatusChange memperbarui atau membuat record dengan Status_Siang saja. Klik berulang pada status yang sama akan menghapusnya, sementara keterangan ditampilkan di kotak terpisah.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Salin absen pagi ke siang",
+          "lineRange": [107, 134],
+          "explanation": "handleCopyMorningAttendance menyalin Status_Pagi ke Status_Siang untuk setiap siswa. Bila status pagi kosong, nilai siang diisi H agar tidak ada baris yang terlewat.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Simpan perubahan siang",
+          "lineRange": [136, 202],
+          "explanation": "handleSave mengirim hanya record yang berubah lewat BULK_UPDATE_PRESENSI, lalu memperbarui originalPresensi tanpa duplikat dan menampilkan toast hasil operasi.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Warna status dan panel statistik",
+          "lineRange": [204, 281],
+          "explanation": "getStatusColor memetakan H, S, I, A, dan B ke kelas warna. Halaman menampilkan total siswa, jumlah hadir siang, jumlah ketidakhadiran, dan pesan status terakhir.",
+          "tourOrder": 7
+        },
+        {
+          "title": "Tabel referensi pagi dan input siang",
+          "lineRange": [283, 374],
+          "explanation": "Tabel memiliki kolom Status Pagi yang hanya dibaca dan kolom Input Siang berisi tombol status aktif. Di akhir baris tersedia kolom keterangan untuk catatan tambahan.",
+          "tourOrder": 7
+        }
+      ]
+    },
+    "src/pages/Laporan.jsx": {
+      "overview": "Laporan menggabungkan data aktif dan arsip menjadi laporan perkembangan kelas bulanan atau mingguan yang siap dicetak atau disimpan sebagai PDF. Halaman ini menghitung ringkasan kehadiran, keuangan, panggilan, keterlambatan, dan komposisi siswa, termasuk pratinjau bukti foto dari Drive.",
+      "sections": [
+        {
+          "title": "Impor dan konstanta warna grafik",
+          "lineRange": [1, 49],
+          "explanation": "Berkas mengimpor banyak helper date-fns, komponen recharts, ikon lucide, komponen pendukung, dan formatDateIndo. COLORS menyimpan palet untuk grafik laporan.",
+          "tourOrder": 8
+        },
+        {
+          "title": "State data, lightbox, dan filter",
+          "lineRange": [51, 76],
+          "explanation": "State menampung sepuluh sumber data dari sheet, tautan thumbnail, kondisi lightbox, serta filter berupa filterType month atau week, selectedMonth, dan selectedWeek. reportRef dipakai untuk area cetak.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Muat seluruh data dan thumbnail Drive",
+          "lineRange": [78, 139],
+          "explanation": "useEffect mengambil sepuluh sheet secara paralel, lalu memindai Bukti_File_URL pada log panggilan untuk mengumpulkan ID file Drive. ID unik tersebut dikirim ke GET_THUMBNAILS agar gambar bukti bisa ditampilkan.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Kalender akademik, rentang tanggal, dan data terfilter",
+          "lineRange": [141, 228],
+          "explanation": "academicMonths menyusun dua belas bulan mulai Juli, weekOptions membagi bulan menjadi minggu, dan dateRange menentukan batas periode. Data presensi, keuangan, dan panggilan aktif digabungkan dengan arsip serta dihilangkan duplikatnya sebelum difilter.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Statistik kehadiran dan akumulasi ketidakhadiran",
+          "lineRange": [229, 307],
+          "explanation": "generalStats menghitung ringkasan H, S, I, A, dan B dengan aturan status unik per hari. studentAbsenceTotals melakukan hal yang sama per siswa, lalu menambahkan rekap dari arsip bila filter bulanan aktif.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Ringkasan keuangan dan saldo",
+          "lineRange": [309, 360],
+          "explanation": "financialStats membersihkan angka bertitik dari sheet, menjumlahkan pemasukan dan pengeluaran periode terpilih, mengambil saldo awal dari arsip, lalu menambahkan transaksi aktif sebelum rentang minggu untuk menghitung saldo akhir.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Statistik panggilan, keterlambatan, dan tren",
+          "lineRange": [362, 477],
+          "explanation": "Blok ini menyusun panggilanStats, menggabungkan dan mengurutkan data keterlambatan, menghitung komposisi jenis kelamin, serta membangun trendData harian. Untuk hari arsip, jumlah Hadir diperkirakan dari total siswa dikurangi siswa yang tercatat tidak hadir.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Cetak, badge status, dan gaya media print",
+          "lineRange": [479, 631],
+          "explanation": "handleDownload memanggil window.print, StatusBadge merender label status, dan blok style berisi aturan @media print untuk menyembunyikan navigasi, mengatur ukuran kertas A4, menjaga header tabel, serta mengatur grafik agar tetap terbaca di PDF.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Header laporan dan bagian I sampai II",
+          "lineRange": [633, 830],
+          "explanation": "Area ini merender tombol filter Bulanan dan Mingguan, kop laporan, PageGuide, bagian Komposisi Kelas, Ringkasan Kehadiran, grafik pie dan batang, serta grafik garis tren kehadiran.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Bagian III sampai VII dan lightbox",
+          "lineRange": [832, 1314],
+          "explanation": "Laporan dilanjutkan dengan Detail Ketidakhadiran, Rekapitulasi Keuangan beserta mutasi, rekap panggilan dan home visit lengkap dengan bukti foto, daftar siswa keluar, dan rekap keterlambatan. Komponen ImageLightbox dipasang di akhir untuk melihat bukti foto.",
+          "tourOrder": 8
+        }
+      ]
+    },
+    "src/pages/MasterSiswa.jsx": {
+      "overview": "MasterSiswa adalah halaman administrasi data induk siswa: tambah, edit, hapus, impor dan ekspor Excel, serta pembaruan massal tanggal histori kelas. Tombol manajemen dibatasi untuk Wali Kelas, sementara koordinat lokasi dan jabatan diatur melalui modal form.",
+      "sections": [
+        {
+          "title": "Impor dan aturan akses",
+          "lineRange": [1, 23],
+          "explanation": "Selain hooks dan fetchGAS, halaman mengimpor StudentCard, loadXLSX, formatPhoneNumber, dan utilitas koordinat. canAddStudent hanya true untuk Wali Kelas, sedangkan canChangeLocation sengaja diaktifkan untuk semua.",
+          "tourOrder": 8
+        },
+        {
+          "title": "State form dan efek pemuatan",
+          "lineRange": [25, 74],
+          "explanation": "State menampung seluruh field profil siswa, status modal, serta state impor dan update massal. useEffect mengambil Master_Siswa lalu menyaring siswa berstatus Aktif.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Unduh template Excel",
+          "lineRange": [76, 91],
+          "explanation": "handleDownloadTemplate memuat XLSX secara malas, membuat workbook berisi baris header dan contoh data, lalu menulis file Template_Master_Siswa.xlsx.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Impor dan ekspor data Excel",
+          "lineRange": [93, 173],
+          "explanation": "handleImportExcel membaca file lewat FileReader, memetakan baris menjadi field sheet, menyeragamkan nomor WhatsApp, lalu mengirim BULK_CREATE sebelum memuat ulang daftar. handleExportData mengambil semua siswa termasuk yang tidak aktif lalu menuliskannya ke file Excel.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Bersihkan form",
+          "lineRange": [175, 200],
+          "explanation": "clearForm mengembalikan semua state field ke nilai awal, menutup modal, dan menghapus editingStudent maupun pesan error.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Tambah atau perbarui siswa",
+          "lineRange": [202, 253],
+          "explanation": "handleCreateOrUpdateStudent menyusun studentData dari seluruh field, menormalkan nomor telepon, dan membuat tautan Maps dari koordinat. Pembaruan dan penambahan memakai UPDATE atau CREATE dengan state yang diperbarui lebih dulu.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Hapus dan isi form edit",
+          "lineRange": [255, 291],
+          "explanation": "handleDeleteStudent meminta konfirmasi lalu mengirim DELETE. handleEditStudent memindahkan data siswa ke state form dan mengubah koordinat desimal menjadi format DMS dengan formatCoordinateInput.",
+          "tourOrder": 8
+        },
+        {
+          "title": "WhatsApp dan sinkronisasi GPS",
+          "lineRange": [293, 332],
+          "explanation": "Dua handler WhatsApp membuka wa.me dengan pesan berbeda untuk wali dan siswa. handleGetGPS memakai navigator.geolocation lalu mengubah koordinat menjadi DMS dan membuat tautan Maps.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Pembaruan massal dan jabatan terisi",
+          "lineRange": [334, 381],
+          "explanation": "handleBulkUpdateHistory mengirim BULK_UPDATE_MASTER_HISTORY untuk tanggal masuk dan kenaikan kelas ke seluruh siswa. takenRoles mengumpulkan jabatan yang sudah dipakai agar opsi jabatan di form bisa dinonaktaskan.",
+          "tourOrder": 8
+        },
+        {
+          "title": "Toolbar, daftar kartu, dan modal form",
+          "lineRange": [383, 785],
+          "explanation": "Tampilan memuat toolbar ekspor dan impor, panel update massal, grid StudentCard, serta modal besar dengan bagian Identitas Dasar, Histori Kelas, Status dan Jabatan, Kontak dan Geotagging, pratinjau peta, dan tombol simpan.",
+          "tourOrder": 8
+        }
+      ]
+    }
+  }
+}

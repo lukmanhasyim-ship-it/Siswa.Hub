@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "pipeline:.github/workflows/node.js.yml",
+      "type": "pipeline",
+      "name": "Node.js CI",
+      "filePath": ".github/workflows/node.js.yml",
+      "summary": "Workflow GitHub Actions yang menjalankan instalasi bersih dependensi, build, dan pengujian proyek pada cabang main untuk setiap push dan pull request. Workflow ini memakai matriks Node.js versi 18, 20, dan 22 di lingkungan ubuntu-latest.",
+      "tags": ["ci", "github-actions", "nodejs", "workflow", "build", "test"],
+      "complexity": "simple",
+      "languageNotes": "File YAML konfigurasi pipeline, bukan kode JS/JSX sehingga tidak memiliki komponen maupun hook React; komponen utamanya berupa job build."
+    },
+    {
+      "id": "function:.github/workflows/node.js.yml:build",
+      "type": "function",
+      "name": "build",
+      "filePath": ".github/workflows/node.js.yml",
+      "summary": "Job utama workflow yang melakukan checkout kode, menyiapkan Node.js sesuai matriks dengan cache npm, lalu menjalankan npm ci, npm run build, dan npm test. Job ini berjalan pada ubuntu-latest untuk masing-masing versi Node.js dalam matriks.",
+      "tags": ["job", "build", "ci", "npm", "matrix"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "pipeline:.github/workflows/node.js.yml",
+      "target": "function:.github/workflows/node.js.yml:build",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "Workflow Node.js CI memuat job build sebagai satu-satunya pekerjaan yang dijalankan."
+    }
+  ]
+}

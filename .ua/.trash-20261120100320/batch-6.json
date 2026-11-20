@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/components/ErrorBoundary.jsx",
+      "type": "file",
+      "name": "ErrorBoundary.jsx",
+      "filePath": "src/components/ErrorBoundary.jsx",
+      "summary": "Komponen class React yang menangkap error render pada child dan menampilkan halaman fallback bertema merah berisi detail error serta tombol untuk memuat ulang halaman.",
+      "tags": [
+        "react",
+        "error-boundary",
+        "class-component",
+        "fallback-ui",
+        "penanganan-error"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Memakai class component React dengan lifecycle getDerivedStateFromError dan componentDidCatch, bukan hook. Sebagian teks antarmuka masih berbahasa Inggris."
+    },
+    {
+      "id": "class:src/components/ErrorBoundary.jsx:ErrorBoundary",
+      "type": "class",
+      "name": "ErrorBoundary",
+      "filePath": "src/components/ErrorBoundary.jsx",
+      "summary": "Class ErrorBoundary extends React.Component yang menyimpan state hasError dan error, mencatat kegagalan ke console, lalu merender UI fallback dengan tombol refresh sebagai pengganti children saat terjadi error.",
+      "tags": [
+        "react",
+        "error-boundary",
+        "class-component",
+        "state",
+        "penanganan-error"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/queryClient.js",
+      "type": "file",
+      "name": "queryClient.js",
+      "filePath": "src/lib/queryClient.js",
+      "summary": "Membuat dan mengekspor instance QueryClient dari TanStack React Query dengan opsi cache default: staleTime 60 detik, gcTime 15 menit, retry dinonaktifkan, serta refetch saat koneksi kembali. Data GAS sengaja hanya hidup di memori tab.",
+      "tags": [
+        "react-query",
+        "query-client",
+        "cache",
+        "konfigurasi",
+        "data-gas"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Data sensitif siswa sengaja tidak dipersistensi ke localStorage maupun service worker."
+    },
+    {
+      "id": "function:src/lib/queryClient.js:queryClient",
+      "type": "function",
+      "name": "queryClient",
+      "filePath": "src/lib/queryClient.js",
+      "summary": "Singleton QueryClient global yang mengatur strategi cache kueri: data segar selama 60 detik, dibersihkan setelah 15 menit, tanpa retry, refetch saat jendela fokus dinonaktifkan, dan refetch saat koneksi kembali diaktifkan.",
+      "tags": [
+        "react-query",
+        "query-client",
+        "cache",
+        "singleton",
+        "konfigurasi"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/main.jsx",
+      "type": "file",
+      "name": "main.jsx",
+      "filePath": "src/main.jsx",
+      "summary": "Titik masuk aplikasi yang memasang root React dengan StrictMode, membungkus komponen App di dalam QueryClientProvider dan ErrorBoundary, serta memuat stylesheet global index.css.",
+      "tags": [
+        "entry-point",
+        "react",
+        "react-dom",
+        "bootstrap",
+        "strict-mode"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Memakai API ReactDOM.createRoot dari React 18."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/components/ErrorBoundary.jsx",
+      "target": "class:src/components/ErrorBoundary.jsx:ErrorBoundary",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File ErrorBoundary.jsx mendefinisikan class ErrorBoundary sebagai satu-satunya komponen di dalamnya."
+    },
+    {
+      "source": "file:src/lib/queryClient.js",
+      "target": "function:src/lib/queryClient.js:queryClient",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "File queryClient.js membuat dan mengekspor instance queryClient sebagai simbol utamanya."
+    },
+    {
+      "source": "file:src/main.jsx",
+      "target": "file:src/App.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "main.jsx mengimpor komponen utama App dari src/App.jsx; edge lintas batch ini dikonfirmasi neighborMap dengan batchIndex 2."
+    },
+    {
+      "source": "file:src/main.jsx",
+      "target": "file:src/components/ErrorBoundary.jsx",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "main.jsx mengimpor ErrorBoundary untuk dijadikan pembungkus komponen App."
+    },
+    {
+      "source": "file:src/main.jsx",
+      "target": "file:src/index.css",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "main.jsx mengimpor stylesheet global index.css; edge lintas batch ini dikonfirmasi neighborMap dengan batchIndex 9."
+    },
+    {
+      "source": "file:src/main.jsx",
+      "target": "file:src/lib/queryClient.js",
+      "type": "imports",
+      "weight": 0.7,
+      "description": "main.jsx mengimpor instance queryClient dari src/lib/queryClient.js untuk dipakai di QueryClientProvider."
+    },
+    {
+      "source": "file:src/main.jsx",
+      "target": "function:src/lib/queryClient.js:queryClient",
+      "type": "configures",
+      "weight": 0.6,
+      "description": "main.jsx menyuntikkan instance queryClient ke QueryClientProvider sehingga seluruh komponen memakai konfigurasi cache yang sama."
+    }
+  ]
+}
