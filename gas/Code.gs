@@ -326,6 +326,9 @@ function handleResponse(e) {
       CREATE_TERLAMBAT: function() {
         return { status: 'success', data: createTerlambat(payload && payload.data) };
       },
+      BULK_CREATE_TERLAMBAT: function() {
+        return { status: 'success', data: bulkCreateTerlambat(payload && payload.data) };
+      },
       GET_TERLAMBAT: function() {
         return { status: 'success', data: getTerlambat(payload && payload.filter) };
       },
@@ -1566,6 +1569,81 @@ function createTerlambat(data) {
   };
   
   return appendData(sheetName, row);
+}
+
+/**
+ * Simpan antrean catatan terlambat sekaligus.
+ * Validasi duplikat dilakukan untuk SEMUA item sebelum ada baris yang ditulis,
+ * sehingga antrean bisa diperbaiki user bila ada yang bentrok.
+ */
+function bulkCreateTerlambat(dataList) {
+  if (!dataList || !Array.isArray(dataList)) throw new Error('Data harus berupa array.');
+  if (dataList.length === 0) return [];
+
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+
+    var existing = getTerlambat() || [];
+    var existingKeys = {};
+    existing.forEach(function(r) {
+      var tanggal = formatDateValue(r.Tanggal, 'Tanggal');
+      var idSiswa = (r.ID_Siswa || '').toString();
+      if (tanggal && idSiswa) existingKeys[tanggal + '_' + idSiswa] = true;
+    });
+
+    var now = new Date();
+    var batchKeys = {};
+    var rows = [];
+
+    dataList.forEach(function(item) {
+      if (!item || !item.Tanggal || !item.ID_Siswa) {
+        throw new Error('Data tanggal dan siswa harus diisi.');
+      }
+
+      var tanggal = formatDateValue(item.Tanggal, 'Tanggal');
+      var idSiswa = item.ID_Siswa.toString();
+      var key = tanggal + '_' + idSiswa;
+      if (existingKeys[key] || batchKeys[key]) {
+        var nama = item.Nama_Siswa || idSiswa;
+        throw new Error('Terdapat duplikat pada antrean: ' + nama + ' sudah tercatat terlambat pada ' + tanggal + '. Perbaiki antrean terlebih dahulu sebelum menyimpan.');
+      }
+      batchKeys[key] = true;
+
+      rows.push({
+        ID_Terlambat: 'TL' + Utilities.getUuid(),
+        Tanggal: tanggal,
+        ID_Siswa: idSiswa,
+        NISN: item.NISN || '',
+        Nama_Siswa: item.Nama_Siswa || '',
+        Keterangan: item.Keterangan || '',
+        Dicatat_Oleh: item.Dicatat_Oleh || '',
+        Created_At: formatDateValue(now, 'Created_At')
+      });
+    });
+
+    var sheetName = 'Catatan_Terlambat';
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      sheet.appendRow(['ID_Terlambat', 'Tanggal', 'ID_Siswa', 'NISN', 'Nama_Siswa', 'Keterangan', 'Dicatat_Oleh', 'Created_At']);
+    }
+
+    ensureHeaders(sheet, rows[0]);
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    var values = rows.map(function(row) {
+      return headers.map(function(header) {
+        var value = row[header];
+        return value !== undefined && value !== null ? formatDateValue(value, header) : '';
+      });
+    });
+
+    sheet.getRange(sheet.getLastRow() + 1, 1, values.length, headers.length).setValues(values);
+    return rows;
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function getTerlambat(filter) {

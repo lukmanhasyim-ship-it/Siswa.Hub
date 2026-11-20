@@ -1,30 +1,119 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchGAS } from '../utils/gasClient';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Clock, Search, X, Trash2, UserCheck, AlertCircle, Pencil, Check, CornerDownLeft } from 'lucide-react';
+import { Clock, Search, X, Trash2, UserCheck, AlertCircle, Pencil, Check } from 'lucide-react';
 import Loading from '../components/Loading';
-import Skeleton from '../components/Skeleton';
 import EmptyState from '../components/EmptyState';
+
+const DRAFT_VERSION = 1;
+const QUEUE_VERSION = 1;
+
+function getDraftKey(user, tanggal) {
+  return `terlambat_draft_v${DRAFT_VERSION}_${user?.email || 'anon'}_${tanggal}`;
+}
+
+function getQueueKey(user, tanggal) {
+  return `terlambat_queue_v${QUEUE_VERSION}_${user?.email || 'anon'}_${tanggal}`;
+}
+
+function makeLocalId() {
+  return `Q${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function normalizeQueueItem(item, tanggal) {
+  if (!item || typeof item !== 'object') return null;
+  const idSiswa = typeof item.ID_Siswa === 'string' ? item.ID_Siswa : '';
+  if (!idSiswa) return null;
+
+  return {
+    localId: typeof item.localId === 'string' && item.localId ? item.localId : makeLocalId(),
+    ID_Siswa: idSiswa,
+    NISN: typeof item.NISN === 'string' ? item.NISN : '',
+    Nama_Siswa: typeof item.Nama_Siswa === 'string' ? item.Nama_Siswa : idSiswa,
+    Keterangan: typeof item.Keterangan === 'string' ? item.Keterangan : '',
+    Dicatat_Oleh: typeof item.Dicatat_Oleh === 'string' ? item.Dicatat_Oleh : '',
+    Tanggal: typeof item.Tanggal === 'string' ? item.Tanggal : tanggal,
+  };
+}
+
+function readQueue(user, tanggal) {
+  try {
+    const raw = localStorage.getItem(getQueueKey(user, tanggal));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map(item => normalizeQueueItem(item, tanggal)).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function writeQueue(user, tanggal, items) {
+  try {
+    localStorage.setItem(getQueueKey(user, tanggal), JSON.stringify(items));
+  } catch {
+    // Storage tidak tersedia → antrean tetap ada di memori selama halaman terbuka.
+  }
+}
+
+function clearQueue(user, tanggal) {
+  try {
+    localStorage.removeItem(getQueueKey(user, tanggal));
+  } catch {
+    // Abaikan kegagalan storage.
+  }
+}
+
+function readDraft(user, tanggal) {
+  try {
+    const raw = localStorage.getItem(getDraftKey(user, tanggal));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return { keterangan: typeof parsed.keterangan === 'string' ? parsed.keterangan : '' };
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(user, tanggal, draft) {
+  try {
+    localStorage.setItem(getDraftKey(user, tanggal), JSON.stringify(draft));
+  } catch {
+    // Storage tidak tersedia (private mode / quota) → form tetap berfungsi.
+  }
+}
+
+function clearDraft(user, tanggal) {
+  try {
+    localStorage.removeItem(getDraftKey(user, tanggal));
+  } catch {
+    // Abaikan kegagalan storage.
+  }
+}
 
 export default function CatatanTerlambat() {
   const { user } = useAuth();
   const { showToast } = useToast();
 
+  const initialDate = format(new Date(), 'yyyy-MM-dd');
   const [siswa, setSiswa] = useState([]);
   const [terlambat, setTerlambat] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(initialDate);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSiswa, setSelectedSiswa] = useState(null);
-  const [keterangan, setKeterangan] = useState('');
+  const [keterangan, setKeterangan] = useState(() => readDraft(user, initialDate)?.keterangan ?? '');
   const [showDropdown, setShowDropdown] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState('');
+  const [queue, setQueue] = useState(() => readQueue(user, initialDate));
+  const skipDraftSaveRef = useRef(false);
 
   const role = user?.role || 'Siswa';
   const canEdit = role === 'Wali Kelas';
@@ -34,7 +123,7 @@ export default function CatatanTerlambat() {
       try {
         const [s, t] = await Promise.all([
           fetchGAS('GET_ALL', { sheet: 'Master_Siswa' }),
-          fetchGAS('GET_TERLAMBAT', { filter: { tanggal: format(new Date(), 'yyyy-MM-dd') } })
+          fetchGAS('GET_TERLAMBAT', { filter: { tanggal: initialDate } })
         ]);
         setSiswa((s.data || []).filter(st => st.Status_Aktif === 'Aktif'));
         setTerlambat(t.data || []);
@@ -46,7 +135,17 @@ export default function CatatanTerlambat() {
       }
     }
     load();
-  }, [showToast]);
+  }, [initialDate, showToast]);
+
+  // Draft keterangan lokal mengikuti akun dan tanggal yang sedang dipilih.
+  useEffect(() => {
+    if (skipDraftSaveRef.current) {
+      skipDraftSaveRef.current = false;
+      return;
+    }
+    if (!canEdit) return;
+    writeDraft(user, date, { keterangan });
+  }, [canEdit, keterangan, date, user]);
 
   const loadTerlambat = useCallback(async (tanggal) => {
     try {
@@ -79,37 +178,81 @@ export default function CatatanTerlambat() {
 
   const handleDateChange = (e) => {
     const newDate = e.target.value;
+    if (!newDate || newDate === date) return;
     setDate(newDate);
+    setQueue(readQueue(user, newDate));
+    setKeterangan(readDraft(user, newDate)?.keterangan ?? '');
+    setSelectedSiswa(null);
+    setSearchQuery('');
+    setShowDropdown(false);
     loadTerlambat(newDate);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedSiswa) {
-      showToast('Pilih siswa terlebih dahulu.', 'error');
+  const handleCatatTerlambat = () => {
+    if (!selectedSiswa || !canEdit || saving) return;
+
+    const idSiswa = String(selectedSiswa.ID_Siswa);
+    const alreadySaved = terlambat.some(item => String(item.ID_Siswa) === idSiswa);
+    const alreadyQueued = queue.some(item => String(item.ID_Siswa) === idSiswa);
+    if (alreadySaved || alreadyQueued) {
+      showToast(`${selectedSiswa.Nama_Siswa} sudah tercatat terlambat pada tanggal ini.`, 'error');
       return;
     }
-    if (!canEdit) return;
 
-    setSubmitting(true);
+    const item = normalizeQueueItem({
+      localId: makeLocalId(),
+      ID_Siswa: idSiswa,
+      NISN: selectedSiswa.NISN || '',
+      Nama_Siswa: selectedSiswa.Nama_Siswa,
+      Keterangan: keterangan,
+      Dicatat_Oleh: user.email || '',
+      Tanggal: date,
+    }, date);
+    if (!item) return;
+
+    const next = [...queue, item];
+    setQueue(next);
+    writeQueue(user, date, next);
+    handleClearSiswa();
+    showToast(`${selectedSiswa.Nama_Siswa} dicatat. Belum masuk database.`, 'info');
+  };
+
+  const handleRemoveQueueItem = (localId) => {
+    const next = queue.filter(item => item.localId !== localId);
+    setQueue(next);
+    writeQueue(user, date, next);
+    showToast('Catatan dihapus dari antrean.', 'info');
+  };
+
+  const handleSaveQueue = async () => {
+    if (!canEdit || saving) return;
+    if (queue.length === 0) {
+      showToast('Belum ada catatan yang dicatat. Klik Catat Terlambat dulu.', 'info');
+      return;
+    }
+
+    setSaving(true);
     try {
-      await fetchGAS('CREATE_TERLAMBAT', {
-        data: {
-          Tanggal: date,
-          ID_Siswa: selectedSiswa.ID_Siswa,
-          NISN: selectedSiswa.NISN || '',
-          Nama_Siswa: selectedSiswa.Nama_Siswa,
-          Keterangan: keterangan,
-          Dicatat_Oleh: user.email || ''
-        }
+      const items = queue.map((item) => {
+        const row = { ...item };
+        delete row.localId;
+        return row;
       });
-      showToast(`Berhasil mencatat ${selectedSiswa.Nama_Siswa} terlambat.`, 'success');
+      const res = await fetchGAS('BULK_CREATE_TERLAMBAT', { data: items });
+      const savedCount = Array.isArray(res?.data) ? res.data.length : queue.length;
+
+      skipDraftSaveRef.current = true;
+      setQueue([]);
+      clearQueue(user, date);
+      clearDraft(user, date);
       handleClearSiswa();
-      loadTerlambat(date);
+      await loadTerlambat(date);
+      showToast(`${savedCount} catatan terlambat berhasil disimpan.`, 'success');
     } catch (error) {
-      showToast(error.message || 'Gagal menyimpan data.', 'error');
+      // Antrean sengaja dipertahankan agar user bisa memperbaiki lalu mencoba lagi.
+      showToast(error.message || 'Gagal menyimpan catatan terlambat.', 'error');
     } finally {
-      setSubmitting(false);
+      setSaving(false);
     }
   };
 
@@ -119,7 +262,7 @@ export default function CatatanTerlambat() {
       await fetchGAS('DELETE_TERLAMBAT', { id });
       showToast('Catatan terlambat berhasil dihapus.', 'success');
       loadTerlambat(date);
-    } catch (error) {
+    } catch {
       showToast('Gagal menghapus data.', 'error');
     }
   };
@@ -137,7 +280,7 @@ export default function CatatanTerlambat() {
       setEditingId(null);
       setEditValue('');
       loadTerlambat(date);
-    } catch (error) {
+    } catch {
       showToast('Gagal memperbarui keterangan.', 'error');
     }
   };
@@ -197,7 +340,7 @@ export default function CatatanTerlambat() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={(e) => { e.preventDefault(); handleCatatTerlambat(); }} className="space-y-5">
               {/* Search Siswa */}
               <div className="relative">
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">
@@ -284,12 +427,15 @@ export default function CatatanTerlambat() {
 
               <button
                 type="submit"
-                disabled={!selectedSiswa || submitting || !canEdit}
+                disabled={!selectedSiswa || saving || !canEdit}
                 className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Clock className={`w-4 h-4 ${submitting ? 'animate-spin' : ''}`} />
-                {submitting ? 'Menyimpan...' : 'Catat Terlambat'}
+                <Clock className="w-4 h-4" />
+                Catat Terlambat
               </button>
+              <p className="text-[11px] font-medium text-slate-500">
+                Catat Terlambat menambah siswa ke antrean. Tombol Simpan Catatan ada di bawah daftar antrean. Draft form tersimpan otomatis di perangkat ini.
+              </p>
             </form>
           </div>
 
@@ -300,12 +446,75 @@ export default function CatatanTerlambat() {
               <div>
                 <p className="text-xs font-black text-amber-800">Pencatatan Keterlambatan</p>
                 <p className="text-[10px] font-medium text-amber-700 mt-1 leading-relaxed">
-                  Mencatat siswa yang datang terlambat. Satu siswa hanya dapat dicatat maksimal 1 kali per hari.
+                  Mencatat siswa yang datang terlambat. Satu siswa hanya dapat dicatat maksimal 1 kali per hari. Antrean berlaku untuk tanggal yang sedang dipilih.
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Antrean Belum Disimpan */}
+        {canEdit && queue.length > 0 && (
+          <div className="card lg:col-span-2 overflow-hidden p-0 border-orange-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-orange-100 bg-orange-50/70 px-4 py-3">
+              <div>
+                <h3 className="font-semibold text-orange-900">Antrean Catatan Belum Disimpan</h3>
+                <p className="text-[11px] text-orange-700">
+                  {queue.length} catatan menunggu disimpan ke database untuk {format(new Date(date), 'dd MMM yyyy', { locale: id })}.
+                </p>
+              </div>
+              <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[10px] font-black uppercase tracking-widest">
+                {format(new Date(date), 'dd MMM yyyy', { locale: id })}
+              </div>
+            </div>
+            <div className="table-container">
+              <table className="modern-table min-w-[500px] md:min-w-full">
+                <thead>
+                  <tr>
+                    <th className="w-12 text-center">No</th>
+                    <th>Nama Siswa</th>
+                    <th>NISN</th>
+                    <th>Keterangan</th>
+                    <th className="w-16 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {queue.map((item, idx) => (
+                    <tr key={item.localId} className="border-b last:border-0 bg-orange-50/30 hover:bg-orange-50">
+                      <td className="text-center font-bold text-slate-300">{idx + 1}</td>
+                      <td className="px-4 py-3 font-black text-slate-800 tracking-tight">{item.Nama_Siswa}</td>
+                      <td className="px-4 py-3 text-[11px] font-bold text-slate-500">{item.NISN || '-'}</td>
+                      <td className="px-4 py-3 text-xs text-slate-600">{item.Keterangan || <span className="text-slate-300 italic">-</span>}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveQueueItem(item.localId)}
+                          className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Hapus dari antrean"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-orange-100 bg-white px-4 py-3">
+              <p className="text-xs text-slate-600">
+                <span className="font-bold text-orange-700">{queue.length}</span> catatan siap disimpan ke database.
+              </p>
+              <button
+                type="button"
+                onClick={handleSaveQueue}
+                disabled={saving}
+                className="btn-primary disabled:opacity-50"
+              >
+                {saving ? 'Menyimpan...' : `Simpan Catatan (${queue.length})`}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Daftar Terlambat */}
         <div className="lg:col-span-2">

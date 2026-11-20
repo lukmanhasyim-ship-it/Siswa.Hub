@@ -1,7 +1,7 @@
-# Siswa.Hub v5.0.0 — Ekosistem Manajemen Kelas Digital Premium
+# Siswa.Hub v5.0.1 — Ekosistem Manajemen Kelas Digital Premium
 
 ![License](https://img.shields.io/badge/License-Private-red.svg)
-![Version](https://img.shields.io/badge/Version-5.0.0-emerald.svg)
+![Version](https://img.shields.io/badge/Version-5.0.1-emerald.svg)
 ![React](https://img.shields.io/badge/Frontend-React%2019-blue.svg)
 ![Backend](https://img.shields.io/badge/Backend-Google%20Apps%20Script-orange.svg)
 
@@ -9,7 +9,15 @@
 
 ---
 
-## 🆕 Versi 5.0.0 — Antrean Kas Massal & Performa Navigasi
+## 🆕 Versi 5.0.1 — Antrean Catatan Terlambat
+
+*   **Antrean per Tanggal**: Tombol **Catat Terlambat** kini memasukkan siswa ke daftar antrean lokal sesuai tanggal yang dipilih di header (bukan langsung ke Sheet). Antrean tanggal lain tetap tersimpan dan tidak tercampur.
+*   **Simpan Massal & Draft**: Tombol **Simpan Catatan** di bawah daftar antrean mengirim seluruh catatan tanggal itu dalam satu permintaan `BULK_CREATE_TERLAMBAT`. Draft keterangan dan antrean bertahan setelah halaman di-refresh.
+*   **Proteksi Duplikat**: Satu siswa maksimal satu catatan per hari. Jika ada duplikat saat penyimpanan, seluruh antrean ditolak dan user diminta memperbaiki terlebih dahulu. Notifikasi cukup berupa toast ringkas.
+
+---
+
+## Versi 5.0.0 — Antrean Kas Massal & Performa Navigasi
 
 *   **Antrean Transaksi Kas**: Tombol **Catat Kas** memasukkan transaksi ke daftar antrean lokal per akun. Banyak siswa bisa dicatat berurutan, lalu disimpan sekaligus lewat tombol **Simpan Transaksi** di bawah daftar antrean.
 *   **Simpan Massal & Notifikasi Ringkas**: Seluruh antrean dikirim dalam satu permintaan `BULK_CREATE` dengan satu notifikasi ringkasan. Draft form tetap tersimpan otomatis dan antrean bertahan setelah halaman di-refresh.
