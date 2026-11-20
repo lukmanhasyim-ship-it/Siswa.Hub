@@ -26,6 +26,7 @@ export default function LaporanHarian() {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [siswa, setSiswa] = useState([]);
   const [presensi, setPresensi] = useState([]);
+  const [terlambat, setTerlambat] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const reportRef = useRef();
 
@@ -61,6 +62,25 @@ export default function LaporanHarian() {
     loadData();
   }, [showToast]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTerlambat() {
+      try {
+        const res = await fetchGAS('GET_TERLAMBAT', { filter: { tanggal: selectedDate } });
+        if (!cancelled) setTerlambat(res.data || []);
+      } catch {
+        if (!cancelled) {
+          setTerlambat([]);
+          showToast('Gagal memuat catatan terlambat.', 'error');
+        }
+      }
+    }
+
+    loadTerlambat();
+    return () => { cancelled = true; };
+  }, [selectedDate, showToast]);
+
   const dailyPresensiByStudent = useMemo(() => {
     const map = {};
     presensi.filter(p => p.Tanggal === selectedDate).forEach(p => {
@@ -83,7 +103,7 @@ export default function LaporanHarian() {
     }
   };
 
-  const attendanceData = useMemo(() => {
+  const allAttendanceData = useMemo(() => {
     return siswa.map(s => {
       const record = dailyPresensiByStudent[s.ID_Siswa] || {};
       return {
@@ -93,8 +113,31 @@ export default function LaporanHarian() {
         siangStatus: record.Status_Siang || '-',
         siangTime: formatTime(record.Timestamp_Siang),
       };
-    }).filter(s => s.Nama_Siswa.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [siswa, dailyPresensiByStudent, searchQuery]);
+    });
+  }, [siswa, dailyPresensiByStudent]);
+
+  const attendanceData = useMemo(() => {
+    return allAttendanceData.filter(s =>
+      s.Nama_Siswa.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [allAttendanceData, searchQuery]);
+
+  const lateReport = useMemo(() => {
+    return (terlambat || []).map(item => {
+      const matched = allAttendanceData.find(
+        s => String(s.ID_Siswa) === String(item.ID_Siswa)
+      );
+      const catatan = typeof item.Keterangan === 'string'
+        ? item.Keterangan.trim()
+        : '';
+
+      return {
+        ...item,
+        Nama_Siswa: matched?.Nama_Siswa || item.Nama_Siswa || '-',
+        keterangan: catatan || '-',
+      };
+    }).sort((a, b) => String(a.Nama_Siswa).localeCompare(String(b.Nama_Siswa), 'id'));
+  }, [terlambat, allAttendanceData]);
 
   const stats = useMemo(() => {
     const sessionPagi = presensi.filter(p => p.Tanggal === selectedDate && p.Status_Pagi);
@@ -210,7 +253,8 @@ export default function LaporanHarian() {
         title="Tentang Laporan Harian:"
         steps={[
           'Pilih tanggal untuk melihat detail presensi pagi dan siang.',
-          'Gunakan kolom pencarian untuk memfilter siswa tertentu.',
+          'Gunakan kolom pencarian untuk memfilter siswa pada tabel presensi; bagian keterlambatan tetap menampilkan seluruh siswa.',
+          'Bagian Laporan Keterlambatan menampilkan siswa yang tercatat terlambat beserta keterangannya; pengisiannya dilakukan di menu Catatan Terlambat.',
           'Status "Nihil" atau "-" berarti siswa belum melakukan presensi atau data tidak ada.'
         ]}
       />
@@ -308,6 +352,51 @@ export default function LaporanHarian() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Laporan Keterlambatan */}
+        <div className="space-y-4 print:space-y-3">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-amber-500 print:hidden" />
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+              Laporan Keterlambatan
+            </h3>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              {lateReport.length} siswa
+            </span>
+          </div>
+
+          {lateReport.length > 0 ? (
+            <div className="table-container">
+              <table className="modern-table">
+                <thead>
+                  <tr>
+                    <th className="text-center w-12">No.</th>
+                    <th className="text-left">Nama Siswa</th>
+                    <th className="text-left">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {lateReport.map((item, idx) => (
+                    <tr key={item.ID_Terlambat || item.ID_Siswa || idx} className="hover:bg-slate-50 transition-colors font-bold">
+                      <td className="text-center text-slate-400 font-black">{idx + 1}</td>
+                      <td>
+                        <p className="text-slate-800 leading-none">{item.Nama_Siswa}</p>
+                        <p className="text-[8px] text-slate-400 font-black mt-1 uppercase leading-none">{item.ID_Siswa}</p>
+                      </td>
+                      <td className="text-slate-600 text-[11px] leading-snug font-semibold print:text-[9px]">
+                        {item.keterangan}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-6 text-center text-[11px] font-black uppercase tracking-widest text-slate-400">
+              Tidak ada catatan keterlambatan pada tanggal ini.
+            </div>
+          )}
         </div>
 
         <div className="hidden print:block pt-8 border-t border-slate-100 text-center">
