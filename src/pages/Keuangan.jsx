@@ -13,7 +13,6 @@ import { sendNotification } from '../utils/notifications';
 
 const DRAFT_VERSION = 1;
 const QUEUE_VERSION = 1;
-const SAVED_FLASH_KEY = 'kas_saved_flash';
 
 function getDraftKey(user) {
   return `kas_draft_v${DRAFT_VERSION}_${user?.email || 'anon'}`;
@@ -131,8 +130,8 @@ export default function Keuangan() {
   const [queue, setQueue] = useState(() => readQueue(user));
   const skipDraftSaveRef = useRef(false);
 
-  const loadKeuangan = useCallback(async () => {
-    setLoading(true);
+  const loadKeuangan = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const [k, s, profil] = await Promise.all([
         fetchGAS('GET_ALL', { sheet: 'Keuangan' }),
@@ -153,7 +152,7 @@ export default function Keuangan() {
       console.error('Keuangan load error:', error);
       showToast('Gagal memuat data keuangan.', 'error');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [showToast, userEmail]);
 
@@ -163,21 +162,13 @@ export default function Keuangan() {
 
   // Draft lokal: hanya untuk transaksi baru dan hanya untuk role yang boleh edit.
   useEffect(() => {
-    if (!canEdit || editingTrx || skipDraftSaveRef.current) return;
+    if (skipDraftSaveRef.current) {
+      skipDraftSaveRef.current = false;
+      return;
+    }
+    if (!canEdit || editingTrx) return;
     writeDraft(user, { idSiswa, jumlahInput, tipe, keterangan, tanggal });
   }, [canEdit, editingTrx, idSiswa, jumlahInput, tipe, keterangan, tanggal, user]);
-
-  // Toast sukses harus muncul setelah reload halaman.
-  useEffect(() => {
-    let saved = false;
-    try {
-      saved = sessionStorage.getItem(SAVED_FLASH_KEY) === '1';
-      if (saved) sessionStorage.removeItem(SAVED_FLASH_KEY);
-    } catch {
-      // sessionStorage tidak tersedia.
-    }
-    if (saved) showToast('Transaksi berhasil disimpan.', 'success');
-  }, [showToast]);
 
   const totalKas = useMemo(() => {
     return keuangan.reduce((acc, curr) => {
@@ -375,16 +366,21 @@ export default function Keuangan() {
 
       }
 
-      // Simpan sukses → buang antrean & draft paksa reload agar data benar-benar baru.
+      // Simpan sukses → buang antrean & draft, segarkan data di tempat.
+      // Tidak memakai window.location.reload() agar tetap berada di halaman Kas.
       skipDraftSaveRef.current = true;
       clearQueue(user);
       clearDraft(user);
-      try {
-        sessionStorage.setItem(SAVED_FLASH_KEY, '1');
-      } catch {
-        // Flash toast bersifat opsional.
-      }
-      window.location.reload();
+      setQueue([]);
+      setEditingTrx(null);
+      setIdSiswa('');
+      setJumlahInput('');
+      setTipe('Masuk');
+      setKeterangan('');
+      setTanggal(format(new Date(), 'yyyy-MM-dd'));
+      setStudentSearch('');
+      await loadKeuangan({ silent: true });
+      showToast('Transaksi berhasil disimpan.', 'success');
       return;
     } catch (error) {
       console.error('Simpan transaksi gagal:', error);
@@ -392,7 +388,7 @@ export default function Keuangan() {
     } finally {
       setSaving(false);
     }
-  }, [canEdit, idSiswa, amountValue, isAmountWarning, tipe, keterangan, tanggal, editingTrx, queue, totalQueue, activeStudents, user, userEmail, showToast]);
+  }, [canEdit, idSiswa, amountValue, isAmountWarning, tipe, keterangan, tanggal, editingTrx, queue, totalQueue, activeStudents, user, userEmail, showToast, loadKeuangan]);
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
