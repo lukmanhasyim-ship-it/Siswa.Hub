@@ -14,6 +14,7 @@
 *   **Antrean per Tanggal**: Tombol **Catat Terlambat** kini memasukkan siswa ke daftar antrean lokal sesuai tanggal yang dipilih di header (bukan langsung ke Sheet). Antrean tanggal lain tetap tersimpan dan tidak tercampur.
 *   **Simpan Massal & Draft**: Tombol **Simpan Catatan** di bawah daftar antrean mengirim seluruh catatan tanggal itu dalam satu permintaan `BULK_CREATE_TERLAMBAT`. Draft keterangan dan antrean bertahan setelah halaman di-refresh.
 *   **Proteksi Duplikat**: Satu siswa maksimal satu catatan per hari. Jika ada duplikat saat penyimpanan, seluruh antrean ditolak dan user diminta memperbaiki terlebih dahulu. Notifikasi cukup berupa toast ringkas.
+*   **Simpan Kas Tanpa Pindah Halaman**: Tombol **Simpan Transaksi** kini menyegarkan data di tempat. Browser tidak di-reload dan pengguna tetap berada di halaman KAS setelah transaksi tersimpan.
 
 ---
 
@@ -54,7 +55,7 @@
 
 ### 1. Persiapan Google Spreadsheet
 
-Buat **Google Spreadsheet** baru. Aplikasi akan membuat semua sheet secara otomatis saat pertama kali menjalankan perintah `setupSpreadsheet()` dari Kode.gs. Namun jika ingin membuat manual, berikut daftar lengkap sheet dan header baris pertamanya:
+Buat **Google Spreadsheet** baru. Jalankan `setupSpreadsheet()` dari editor Apps Script sekali saat awal setup (lihat langkah 2). Berikut struktur sheet yang dihasilkan. Kolom tambahan seperti `Status_Aktif`, `Latitude`, dan `Longitude` akan ditambahkan otomatis oleh fungsi `ensureHeaders()` saat aplikasi pertama kali menyimpan data siswa.
 
 **Sheet Aktif:**
 
@@ -64,22 +65,24 @@ Buat **Google Spreadsheet** baru. Aplikasi akan membuat semua sheet secara otoma
 | **Presensi** | `ID_Presensi, Tanggal, ID_Siswa, NISN, Status_Pagi, Timestamp_Pagi, Status_Siang, Timestamp_Siang, Keterangan` |
 | **Keuangan** | `ID_Transaksi, Tanggal, ID_Siswa, NISN, Tipe, Jumlah, Keterangan` |
 | **Daftar_Nilai** | `ID_Nilai, ID_Siswa, NISN, Jenjang, Semester, Kategori_Mapel, Nama_Mapel, Topik, Nilai, Timestamp` |
-| **Log_Panggilan** | `ID_Panggilan, Tanggal, NISN, Kategori, Alasan, Tanggal_Pemanggilan, Waktu_Diskusi, Hasil_Pertemuan, Status_Selesai, Bukti_File_URL` |
+| **Log_Panggilan** | `ID_Panggilan, Tanggal, ID_Siswa, NISN, Kategori, Alasan, Tanggal_Pemanggilan, Waktu_Diskusi, Hasil_Pertemuan, Status_Selesai, Bukti_File_URL` |
 | **Catatan_Terlambat** | `ID_Terlambat, Tanggal, ID_Siswa, NISN, Nama_Siswa, Keterangan, Dicatat_Oleh, Created_At` |
 | **Profil_Wali_Kelas** | `Id_Wali, Nama, Email, Bio, Gaya_Ajar, Kontak, Created_At, Nominal_Iuran, Kelas` |
 | **Lokasi** | `ID_Lokasi, Nama_Lokasi, Deskripsi, Alamat, Latitude, Longitude, Lokasi, Created_By, Created_By_Email, Created_At` |
 | **Notifikasi** | `ID, Message, Type, Target_Email, Is_Read, Timestamp, Target_Role, Role, Email` |
 | **Piket** | `ID_Piket, Hari, ID_Siswa, Nama_Siswa, Email` |
 
-**Sheet Arsip (dibuat otomatis oleh trigger bulanan):**
+**Sheet Arsip (dibuat otomatis oleh `ensureArchiveSheets()` saat setup dan sebelum pengarsipan):**
 
 | Nama Sheet | Header (baris 1) |
 |---|---|
 | **Archive_Rekap_Absensi** | `ID_Siswa, Bulan, H, I, S, A, B` |
 | **Archive_Rekap_Keuangan** | `Bulan, Saldo_Awal, Total_Masuk, Total_Keluar, Saldo_Akhir` |
 | **Archive_Detail_Absensi** | `ID_Presensi, Tanggal, ID_Siswa, NISN, Status_Pagi, Timestamp_Pagi, Status_Siang, Timestamp_Siang, Keterangan` |
+| **Archive_Catatan_Terlambat** | `ID_Terlambat, Tanggal, ID_Siswa, NISN, Nama_Siswa, Keterangan, Dicatat_Oleh, Created_At` |
+| **Archive_Detail_Keuangan** | `ID_Transaksi, Tanggal, ID_Siswa, NISN, Tipe, Jumlah, Keterangan` |
 
-> **Catatan Penting:** Nama sheet dan header **HARUS PERSIS** termasuk huruf besar/kecil dan underscore. Aplikasi akan error jika ada ketidakcocokan nama sheet.
+> **Catatan Penting:** Nama sheet dan header **HARUS PERSIS** termasuk huruf besar/kecil dan underscore. Cara paling aman adalah membiarkan `setupSpreadsheet()` yang membuat sheet beserta headernya. Jangan membuat sheet arsip manual dengan nama yang berbeda.
 
 ---
 
@@ -121,27 +124,30 @@ Buat **Google Spreadsheet** baru. Aplikasi akan membuat semua sheet secara otoma
 8. **Izinkan (Grant) semua permission** yang diminta saat pertama deploy. Jika ada peringatan "This app isn't verified", klik **Advanced** > **Go to SiswaHub_API (unsafe)** — ini aman karena script Anda sendiri.
 9. Setelah deploy berhasil, **salin Web App URL** (contoh: `https://script.google.com/macros/s/ABCDEF12345/exec`). URL ini akan digunakan di frontend.
 
-> **⚠️ PENTING:** Setiap kali Anda mengubah kode `Code.gs`, Anda harus melakukan **Deploy > New Deployment** (atau **Manage Deployments > Deploy**) agar perubahan diterapkan. Deploy ulang akan menghasilkan URL baru.
+> **⚠️ PENTING:** Setiap kali Anda mengubah kode `Code.gs`, Anda harus melakukan **Deploy > New Deployment** (atau **Manage Deployments > Deploy**) agar perubahan diterapkan. URL Web App (`/exec`) tetap sama, yang berubah adalah versi deployment yang aktif — jadi URL di `.env` tidak perlu diganti.
 
 #### Menjalankan Setup Awal Spreadsheet
 
-Setelah deploy pertama, buka URL Web App Anda dan tambahkan parameter `?action=SETUP` di akhir URL:
+Fungsi `setupSpreadsheet()` **tidak** bisa dipanggil lewat parameter URL Web App. Web App hanya menerima permintaan **POST** dengan body JSON. Jalankan fungsi tersebut langsung dari editor Apps Script:
 
-```
-https://script.google.com/macros/s/ABCDEF12345/exec?action=SETUP
-```
+1. Buka proyek `SiswaHub_API` di editor Apps Script.
+2. Pilih fungsi `setupSpreadsheet` pada dropdown fungsi di toolbar.
+3. Klik **Run** dan setujui izin akses spreadsheet bila diminta.
+4. Fungsi ini membuat sheet aktif, sheet arsip, dan satu notifikasi awal sekaligus.
 
-Ini akan membuat semua sheet yang diperlukan dan mengisi data awal. Biasanya Anda perlu menjalankan ini hanya sekali.
+> **Catatan:** `setupSpreadsheet()` menggunakan `insertSheet()`, jadi jalankan **hanya sekali** pada spreadsheet yang masih kosong. Jika sheet dengan nama sama sudah ada, fungsi akan gagal karena duplikat nama sheet.
 
 #### Menjadwalkan Arsip Otomatis
 
-Untuk mengaktifkan trigger arsip bulanan (setiap tanggal 1), akses:
+Action `SETUP_TRIGGERS` baru diproses lewat POST JSON ke Web App, bukan dengan membuka URL di browser. Contoh `curl`:
 
-```
-https://script.google.com/macros/s/ABCDEF12345/exec?action=SETUP_TRIGGERS
+```bash
+curl -X POST "https://script.google.com/macros/s/ABCDEF12345/exec" \
+  -H "Content-Type: text/plain;charset=utf-8" \
+  -d '{"action":"SETUP_TRIGGERS"}'
 ```
 
-Ini akan membuat trigger time-based yang menjalankan `runMonthlyArchive()` otomatis.
+Trigger yang dibuat berjalan setiap tanggal 1 pukul 01:00 untuk mengarsipkan data bulan sebelumnya. Statusnya bisa dicek dengan action `GET_TRIGGER_STATUS` menggunakan pola POST yang sama.
 
 ---
 
@@ -178,8 +184,8 @@ Aplikasi menggunakan **Google OAuth 2.0** untuk login. Ikuti langkah berikut:
 
 ```bash
 # 1. Clone/download repository
-git clone https://github.com/username/siswa-hub.git
-cd siswa-hub
+git clone https://github.com/lukmanhasyim-ship-it/Wali-Kelas.git
+cd Wali-Kelas
 
 # 2. Install dependencies
 npm install
@@ -195,10 +201,9 @@ VITE_GOOGLE_CLIENT_ID=123456789-xxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
 
 # URL Web App dari Google Apps Script (langkah 2.9)
 VITE_GAS_API_URL=https://script.google.com/macros/s/ABCDEF12345/exec
-
-# (Opsional) Jika menggunakan Firebase
-VITE_FIREBASE_API_KEY=your-firebase-api-key
 ```
+
+Hanya dua variabel di atas yang dibaca aplikasi (`VITE_GOOGLE_CLIENT_ID` oleh `App.jsx`, `VITE_GAS_API_URL` oleh `utils/gasClient.js`). Firebase dipakai untuk hosting statis saja, jadi tidak perlu variabel environment Firebase.
 
 ```bash
 # 4. Jalankan development server
@@ -231,12 +236,9 @@ npx firebase init
 
 # 5. Deploy
 npx firebase deploy
-
-# 6. (Opsional) Jika menggunakan Firebase Authentication:
-#    - Di Firebase Console > Authentication > Sign-in method
-#    - Aktifkan provider Google
-#    - Masukkan Client ID dan Client Secret dari Google Cloud Console
 ```
+
+> Firebase di sini hanya berfungsi sebagai **hosting statis** untuk folder `dist`. Proses login sepenuhnya memakai Google OAuth (Google Identity Services) di sisi klien, jadi tidak perlu mengaktifkan Firebase Authentication.
 
 ---
 
@@ -244,7 +246,7 @@ npx firebase deploy
 
 Setelah semua terhubung, login sebagai **Wali Kelas** (email harus terdaftar di sheet `Profil_Wali_Kelas`).
 
-1. **Master Siswa**: Impor data siswa via halaman Siswa > Tambah/Import.
+1. **Master Siswa**: Impor data siswa via halaman **Data Siswa** > Tambah/Import.
 2. **Profil Wali Kelas**: Isi manual di sheet `Profil_Wali_Kelas` (minimal: Id_Wali, Nama, Email, Kelas).
 3. **Setoran Iuran**: Atur nominal iuran di Profil Wali Kelas (kolom `Nominal_Iuran`).
 4. **Piket**: Atur jadwal piket di halaman Piket.
@@ -255,10 +257,18 @@ Setelah semua terhubung, login sebagai **Wali Kelas** (email harus terdaftar di 
 ## 🔄 Alur Kerja Utama
 
 ### Presensi Harian
-1. Buka halaman Presensi.
-2. Pilih tanggal.
+1. Buka halaman **Presensi Pagi** atau **Presensi Siang** (menu grup Presensi).
+2. Pilih tanggal yang akan dicatat.
 3. Klik status per siswa: **H** (Hadir), **S** (Sakit), **I** (Ijin), **A** (Alfa), **B** (Bolos).
-4. Status Siang bisa diisi terpisah (menggantikan Status Pagi jika berbeda).
+4. Kedua sesi disimpan terpisah di sheet `Presensi` (`Status_Pagi` / `Status_Siang` beserta timestamp-nya).
+
+### Kas Kelas
+1. Buka halaman **KAS Kelas**.
+2. Pilih siswa, masukkan jumlah, tipe (**Masuk** / **Keluar**), keterangan, dan tanggal.
+3. Klik **Catat Kas** — transaksi masuk ke **antrean lokal** (belum tersimpan di Sheet).
+4. Ulangi untuk beberapa transaksi. Draft form dan antrean tetap bertahan setelah halaman di-refresh.
+5. Klik **Simpan Transaksi (n)** di bawah daftar antrean. Seluruh antrean dikirim sekaligus lewat `BULK_CREATE`.
+6. Setelah berhasil, antrean dikosongkan, data tabel di-refresh di tempat, dan halaman tetap di `/keuangan` (tidak kembali ke dashboard maupun di-reload).
 
 ### Panggilan Orang Tua
 1. Sistem mendeteksi **3x Alfa** dalam sebulan → alert "Siap Panggil".
@@ -271,51 +281,95 @@ Setelah semua terhubung, login sebagai **Wali Kelas** (email harus terdaftar di 
 
 ### Catatan Terlambat
 1. Buka halaman **Catatan Terlambat** (menu sidebar di grup Presensi).
-2. Cari siswa, pilih tanggal, isi keterangan (opsional), klik **Catat**.
-3. Data tersimpan di sheet `Catatan_Terlambat`, terpisah dari Presensi.
-4. Satu siswa hanya bisa dicatat sekali per hari (duplikasi dicegah otomatis).
+2. Pastikan tanggal yang diinginkan sudah dipilih di header — antrean disimpan **per tanggal**, antrean tanggal lain tidak tercampur.
+3. Cari siswa, isi keterangan (opsional), lalu klik **Catat Terlambat**. Siswa masuk ke antrean lokal, belum langsung ditulis ke Sheet.
+4. Klik **Simpan Catatan (n)** di bawah daftar antrean untuk mengirim seluruh catatan tanggal itu sekaligus lewat `BULK_CREATE_TERLAMBAT`.
+5. Satu siswa maksimal satu catatan per hari. Jika ada duplikat (baik di antrean maupun di Sheet), **seluruh antrean ditolak** dan Anda diminta memperbaikinya terlebih dahulu. Hasilnya hanya muncul sebagai toast ringkas.
+
+---
+
+## 👥 Peran & Hak Akses
+
+Aplikasi mengenal delapan peran. Peran menentukan menu yang tampil di sidebar/navigasi bawah dan route yang boleh diakses. Jika pengguna membuka route yang tidak diizinkan, mereka dialihkan ke Dashboard.
+
+| Peran | Akses utama |
+|---|---|
+| **Wali Kelas** | Semua menu: Data Siswa, Buku Klaper, Leger, Tanggungan KAS, KAS Kelas, Presensi Pagi/Siang, Catatan Terlambat, Laporan Akhir, Laporan Harian, Log Panggilan, Jadwal Piket |
+| **Ketua Kelas / Wakil Ketua Kelas** | Presensi Pagi/Siang, KAS Kelas, Jadwal Piket |
+| **Bendahara / Wakil Bendahara** | Tanggungan KAS, KAS Kelas, Jadwal Piket |
+| **Sekretaris / Wakil Sekretaris** | Presensi Pagi/Siang, Jadwal Piket |
+| **Siswa** | Dashboard, Profil, Jadwal Piket, Notifikasi, Feedback |
+
+Semua peran bisa mengakses **Dashboard, Profil, Notifikasi, Feedback, dan Jadwal Piket**. Role disimpan di `wali_kelas_user` pada `localStorage` saat login dan dipakai oleh `config/navigation.js` sebagai sumber kebenaran tunggal untuk navigasi maupun pembatasan route.
 
 ---
 
 ## 🧩 Struktur Proyek
 
 ```
-siswa-hub/
+Wali-Kelas/
 ├── gas/
-│   └── Code.gs                  # Backend Google Apps Script (semua logika)
-├── public/
-│   └── (favicon, manifest, dll)
+│   └── Code.gs                  # Backend Google Apps Script (semua logika + action API)
+├── public/                      # Aset statis (favicon, logo, dll)
 ├── src/
 │   ├── components/              # Komponen React reusable
-│   │   ├── StudentCard.jsx      # Kartu siswa (alert dashboard)
-│   │   ├── ImageLightbox.jsx    # Preview gambar fullscreen
-│   │   ├── Loading.jsx          # Loading spinner
+│   │   ├── navigation/          # BottomNav + style navigasi bawah
+│   │   ├── Breadcrumbs.jsx      # Jejak navigasi halaman
+│   │   ├── ErrorBoundary.jsx    # Penangkap error render
+│   │   ├── Loading.jsx          # Fallback lazy route
 │   │   ├── Skeleton.jsx         # Skeleton loading
-│   │   └── EmptyState.jsx       # State kosong
+│   │   ├── EmptyState.jsx       # State kosong
+│   │   ├── StudentCard.jsx      # Kartu alert siswa di dashboard
+│   │   ├── ImageLightbox.jsx    # Preview gambar fullscreen
+│   │   ├── NotificationDrawer.jsx
+│   │   ├── PageGuide.jsx        # Panduan singkat tiap halaman
+│   │   ├── SearchModal.jsx      # Pencarian cepat
+│   │   ├── Toast.jsx            # Panel toast
+│   │   ├── UpdateCheck.jsx      # Panel pengecekan versi di Profil
+│   │   └── Layout.jsx           # Shell: sidebar, header, navigasi bawah
+│   ├── config/
+│   │   └── navigation.js        # Daftar menu + pembatasan role (sumber kebenaran)
 │   ├── context/
 │   │   ├── AuthContext.jsx      # Context autentikasi Google OAuth
 │   │   └── ToastContext.jsx     # Context notifikasi toast
+│   ├── lib/
+│   │   └── queryClient.js       # Instance TanStack Query
 │   ├── pages/
-│   │   ├── Dashboard.jsx        # Halaman utama (alert + statistik)
-│   │   ├── Presensi.jsx         # Presensi harian
-│   │   ├── Keuangan.jsx         # Manajemen kas kelas
-│   │   ├── Panggilan.jsx        # Log panggilan & home visit
-│   │   ├── CatatanTerlambat.jsx # Catatan siswa terlambat
-│   │   ├── Laporan.jsx          # Laporan komprehensif
-│   │   ├── Nilai.jsx            # Input dan rekap nilai
-│   │   ├── Siswa.jsx            # Manajemen data siswa
+│   │   ├── Dashboard.jsx        # Alert + statistik utama
+│   │   ├── MasterSiswa.jsx      # Data siswa (import/ekspor)
+│   │   ├── PresensiPagi.jsx     # Presensi sesi pagi
+│   │   ├── PresensiSiang.jsx    # Presensi sesi siang
+│   │   ├── Presensi.jsx         # Presensi umum (route non-menu)
 │   │   ├── Piket.jsx            # Jadwal piket
-│   │   └── Lainnya.jsx          # Pengaturan profil wali kelas
+│   │   ├── CatatanTerlambat.jsx # Antrean catatan terlambat per tanggal
+│   │   ├── Keuangan.jsx         # KAS kelas + antrean transaksi
+│   │   ├── Tanggungan.jsx       # Tagihan KAS
+│   │   ├── Panggilan.jsx        # Log panggilan & home visit
+│   │   ├── Laporan.jsx          # Laporan akhir komprehensif
+│   │   ├── LaporanHarian.jsx    # Rekap harian
+│   │   ├── BukuKlaper.jsx       # Buku klaper
+│   │   ├── DKN.jsx              # Leger digital
+│   │   ├── Profile.jsx          # Profil + Update Sistem
+│   │   ├── Notifications.jsx    # Pusat notifikasi
+│   │   ├── Feedback.jsx         # Kirim feedback
+│   │   ├── Login.jsx            # Login Google OAuth
+│   │   ├── Register.jsx         # Pendaftaran
+│   │   ├── Terms.jsx            # Syarat & ketentuan
+│   │   └── Privacy.jsx          # Kebijakan privasi
 │   ├── utils/
-│   │   ├── gasClient.js         # Helper fetch ke GAS Web App
-│   │   ├── logic.js             # Fungsi utilitas (format, kalkulasi)
-│   │   └── notifications.js     # Kirim notifikasi via GAS
-│   ├── App.jsx                  # Root komponen + routing
+│   │   ├── gasClient.js         # Helper POST ke GAS + cache TanStack Query
+│   │   ├── logic.js             # Format, kalkulasi, tanggal
+│   │   ├── notifications.js     # Kirim notifikasi via GAS
+│   │   ├── version.js           # Versi aplikasi + pengecekan update GitHub
+│   │   ├── coordinates.js       # Konversi koordinat DMS
+│   │   └── xlsxLoader.js        # Loader XLSX via CDN SheetJS
+│   ├── App.jsx                  # Routing + proteksi role
 │   └── main.jsx                 # Entry point Vite
 ├── .env                         # Environment variables (TIDAK di-commit)
-├── package.json
-├── vite.config.js
+├── firebase.json                # Konfigurasi Firebase Hosting (public: dist)
+├── vite.config.js               # Vite + PWA service worker
 ├── tailwind.config.js
+├── package.json
 └── README.md
 ```
 
@@ -323,12 +377,14 @@ siswa-hub/
 
 ## 💻 Tech Stack
 
-*   **Frontend**: React 19, Vite 7, Tailwind CSS 3.4, Recharts, date-fns, Lucide Icons
-*   **Backend**: Google Apps Script (GAS) dengan runtime V8
-*   **Database**: Google Sheets (Cloud-based Spreadsheet)
-*   **Autentikasi**: Google OAuth 2.0 (via Google Identity Services)
-*   **Integrasi**: Google Drive API (upload & read file), Google Sheets API
-*   **Hosting**: Firebase Hosting (PWA-enabled via vite-plugin-pwa)
+*   **Frontend**: React 19, Vite 7, React Router 7, Tailwind CSS 3.4, Recharts, date-fns, Lucide Icons
+*   **State & Data**: TanStack Query untuk cache server-state; `localStorage` untuk draft/antrean dan sesi login
+*   **Backend**: Google Apps Script (GAS) runtime V8 — API berbasis action lewat POST JSON
+*   **Database**: Google Sheets (sheet aktif + sheet arsip bulanan)
+*   **Autentikasi**: Google OAuth 2.0 via Google Identity Services (`@react-oauth/google`)
+*   **Integrasi**: Google Drive (upload bukti & `GET_FILE` base64), Google Sheets API, GitHub REST API untuk pengecekan versi
+*   **Ekspor/Impor**: SheetJS (xlsx), jsPDF + html2canvas
+*   **Hosting**: Firebase Hosting; PWA dengan service worker auto-update via `vite-plugin-pwa`
 
 ---
 
@@ -338,6 +394,9 @@ siswa-hub/
 *   **Ketersediaan**: Pastikan spreadsheet tidak dihapus/dipindahkan. Cadangan (backup) spreadsheet secara berkala.
 *   **Keamanan**: GAS Web App dijalankan sebagai **pemilik script** (Anda). File yang diupload ke Drive hanya bisa diakses oleh script via `DriveApp.getFileById()` — tidak ada akses publik.
 *   **CORS**: GAS Web App sudah mendukung CORS. Jika ada error CORS, pastikan Anda mendeploy ulang setelah perubahan.
+*   **Deploy Backend**: Setiap perubahan `gas/Code.gs` **wajib** di-deploy ulang lewat **Deploy → New Deployment** (bukan hanya Save/Update deployment). Action baru seperti `BULK_CREATE_TERLAMBAT` tidak akan dikenal sampai deployment baru aktif — frontend akan menampilkan pesan "Unknown action" sebagai petunjuk.
+*   **Deploy Frontend**: Setiap perubahan kode harus diikuti `npm run build` lalu deploy ulang folder `dist`. Karena service worker PWA menyimpan bundle lama, lakukan **hard refresh** (Ctrl+Shift+R) atau hapus service worker jika nomor versi di sidebar belum berubah.
+*   **Versi Aplikasi**: Nomor versi dibaca dari `package.json`, ditampilkan di sidebar/login dan di panel **Profil → Update Sistem**. Keduanya akan sinkron setelah bundle baru berhasil di-deploy.
 
 ---
 

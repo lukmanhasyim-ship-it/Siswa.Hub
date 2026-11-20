@@ -42,6 +42,10 @@ function readCachedCheck() {
     const parsed = JSON.parse(raw)
     if (!parsed || typeof parsed.checkedAt !== 'number') return null
 
+    // Cache hasil pengecekan PASTI milik versi aplikasi yang sama.
+    // Tanpa ini, setelah deploy versi baru hasil lama dipakai sampai TTL habis.
+    if (!parsed.result || parsed.result.currentVersion !== getCurrentVersion()) return null
+
     const ttl = parsed.result?.error ? ERROR_TTL : UPDATE_TTL
     if (Date.now() - parsed.checkedAt > ttl) return null
     return parsed.result
