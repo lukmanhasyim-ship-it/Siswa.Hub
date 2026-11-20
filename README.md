@@ -15,6 +15,9 @@
 *   **Simpan Massal & Draft**: Tombol **Simpan Catatan** di bawah daftar antrean mengirim seluruh catatan tanggal itu dalam satu permintaan `BULK_CREATE_TERLAMBAT`. Draft keterangan dan antrean bertahan setelah halaman di-refresh.
 *   **Proteksi Duplikat**: Satu siswa maksimal satu catatan per hari. Jika ada duplikat saat penyimpanan, seluruh antrean ditolak dan user diminta memperbaiki terlebih dahulu. Notifikasi cukup berupa toast ringkas.
 *   **Simpan Kas Tanpa Pindah Halaman**: Tombol **Simpan Transaksi** kini menyegarkan data di tempat. Browser tidak di-reload dan pengguna tetap berada di halaman KAS setelah transaksi tersimpan.
+*   **Navigasi Lebih Ringan**: Halaman berat (Dashboard, Master Siswa, Laporan, DKN, Tanggungan, dan Buku Klaper) kini dimuat secara lazy per rute, sehingga bundle awal lebih kecil dan perpindahan halaman lebih responsif.
+*   **Pengecekan Update Lebih Akurat**: Cache hasil pengecekan versi kini diverifikasi terhadap nomor versi aplikasi yang aktif. Hasil lama tidak lagi dipakai setelah deploy versi baru walaupun TTL belum habis.
+*   **Dependensi Terbaru**: `xlsx` diperbarui ke 0.20.3 dari CDN resmi SheetJS dan `react-router-dom` ke 7.18.6 untuk kompatibilitas dengan React 19.
 
 ---
 
@@ -184,8 +187,8 @@ Aplikasi menggunakan **Google OAuth 2.0** untuk login. Ikuti langkah berikut:
 
 ```bash
 # 1. Clone/download repository
-git clone https://github.com/lukmanhasyim-ship-it/Wali-Kelas.git
-cd Wali-Kelas
+git clone https://github.com/lukmanhasyim-ship-it/Siswa.Hub.git
+cd Siswa.Hub
 
 # 2. Install dependencies
 npm install
